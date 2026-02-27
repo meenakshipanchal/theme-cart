@@ -1,392 +1,436 @@
+{% comment %}
+  =====================================================
+  DYNAMIC REWARDS PROGRESS BAR
+  =====================================================
+  To add/remove milestones, just edit the config below.
+  The bar auto-adjusts spacing for any number of milestones.
+
+  Each milestone needs:
+    - threshold (in paise, e.g. 49900 = ₹499)
+    - display  (display amount, e.g. "499")
+    - label    (e.g. "Free Shipping")
+    - icon     (truck / gift / star / percent)
+    - message  (what to show when user hasn't reached it)
+    - success  (what to show when all milestones unlocked)
+  =====================================================
+{% endcomment %}
+
 {% liquid
-  assign free_shipping_threshold = 49900
-  assign first_gift_threshold = 149900
-  assign first_delivery = 499
-  assign first_gift_value = 1499
+  comment
+    ======= MILESTONE CONFIG - EDIT HERE =======
+    Add or remove milestones as needed.
+    They MUST be in ascending order of threshold.
+  endcomment
+
+  assign milestone_count = 2
+
+  assign ms_1_threshold = 49900
+  assign ms_1_display = '499'
+  assign ms_1_label = 'Free Shipping'
+  assign ms_1_icon = 'truck'
+  assign ms_1_msg = 'FREE Shipping'
+
+  assign ms_2_threshold = 149900
+  assign ms_2_display = '1499'
+  assign ms_2_label = 'Free Gift'
+  assign ms_2_icon = 'gift'
+  assign ms_2_msg = 'FREE Surprise Gift'
+
+  comment
+    Uncomment below to add milestone 3:
+    assign milestone_count = 3
+    assign ms_3_threshold = 249900
+    assign ms_3_display = '2499'
+    assign ms_3_label = 'Premium Gift'
+    assign ms_3_icon = 'star'
+    assign ms_3_msg = 'a Premium Gift'
+  endcomment
+
+  comment
+    Uncomment below to add milestone 4:
+    assign milestone_count = 4
+    assign ms_4_threshold = 349900
+    assign ms_4_display = '3499'
+    assign ms_4_label = 'VIP Reward'
+    assign ms_4_icon = 'percent'
+    assign ms_4_msg = 'VIP Reward'
+  endcomment
+
   assign current_cart_total = cart.total_price
 
-  assign shipping_reached = false
-  assign gift_reached = false
-  if current_cart_total >= free_shipping_threshold
-    assign shipping_reached = true
-  endif
-  if current_cart_total >= first_gift_threshold
-    assign gift_reached = true
-  endif
-
+  comment
+    Calculate progress: each milestone gets equal segment (100/count)%
+  endcomment
+  assign segment_size = 100 | divided_by: milestone_count
   assign progress_percent = 0
-  if gift_reached
-    assign progress_percent = 100
-  elsif shipping_reached
-    assign diff = current_cart_total | minus: free_shipping_threshold
-    assign range = first_gift_threshold | minus: free_shipping_threshold
-    assign segment = diff | times: 100 | divided_by: range
-    assign segment_half = segment | divided_by: 2
-    assign progress_percent = 50 | plus: segment_half
-  else
-    if current_cart_total > 0
-      assign progress_percent = current_cart_total | times: 50 | divided_by: free_shipping_threshold
-    endif
-  endif
+  assign reached_count = 0
+  assign next_milestone_msg = ''
+  assign next_milestone_remaining = 0
+  assign all_reached = false
 %}
 
-<div class="rpb-container" id="rewardsProgressBar">
-  <!-- Dynamic Message Banner -->
-  <div class="rpb-message" id="rpbMessage">
-    {% if gift_reached %}
-      <span class="rpb-msg-success">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3.54 6.29l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 111.06-1.06L7 8.77l3.47-3.47a.75.75 0 111.06 1.06z" fill="#235A49"/></svg>
-        You've unlocked FREE Shipping + FREE Surprise Gift!
-      </span>
-    {% elsif shipping_reached %}
-      {% assign gift_remaining = first_gift_threshold | minus: current_cart_total | divided_by: 100 %}
-      <span class="rpb-msg-progress">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 0C3.13 0 0 3.13 0 7s3.13 7 7 7 7-3.13 7-7S10.87 0 7 0zm.5 10.5h-1v-1h1v1zm0-2h-1v-5h1v5z" fill="#D4880F"/></svg>
-        Add <strong>&#8377;{{ gift_remaining }}</strong> more to unlock a <strong>FREE Surprise Gift!</strong>
-      </span>
+{% comment %} Calculate reached milestones and progress {% endcomment %}
+{% for i in (1..milestone_count) %}
+  {% case i %}
+    {% when 1 %}
+      {% assign this_threshold = ms_1_threshold %}
+      {% assign this_msg = ms_1_msg %}
+    {% when 2 %}
+      {% assign this_threshold = ms_2_threshold %}
+      {% assign this_msg = ms_2_msg %}
+    {% when 3 %}
+      {% assign this_threshold = ms_3_threshold %}
+      {% assign this_msg = ms_3_msg %}
+    {% when 4 %}
+      {% assign this_threshold = ms_4_threshold %}
+      {% assign this_msg = ms_4_msg %}
+  {% endcase %}
+
+  {% if current_cart_total >= this_threshold %}
+    {% assign reached_count = reached_count | plus: 1 %}
+  {% elsif next_milestone_msg == '' %}
+    {% assign next_milestone_msg = this_msg %}
+    {% assign next_milestone_remaining = this_threshold | minus: current_cart_total | divided_by: 100 %}
+  {% endif %}
+{% endfor %}
+
+{% if reached_count == milestone_count %}
+  {% assign all_reached = true %}
+  {% assign progress_percent = 100 %}
+{% elsif reached_count > 0 %}
+  {% comment %} Fully fill reached segments + partial for current segment {% endcomment %}
+  {% assign filled_segments = reached_count | times: segment_size %}
+
+  {% comment %} Get current and previous thresholds for partial calc {% endcomment %}
+  {% assign prev_threshold = 0 %}
+  {% assign curr_threshold = 0 %}
+  {% assign next_index = reached_count | plus: 1 %}
+  {% case reached_count %}
+    {% when 1 %}{% assign prev_threshold = ms_1_threshold %}
+    {% when 2 %}{% assign prev_threshold = ms_2_threshold %}
+    {% when 3 %}{% assign prev_threshold = ms_3_threshold %}
+  {% endcase %}
+  {% case next_index %}
+    {% when 1 %}{% assign curr_threshold = ms_1_threshold %}
+    {% when 2 %}{% assign curr_threshold = ms_2_threshold %}
+    {% when 3 %}{% assign curr_threshold = ms_3_threshold %}
+    {% when 4 %}{% assign curr_threshold = ms_4_threshold %}
+  {% endcase %}
+
+  {% assign seg_diff = current_cart_total | minus: prev_threshold %}
+  {% assign seg_range = curr_threshold | minus: prev_threshold %}
+  {% if seg_range > 0 %}
+    {% assign partial = seg_diff | times: segment_size | divided_by: seg_range %}
+  {% else %}
+    {% assign partial = 0 %}
+  {% endif %}
+  {% assign progress_percent = filled_segments | plus: partial %}
+{% else %}
+  {% comment %} Haven't reached first milestone {% endcomment %}
+  {% if current_cart_total > 0 %}
+    {% assign progress_percent = current_cart_total | times: segment_size | divided_by: ms_1_threshold %}
+  {% endif %}
+{% endif %}
+
+<div class="rpb" id="rewardsProgressBar">
+  <!-- Message -->
+  <div class="rpb__msg" id="rpbMessage">
+    {% if all_reached %}
+      <div class="rpb__pill">All rewards unlocked!</div>
     {% else %}
-      {% assign ship_remaining = free_shipping_threshold | minus: current_cart_total | divided_by: 100 %}
-      <span class="rpb-msg-progress">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 0C3.13 0 0 3.13 0 7s3.13 7 7 7 7-3.13 7-7S10.87 0 7 0zm.5 10.5h-1v-1h1v1zm0-2h-1v-5h1v5z" fill="#D4880F"/></svg>
-        Add <strong>&#8377;{{ ship_remaining }}</strong> more to get <strong>FREE Shipping!</strong>
-      </span>
+      <div class="rpb__msg-text">Add <strong>&#8377;{{ next_milestone_remaining }}</strong> more for <strong>{{ next_milestone_msg }}!</strong></div>
     {% endif %}
   </div>
 
-  <!-- Progress Track -->
-  <div class="rpb-track-wrapper">
-    <!-- Start dot -->
-    <div class="rpb-start-dot {% if current_cart_total > 0 %}filled{% endif %}"></div>
+  <!-- Progress bar area -->
+  <div class="rpb__area" style="--ms-count: {{ milestone_count }};">
+    <!-- Track -->
+    <div class="rpb__track">
+      <div class="rpb__fill" id="rpbFill" style="width: {{ progress_percent }}%;"></div>
 
-    <!-- Track background -->
-    <div class="rpb-track">
-      <div class="rpb-track-fill" id="rpbTrackFill" style="width: {{ progress_percent }}%;"></div>
+      {% comment %} Render marker dots on the track {% endcomment %}
+      {% for i in (1..milestone_count) %}
+        {% assign pos = i | times: segment_size %}
+        {% case i %}
+          {% when 1 %}{% assign t = ms_1_threshold %}
+          {% when 2 %}{% assign t = ms_2_threshold %}
+          {% when 3 %}{% assign t = ms_3_threshold %}
+          {% when 4 %}{% assign t = ms_4_threshold %}
+        {% endcase %}
+        <div class="rpb__dot {% if current_cart_total >= t %}done{% endif %}" style="left: {{ pos }}%;">
+          {% if current_cart_total >= t %}
+            <svg viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
 
-    <!-- Milestone: Free Shipping -->
-    <div class="rpb-milestone {% if shipping_reached %}reached{% endif %}" style="left: 50%;">
-      <div class="rpb-milestone-icon">
-        {% if shipping_reached %}
-          <svg width="14" height="14" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        {% else %}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        {% endif %}
-      </div>
-      <span class="rpb-milestone-label">Free Shipping</span>
-      <span class="rpb-milestone-value">&#8377;{{ first_delivery }}+</span>
-    </div>
-
-    <!-- Milestone: Free Gift -->
-    <div class="rpb-milestone {% if gift_reached %}reached{% endif %}" style="left: 100%;">
-      <div class="rpb-milestone-icon">
-        {% if gift_reached %}
-          <svg width="14" height="14" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        {% else %}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-        {% endif %}
-      </div>
-      <span class="rpb-milestone-label">Free Gift</span>
-      <span class="rpb-milestone-value">&#8377;{{ first_gift_value }}+</span>
+    <!-- Labels -->
+    <div class="rpb__labels">
+      {% for i in (1..milestone_count) %}
+        {% assign pos = i | times: segment_size %}
+        {% case i %}
+          {% when 1 %}
+            {% assign t = ms_1_threshold %}{% assign lbl = ms_1_label %}{% assign dsp = ms_1_display %}{% assign ico = ms_1_icon %}
+          {% when 2 %}
+            {% assign t = ms_2_threshold %}{% assign lbl = ms_2_label %}{% assign dsp = ms_2_display %}{% assign ico = ms_2_icon %}
+          {% when 3 %}
+            {% assign t = ms_3_threshold %}{% assign lbl = ms_3_label %}{% assign dsp = ms_3_display %}{% assign ico = ms_3_icon %}
+          {% when 4 %}
+            {% assign t = ms_4_threshold %}{% assign lbl = ms_4_label %}{% assign dsp = ms_4_display %}{% assign ico = ms_4_icon %}
+        {% endcase %}
+        <div class="rpb__lbl {% if current_cart_total >= t %}done{% endif %}" style="left: {{ pos }}%;">
+          <span class="rpb__ico">
+            {% if ico == 'truck' %}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            {% elsif ico == 'gift' %}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+            {% elsif ico == 'star' %}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            {% elsif ico == 'percent' %}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+            {% endif %}
+          </span>
+          <span class="rpb__lbl-t">{{ lbl }}</span>
+          <span class="rpb__lbl-v">&#8377;{{ dsp }}+</span>
+        </div>
+      {% endfor %}
     </div>
   </div>
 </div>
 
 <style>
-  .rpb-container {
-    width: 100%;
-    padding: 12px 16px 8px;
-    background: linear-gradient(135deg, #f0faf5 0%, #e8f5ee 100%);
+  .rpb {
+    padding: 10px 16px 4px;
+    background: linear-gradient(180deg, #f4faf7, #edf5f0);
     border-bottom: 1px solid #e0ebe5;
   }
 
-  /* Message Banner */
-  .rpb-message {
+  /* Message */
+  .rpb__msg {
     text-align: center;
-    margin-bottom: 14px;
-    animation: rpbFadeIn 0.4s ease;
+    margin-bottom: 10px;
   }
-
-  .rpb-msg-success {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #235A49;
-    background: rgba(35, 90, 73, 0.08);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-family: 'Roboto Slab', serif;
-    animation: rpbCelebrate 0.6s ease;
-  }
-
-  .rpb-msg-progress {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+  .rpb__msg-text {
     font-size: 12px;
     font-weight: 500;
-    color: #495057;
+    color: #555;
+    font-family: 'Roboto Slab', serif;
+  }
+  .rpb__msg-text strong {
+    color: #235A49;
+  }
+  .rpb__pill {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #235A49;
+    background: rgba(35,90,73,0.1);
+    padding: 5px 14px;
+    border-radius: 20px;
     font-family: 'Roboto Slab', serif;
   }
 
-  .rpb-msg-progress strong {
-    color: #235A49;
-    font-weight: 700;
-  }
-
-  /* Track Wrapper */
-  .rpb-track-wrapper {
+  /* Bar area - right padding so last milestone label doesn't clip */
+  .rpb__area {
     position: relative;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    margin-bottom: 28px;
-    height: 6px;
-  }
-
-  /* Start Dot */
-  .rpb-start-dot {
-    position: absolute;
-    left: 12px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d0d5dd;
-    border: 2px solid #fff;
-    z-index: 3;
-    transition: background 0.4s ease;
-  }
-
-  .rpb-start-dot.filled {
-    background: #235A49;
-    box-shadow: 0 0 0 3px rgba(35, 90, 73, 0.15);
+    padding-right: 30px;
   }
 
   /* Track */
-  .rpb-track {
-    flex: 1;
+  .rpb__track {
+    position: relative;
     height: 5px;
-    background: #d9e2dc;
+    background: #dce5df;
     border-radius: 10px;
+  }
+  .rpb__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2d7a5f, #235A49);
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     position: relative;
   }
-
-  .rpb-track-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #235A49, #3a8f6e);
-    border-radius: 10px;
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-  }
-
-  .rpb-track-fill::after {
+  .rpb__fill::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.25) 50%,
-      transparent 100%
-    );
-    animation: rpbShimmer 2s infinite;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: rpbShine 2s ease-in-out infinite;
   }
-
-  @keyframes rpbShimmer {
+  @keyframes rpbShine {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
 
-  /* Milestones */
-  .rpb-milestone {
+  /* Marker dots sitting ON the track */
+  .rpb__dot {
     position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid #c5d0c9;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: all 0.35s ease;
+  }
+  .rpb__dot svg {
+    width: 9px;
+    height: 9px;
+  }
+  .rpb__dot.done {
+    background: #235A49;
+    border-color: #235A49;
+    box-shadow: 0 0 0 3px rgba(35,90,73,0.15);
+  }
+
+  /* Labels row - positioned BELOW the track with relative layout */
+  .rpb__labels {
+    position: relative;
+    height: 46px;
+    margin-top: 2px;
+  }
+  .rpb__lbl {
+    position: absolute;
+    top: 4px;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 4;
+    gap: 0px;
   }
-
-  .rpb-milestone-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+  .rpb__ico {
+    color: #a8b2ab;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    border: 2.5px solid #d0d5dd;
-    color: #98a2b3;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    margin-top: -13px;
+    transition: color 0.3s;
   }
-
-  .rpb-milestone.reached .rpb-milestone-icon {
-    background: #235A49;
-    border-color: #235A49;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(35, 90, 73, 0.3);
-    transform: scale(1.1);
+  .rpb__lbl.done .rpb__ico {
+    color: #235A49;
   }
-
-  .rpb-milestone-label {
-    margin-top: 6px;
-    font-size: 11px;
+  .rpb__lbl-t {
+    font-size: 10.5px;
     font-weight: 600;
-    color: #6c757d;
+    color: #888;
     font-family: 'Roboto Slab', serif;
     white-space: nowrap;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
   }
-
-  .rpb-milestone.reached .rpb-milestone-label {
+  .rpb__lbl.done .rpb__lbl-t {
     color: #235A49;
     font-weight: 700;
   }
-
-  .rpb-milestone-value {
-    font-size: 10px;
-    font-weight: 500;
-    color: #98a2b3;
+  .rpb__lbl-v {
+    font-size: 9.5px;
+    color: #aaa;
     font-family: 'Roboto Slab', serif;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
   }
-
-  .rpb-milestone.reached .rpb-milestone-value {
+  .rpb__lbl.done .rpb__lbl-v {
     color: #3a8f6e;
   }
 
-  /* Animations */
-  @keyframes rpbFadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes rpbCelebrate {
-    0% { transform: scale(0.9); opacity: 0; }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* Responsive */
+  /* Mobile */
   @media (max-width: 480px) {
-    .rpb-container {
-      padding: 10px 12px 6px;
+    .rpb {
+      padding: 8px 12px 2px;
     }
-
-    .rpb-track-wrapper {
-      padding: 0 16px;
-      margin-bottom: 26px;
+    .rpb__area {
+      padding-right: 24px;
     }
-
-    .rpb-milestone-icon {
-      width: 28px;
-      height: 28px;
-      margin-top: -11px;
-    }
-
-    .rpb-milestone-icon svg {
-      width: 13px;
-      height: 13px;
-    }
-
-    .rpb-milestone.reached .rpb-milestone-icon svg {
-      width: 12px;
-      height: 12px;
-    }
-
-    .rpb-milestone-label {
-      font-size: 10px;
-      margin-top: 5px;
-    }
-
-    .rpb-milestone-value {
-      font-size: 9px;
-    }
-
-    .rpb-msg-success {
-      font-size: 11px;
-      padding: 5px 10px;
-    }
-
-    .rpb-msg-progress {
-      font-size: 11px;
-    }
-
-    .rpb-start-dot {
-      left: 8px;
-      width: 7px;
-      height: 7px;
-    }
+    .rpb__msg-text { font-size: 11px; }
+    .rpb__pill { font-size: 10.5px; padding: 4px 10px; }
+    .rpb__dot { width: 15px; height: 15px; }
+    .rpb__dot svg { width: 7px; height: 7px; }
+    .rpb__ico svg { width: 12px; height: 12px; }
+    .rpb__lbl-t { font-size: 9.5px; }
+    .rpb__lbl-v { font-size: 8.5px; }
+    .rpb__labels { height: 40px; }
   }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const fill = document.getElementById('rpbTrackFill');
+  var fill = document.getElementById('rpbFill');
   if (fill) {
+    var target = fill.style.width;
     fill.style.width = '0%';
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        fill.style.width = '{{ progress_percent }}%';
-      });
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { fill.style.width = target; });
     });
   }
 });
 
+/*
+  Dynamic update function.
+  Call: window.updateCartRewards(cartTotalInPaise)
+  Milestones config is baked in from Liquid at render time.
+*/
 window.updateCartRewards = function(cartTotal) {
-  const freeShipping = {{ free_shipping_threshold }};
-  const freeGift = {{ first_gift_threshold }};
-  const total = cartTotal || {{ current_cart_total | default: 0 }};
-  const fill = document.getElementById('rpbTrackFill');
-  const msg = document.getElementById('rpbMessage');
+  var milestones = [
+    {% for i in (1..milestone_count) %}
+      {% case i %}
+        {% when 1 %}{ threshold: {{ ms_1_threshold }}, msg: '{{ ms_1_msg }}' }{% unless milestone_count == 1 %},{% endunless %}
+        {% when 2 %}{ threshold: {{ ms_2_threshold }}, msg: '{{ ms_2_msg }}' }{% unless milestone_count == 2 %},{% endunless %}
+        {% when 3 %}{ threshold: {{ ms_3_threshold }}, msg: '{{ ms_3_msg }}' }{% unless milestone_count == 3 %},{% endunless %}
+        {% when 4 %}{ threshold: {{ ms_4_threshold }}, msg: '{{ ms_4_msg }}' }
+      {% endcase %}
+    {% endfor %}
+  ];
 
+  var total = cartTotal || {{ current_cart_total | default: 0 }};
+  var count = milestones.length;
+  var seg = 100 / count;
+  var fill = document.getElementById('rpbFill');
+  var msg = document.getElementById('rpbMessage');
   if (!fill) return;
 
-  let pct = 0;
-  let html = '';
+  var reached = 0;
+  var nextMsg = '';
+  var nextRem = 0;
 
-  if (total >= freeGift) {
-    pct = 100;
-    html = '<span class="rpb-msg-success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3.54 6.29l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 111.06-1.06L7 8.77l3.47-3.47a.75.75 0 111.06 1.06z" fill="#235A49"/></svg>You\'ve unlocked FREE Shipping + FREE Surprise Gift!</span>';
-  } else if (total >= freeShipping) {
-    const diff = total - freeShipping;
-    const range = freeGift - freeShipping;
-    pct = 50 + (diff / range) * 50;
-    const rem = Math.ceil((freeGift - total) / 100);
-    html = '<span class="rpb-msg-progress"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 0C3.13 0 0 3.13 0 7s3.13 7 7 7 7-3.13 7-7S10.87 0 7 0zm.5 10.5h-1v-1h1v1zm0-2h-1v-5h1v5z" fill="#D4880F"/></svg>Add <strong>\u20B9' + rem + '</strong> more to unlock a <strong>FREE Surprise Gift!</strong></span>';
-  } else {
-    if (total > 0) {
-      pct = (total / freeShipping) * 50;
+  for (var i = 0; i < count; i++) {
+    if (total >= milestones[i].threshold) {
+      reached++;
+    } else if (!nextMsg) {
+      nextMsg = milestones[i].msg;
+      nextRem = Math.ceil((milestones[i].threshold - total) / 100);
     }
-    const rem = Math.ceil((freeShipping - total) / 100);
-    html = '<span class="rpb-msg-progress"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 0C3.13 0 0 3.13 0 7s3.13 7 7 7 7-3.13 7-7S10.87 0 7 0zm.5 10.5h-1v-1h1v1zm0-2h-1v-5h1v5z" fill="#D4880F"/></svg>Add <strong>\u20B9' + rem + '</strong> more to get <strong>FREE Shipping!</strong></span>';
+  }
+
+  var pct = 0;
+  if (reached >= count) {
+    pct = 100;
+  } else if (reached > 0) {
+    var prevT = milestones[reached - 1].threshold;
+    var currT = milestones[reached].threshold;
+    var partial = (total - prevT) / (currT - prevT) * seg;
+    pct = reached * seg + partial;
+  } else if (total > 0) {
+    pct = (total / milestones[0].threshold) * seg;
   }
 
   fill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-  if (msg) msg.innerHTML = html;
 
-  // Update milestone states
-  document.querySelectorAll('.rpb-milestone').forEach(function(m) {
-    var threshold = parseInt(m.style.left) === 50 ? freeShipping : freeGift;
-    if (total >= threshold) {
-      m.classList.add('reached');
+  if (msg) {
+    if (reached >= count) {
+      msg.innerHTML = '<div class="rpb__pill">All rewards unlocked!</div>';
     } else {
-      m.classList.remove('reached');
+      msg.innerHTML = '<div class="rpb__msg-text">Add <strong>\u20B9' + nextRem + '</strong> more for <strong>' + nextMsg + '!</strong></div>';
     }
-  });
+  }
 
-  // Update start dot
-  var dot = document.querySelector('.rpb-start-dot');
-  if (dot) {
-    if (total > 0) dot.classList.add('filled');
-    else dot.classList.remove('filled');
+  var dots = document.querySelectorAll('.rpb__dot');
+  var lbls = document.querySelectorAll('.rpb__lbl');
+  for (var j = 0; j < count; j++) {
+    var isReached = total >= milestones[j].threshold;
+    if (dots[j]) dots[j].classList.toggle('done', isReached);
+    if (lbls[j]) lbls[j].classList.toggle('done', isReached);
   }
 };
 </script>
