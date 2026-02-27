@@ -96,42 +96,38 @@
   endfor
 
   comment
-    Calculate overall progress % for the sliding bar
-    With N milestones at equal positions, each segment = 100/N
+    Calculate overall progress % using loop (no variable indexing)
+    Each milestone gets equal segment = 100/N
   endcomment
-  assign reached_count = 0
+  assign segment_size = 100 | divided_by: ms_count
+  assign overall_progress = 0
+  assign prev_threshold = 0
+  assign progress_done = false
+
   for ms in milestones
     assign parts = ms | split: ':'
     assign ms_t = parts[0] | plus: 0
+    assign seg_index = forloop.index0
+
     if current_cart_total >= ms_t
-      assign reached_count = reached_count | plus: 1
+      assign prev_threshold = ms_t
+    elsif progress_done == false
+      assign progress_done = true
+      assign filled = seg_index | times: segment_size
+      assign seg_diff = current_cart_total | minus: prev_threshold
+      assign seg_range = ms_t | minus: prev_threshold
+      if seg_range > 0
+        assign partial = seg_diff | times: segment_size | divided_by: seg_range
+      else
+        assign partial = 0
+      endif
+      assign overall_progress = filled | plus: partial
     endif
   endfor
 
-  assign segment_size = 100 | divided_by: ms_count
-  assign overall_progress = 0
-
-  if reached_count >= ms_count
-    assign overall_progress = 100
-  elsif reached_count > 0
-    assign filled = reached_count | times: segment_size
-    assign prev_parts = milestones[reached_count] | split: ':'
-    assign next_t = prev_parts[0] | plus: 0
-    assign prev_ms = milestones[reached_count | minus: 1] | split: ':'
-    assign prev_t = prev_ms[0] | plus: 0
-    assign seg_diff = current_cart_total | minus: prev_t
-    assign seg_range = next_t | minus: prev_t
-    if seg_range > 0
-      assign partial = seg_diff | times: segment_size | divided_by: seg_range
-    else
-      assign partial = 0
-    endif
-    assign overall_progress = filled | plus: partial
-  else
-    if current_cart_total > 0
-      assign first_parts = milestones[0] | split: ':'
-      assign first_t = first_parts[0] | plus: 0
-      assign overall_progress = current_cart_total | times: segment_size | divided_by: first_t
+  if progress_done == false
+    if current_cart_total >= prev_threshold and prev_threshold > 0
+      assign overall_progress = 100
     endif
   endif
 %}
