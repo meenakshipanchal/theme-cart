@@ -162,9 +162,12 @@
     {% endif %}
   </div>
 
+  <!-- DEBUG: remove after testing -->
+  <small style="color:red; font-size:10px;">DBG: progress={{ overall_progress }}, cart={{ current_cart_total }}</small>
+
   <!-- Track -->
   <div class="rpb__track" id="rpbTrack">
-    <div class="rpb__fill" id="rpbFill" style="width: {{ overall_progress }}%;"></div>
+    <div id="rpbFill" style="width: {{ overall_progress }}%; height: 6px; background-color: #235A49; border-radius: 10px;"></div>
 
     {% comment %} Milestone dots on the track {% endcomment %}
     {% for ms in milestones %}
