@@ -116,8 +116,11 @@
         var existingVid = existingFreebie ? String(existingFreebie.variant_id) : null;
         var neededVid = qualifiedFreebie ? qualifiedFreebie.variantId : null;
 
-        // Already correct → skip
+        // Already correct → just update progress bar
         if (existingVid === neededVid) {
+          if (typeof window.updateCartRewards === 'function') {
+            window.updateCartRewards(realTotal);
+          }
           _processing = false;
           return;
         }
