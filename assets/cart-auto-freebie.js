@@ -54,6 +54,14 @@
     });
   }
 
+  /** Instantly hide freebie items from DOM (before API call completes) */
+  function hideFreebieItems() {
+    var freebieEls = document.querySelectorAll('[data-freebie]');
+    for (var i = 0; i < freebieEls.length; i++) {
+      freebieEls[i].style.display = 'none';
+    }
+  }
+
   /** Apply section HTML from API response directly — no extra fetch */
   function applySectionHTML(response) {
     var html = response && response.sections && response.sections[SECTION_ID];
@@ -116,22 +124,28 @@
         var existingVid = existingFreebie ? String(existingFreebie.variant_id) : null;
         var neededVid = qualifiedFreebie ? qualifiedFreebie.variantId : null;
 
-        // Already correct → just update progress bar
+        // Update progress bar immediately (before any API calls)
+        if (typeof window.updateCartRewards === 'function') {
+          window.updateCartRewards(realTotal);
+        }
+
+        // Already correct → done
         if (existingVid === neededVid) {
-          if (typeof window.updateCartRewards === 'function') {
-            window.updateCartRewards(realTotal);
-          }
           _processing = false;
           return;
         }
 
+        // Freebie needs to be removed or swapped → hide it INSTANTLY from UI
+        if (existingFreebie) {
+          hideFreebieItems();
+        }
+
         // Build chain: remove old → add new
-        // Last call in chain returns sections HTML, so no extra refresh needed
         var chain = Promise.resolve();
         var lastResponse = null;
 
         if (existingFreebie && qualifiedFreebie) {
-          // Swap: remove old (skip sections), add new (with sections)
+          // Swap: remove old, add new
           chain = chain
             .then(function () { return removeItem(existingFreebie.key); })
             .then(function () { return addItem(qualifiedFreebie.variantId); })
@@ -151,7 +165,6 @@
         return chain.then(function () {
           if (lastResponse) {
             applySectionHTML(lastResponse);
-            // Update rewards slider after DOM replacement
             if (typeof window.updateCartRewards === 'function') {
               window.updateCartRewards(realTotal);
             }
@@ -175,7 +188,7 @@
   if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
     subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
       if (event.source === 'auto-freebie') return;
-      setTimeout(manageFreebie, 80);
+      setTimeout(manageFreebie, 50);
     });
   }
 

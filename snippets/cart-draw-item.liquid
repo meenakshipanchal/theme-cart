@@ -23,6 +23,7 @@
   style="border: 0.52px solid black; background-color: "
   id="CartDrawer-Item-{{ item.index | plus: 1 }}"
   class="cart-item"
+  {% if is_freebie %}data-freebie="true"{% endif %}
 >
   {%- comment -%}
     ===== PRODUCT IMAGE SECTION =====
