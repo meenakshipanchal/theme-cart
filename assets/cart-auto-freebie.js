@@ -59,16 +59,24 @@
     var html = response && response.sections && response.sections[SECTION_ID];
     if (!html) return;
     var doc = new DOMParser().parseFromString(html, 'text/html');
-    // Replace entire drawer inner to handle empty ↔ non-empty transitions correctly
     var oldDrawer = document.querySelector('#CartDrawer');
     var newDrawer = doc.querySelector('#CartDrawer');
     if (oldDrawer && newDrawer) {
       oldDrawer.innerHTML = newDrawer.innerHTML;
-      // Update is-empty class on cart-drawer element
+      // Update is-empty class but PRESERVE active/animate classes
       var cartDrawerEl = document.querySelector('cart-drawer');
       var newCartDrawerEl = doc.querySelector('cart-drawer');
       if (cartDrawerEl && newCartDrawerEl) {
+        var wasActive = cartDrawerEl.classList.contains('active');
+        var wasAnimate = cartDrawerEl.classList.contains('animate');
         cartDrawerEl.className = newCartDrawerEl.className;
+        if (wasActive) cartDrawerEl.classList.add('active');
+        if (wasAnimate) cartDrawerEl.classList.add('animate');
+      }
+      // Re-bind overlay click handler (lost during innerHTML replacement)
+      var overlay = document.querySelector('#CartDrawer-Overlay');
+      if (overlay && cartDrawerEl) {
+        overlay.addEventListener('click', function () { cartDrawerEl.close(); });
       }
     }
   }
