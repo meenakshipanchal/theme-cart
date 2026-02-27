@@ -1,225 +1,214 @@
-{% comment %}
-  =====================================================
-  DYNAMIC REWARDS PROGRESS BAR
-  =====================================================
-  To add/remove milestones, just edit the config below.
-  The bar auto-adjusts spacing for any number of milestones.
-
-  Each milestone needs:
-    - threshold (in paise, e.g. 49900 = ₹499)
-    - display  (display amount, e.g. "499")
-    - label    (e.g. "Free Shipping")
-    - icon     (truck / gift / star / percent)
-    - message  (what to show when user hasn't reached it)
-    - success  (what to show when all milestones unlocked)
-  =====================================================
-{% endcomment %}
-
 {% liquid
   comment
-    ======= MILESTONE CONFIG - EDIT HERE =======
-    Add or remove milestones as needed.
-    They MUST be in ascending order of threshold.
+    =====================================================
+    REWARDS PROGRESS BAR - BOOLEAN CONFIG
+    =====================================================
+    Toggle milestones ON/OFF with true/false.
+    Free Shipping is ALWAYS first when enabled.
+    Milestones appear left→right in this order:
+      1. Free Shipping  2. Free Gift
+      3. Premium Gift   4. VIP Reward
+    =====================================================
   endcomment
 
-  assign milestone_count = 2
+  assign enable_free_shipping = true
+  assign shipping_threshold = 49900
+  assign shipping_display = '499'
+  assign shipping_label = 'Free Shipping'
+  assign shipping_msg = 'FREE Shipping'
 
-  assign ms_1_threshold = 49900
-  assign ms_1_display = '499'
-  assign ms_1_label = 'Free Shipping'
-  assign ms_1_icon = 'truck'
-  assign ms_1_msg = 'FREE Shipping'
+  assign enable_free_gift = true
+  assign gift_threshold = 149900
+  assign gift_display = '1499'
+  assign gift_label = 'Free Gift'
+  assign gift_msg = 'FREE Surprise Gift'
 
-  assign ms_2_threshold = 149900
-  assign ms_2_display = '1499'
-  assign ms_2_label = 'Free Gift'
-  assign ms_2_icon = 'gift'
-  assign ms_2_msg = 'FREE Surprise Gift'
+  assign enable_premium_gift = false
+  assign premium_threshold = 249900
+  assign premium_display = '2499'
+  assign premium_label = 'Premium Gift'
+  assign premium_msg = 'a Premium Gift'
 
-  comment
-    Uncomment below to add milestone 3:
-    assign milestone_count = 3
-    assign ms_3_threshold = 249900
-    assign ms_3_display = '2499'
-    assign ms_3_label = 'Premium Gift'
-    assign ms_3_icon = 'star'
-    assign ms_3_msg = 'a Premium Gift'
-  endcomment
-
-  comment
-    Uncomment below to add milestone 4:
-    assign milestone_count = 4
-    assign ms_4_threshold = 349900
-    assign ms_4_display = '3499'
-    assign ms_4_label = 'VIP Reward'
-    assign ms_4_icon = 'percent'
-    assign ms_4_msg = 'VIP Reward'
-  endcomment
+  assign enable_vip_reward = false
+  assign vip_threshold = 349900
+  assign vip_display = '3499'
+  assign vip_label = 'VIP Reward'
+  assign vip_msg = 'VIP Reward'
 
   assign current_cart_total = cart.total_price
 
   comment
-    Calculate progress: each milestone gets equal segment (100/count)%
+    Build active milestones list as | separated string
+    Format: threshold:display:label:msg:icon per entry
   endcomment
-  assign segment_size = 100 | divided_by: milestone_count
-  assign progress_percent = 0
+  assign ms_list = ''
+  if enable_free_shipping
+    assign entry = shipping_threshold | append: ':' | append: shipping_display | append: ':' | append: shipping_label | append: ':' | append: shipping_msg | append: ':truck'
+    if ms_list == ''
+      assign ms_list = entry
+    else
+      assign ms_list = ms_list | append: '|' | append: entry
+    endif
+  endif
+  if enable_free_gift
+    assign entry = gift_threshold | append: ':' | append: gift_display | append: ':' | append: gift_label | append: ':' | append: gift_msg | append: ':gift'
+    if ms_list == ''
+      assign ms_list = entry
+    else
+      assign ms_list = ms_list | append: '|' | append: entry
+    endif
+  endif
+  if enable_premium_gift
+    assign entry = premium_threshold | append: ':' | append: premium_display | append: ':' | append: premium_label | append: ':' | append: premium_msg | append: ':star'
+    if ms_list == ''
+      assign ms_list = entry
+    else
+      assign ms_list = ms_list | append: '|' | append: entry
+    endif
+  endif
+  if enable_vip_reward
+    assign entry = vip_threshold | append: ':' | append: vip_display | append: ':' | append: vip_label | append: ':' | append: vip_msg | append: ':percent'
+    if ms_list == ''
+      assign ms_list = entry
+    else
+      assign ms_list = ms_list | append: '|' | append: entry
+    endif
+  endif
+
+  assign milestones = ms_list | split: '|'
+  assign ms_count = milestones.size
+
+  comment
+    Find next unreached milestone for message
+  endcomment
+  assign all_done = true
+  assign next_msg = ''
+  assign next_rem = 0
+  for ms in milestones
+    assign parts = ms | split: ':'
+    assign ms_t = parts[0] | plus: 0
+    assign ms_msg = parts[3]
+    if current_cart_total < ms_t and next_msg == ''
+      assign all_done = false
+      assign next_msg = ms_msg
+      assign next_rem = ms_t | minus: current_cart_total | divided_by: 100
+    endif
+  endfor
+
+  comment
+    Calculate overall progress % for the sliding bar
+    With N milestones at equal positions, each segment = 100/N
+  endcomment
   assign reached_count = 0
-  assign next_milestone_msg = ''
-  assign next_milestone_remaining = 0
-  assign all_reached = false
+  for ms in milestones
+    assign parts = ms | split: ':'
+    assign ms_t = parts[0] | plus: 0
+    if current_cart_total >= ms_t
+      assign reached_count = reached_count | plus: 1
+    endif
+  endfor
+
+  assign segment_size = 100 | divided_by: ms_count
+  assign overall_progress = 0
+
+  if reached_count >= ms_count
+    assign overall_progress = 100
+  elsif reached_count > 0
+    assign filled = reached_count | times: segment_size
+    assign prev_parts = milestones[reached_count] | split: ':'
+    assign next_t = prev_parts[0] | plus: 0
+    assign prev_ms = milestones[reached_count | minus: 1] | split: ':'
+    assign prev_t = prev_ms[0] | plus: 0
+    assign seg_diff = current_cart_total | minus: prev_t
+    assign seg_range = next_t | minus: prev_t
+    if seg_range > 0
+      assign partial = seg_diff | times: segment_size | divided_by: seg_range
+    else
+      assign partial = 0
+    endif
+    assign overall_progress = filled | plus: partial
+  else
+    if current_cart_total > 0
+      assign first_parts = milestones[0] | split: ':'
+      assign first_t = first_parts[0] | plus: 0
+      assign overall_progress = current_cart_total | times: segment_size | divided_by: first_t
+    endif
+  endif
 %}
 
-{% comment %} Calculate reached milestones and progress {% endcomment %}
-{% for i in (1..milestone_count) %}
-  {% case i %}
-    {% when 1 %}
-      {% assign this_threshold = ms_1_threshold %}
-      {% assign this_msg = ms_1_msg %}
-    {% when 2 %}
-      {% assign this_threshold = ms_2_threshold %}
-      {% assign this_msg = ms_2_msg %}
-    {% when 3 %}
-      {% assign this_threshold = ms_3_threshold %}
-      {% assign this_msg = ms_3_msg %}
-    {% when 4 %}
-      {% assign this_threshold = ms_4_threshold %}
-      {% assign this_msg = ms_4_msg %}
-  {% endcase %}
-
-  {% if current_cart_total >= this_threshold %}
-    {% assign reached_count = reached_count | plus: 1 %}
-  {% elsif next_milestone_msg == '' %}
-    {% assign next_milestone_msg = this_msg %}
-    {% assign next_milestone_remaining = this_threshold | minus: current_cart_total | divided_by: 100 %}
-  {% endif %}
-{% endfor %}
-
-{% if reached_count == milestone_count %}
-  {% assign all_reached = true %}
-  {% assign progress_percent = 100 %}
-{% elsif reached_count > 0 %}
-  {% comment %} Fully fill reached segments + partial for current segment {% endcomment %}
-  {% assign filled_segments = reached_count | times: segment_size %}
-
-  {% comment %} Get current and previous thresholds for partial calc {% endcomment %}
-  {% assign prev_threshold = 0 %}
-  {% assign curr_threshold = 0 %}
-  {% assign next_index = reached_count | plus: 1 %}
-  {% case reached_count %}
-    {% when 1 %}{% assign prev_threshold = ms_1_threshold %}
-    {% when 2 %}{% assign prev_threshold = ms_2_threshold %}
-    {% when 3 %}{% assign prev_threshold = ms_3_threshold %}
-  {% endcase %}
-  {% case next_index %}
-    {% when 1 %}{% assign curr_threshold = ms_1_threshold %}
-    {% when 2 %}{% assign curr_threshold = ms_2_threshold %}
-    {% when 3 %}{% assign curr_threshold = ms_3_threshold %}
-    {% when 4 %}{% assign curr_threshold = ms_4_threshold %}
-  {% endcase %}
-
-  {% assign seg_diff = current_cart_total | minus: prev_threshold %}
-  {% assign seg_range = curr_threshold | minus: prev_threshold %}
-  {% if seg_range > 0 %}
-    {% assign partial = seg_diff | times: segment_size | divided_by: seg_range %}
-  {% else %}
-    {% assign partial = 0 %}
-  {% endif %}
-  {% assign progress_percent = filled_segments | plus: partial %}
-{% else %}
-  {% comment %} Haven't reached first milestone {% endcomment %}
-  {% if current_cart_total > 0 %}
-    {% assign progress_percent = current_cart_total | times: segment_size | divided_by: ms_1_threshold %}
-  {% endif %}
-{% endif %}
-
+{% if ms_count > 0 %}
 <div class="rpb" id="rewardsProgressBar">
   <!-- Message -->
-  <div class="rpb__msg" id="rpbMessage">
-    {% if all_reached %}
+  <div class="rpb__msg" id="rpbMsg">
+    {% if all_done %}
       <div class="rpb__pill">All rewards unlocked!</div>
     {% else %}
-      <div class="rpb__msg-text">Add <strong>&#8377;{{ next_milestone_remaining }}</strong> more for <strong>{{ next_milestone_msg }}!</strong></div>
+      <div class="rpb__txt">Add <strong>&#8377;{{ next_rem }}</strong> more for <strong>{{ next_msg }}!</strong></div>
     {% endif %}
   </div>
 
-  <!-- Progress bar area -->
-  <div class="rpb__area" style="--ms-count: {{ milestone_count }};">
-    <!-- Track -->
-    <div class="rpb__track">
-      <div class="rpb__fill" id="rpbFill" style="width: {{ progress_percent }}%;"></div>
+  <!-- Sliding bar track -->
+  <div class="rpb__track" id="rpbTrack">
+    <div class="rpb__slider" id="rpbSlider" style="width: {{ overall_progress }}%;"></div>
 
-      {% comment %} Render marker dots on the track {% endcomment %}
-      {% for i in (1..milestone_count) %}
-        {% assign pos = i | times: segment_size %}
-        {% case i %}
-          {% when 1 %}{% assign t = ms_1_threshold %}
-          {% when 2 %}{% assign t = ms_2_threshold %}
-          {% when 3 %}{% assign t = ms_3_threshold %}
-          {% when 4 %}{% assign t = ms_4_threshold %}
-        {% endcase %}
-        <div class="rpb__dot {% if current_cart_total >= t %}done{% endif %}" style="left: {{ pos }}%;">
-          {% if current_cart_total >= t %}
-            <svg viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {% comment %} Milestone dots on the track {% endcomment %}
+    {% for ms in milestones %}
+      {% assign parts = ms | split: ':' %}
+      {% assign ms_t = parts[0] | plus: 0 %}
+      {% assign idx_1 = forloop.index %}
+      {% assign dot_pos = idx_1 | times: segment_size %}
+      <div class="rpb__dot {% if current_cart_total >= ms_t %}done{% endif %}" style="left: {{ dot_pos }}%;" data-idx="{{ forloop.index0 }}">
+        {% if current_cart_total >= ms_t %}
+          <svg viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Labels below track -->
+  <div class="rpb__labels" style="--ms-count: {{ ms_count }};">
+    {% for ms in milestones %}
+      {% assign parts = ms | split: ':' %}
+      {% assign ms_t = parts[0] | plus: 0 %}
+      {% assign ms_disp = parts[1] %}
+      {% assign ms_lbl = parts[2] %}
+      {% assign ms_ico = parts[4] %}
+      {% assign idx_1 = forloop.index %}
+      {% assign lbl_pos = idx_1 | times: segment_size %}
+      <div class="rpb__label {% if current_cart_total >= ms_t %}done{% endif %}" style="left: {{ lbl_pos }}%;" data-idx="{{ forloop.index0 }}">
+        <span class="rpb__ico">
+          {% if ms_ico == 'truck' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          {% elsif ms_ico == 'gift' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+          {% elsif ms_ico == 'star' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          {% elsif ms_ico == 'percent' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
           {% endif %}
-        </div>
-      {% endfor %}
-    </div>
-
-    <!-- Labels -->
-    <div class="rpb__labels">
-      {% for i in (1..milestone_count) %}
-        {% assign pos = i | times: segment_size %}
-        {% case i %}
-          {% when 1 %}
-            {% assign t = ms_1_threshold %}{% assign lbl = ms_1_label %}{% assign dsp = ms_1_display %}{% assign ico = ms_1_icon %}
-          {% when 2 %}
-            {% assign t = ms_2_threshold %}{% assign lbl = ms_2_label %}{% assign dsp = ms_2_display %}{% assign ico = ms_2_icon %}
-          {% when 3 %}
-            {% assign t = ms_3_threshold %}{% assign lbl = ms_3_label %}{% assign dsp = ms_3_display %}{% assign ico = ms_3_icon %}
-          {% when 4 %}
-            {% assign t = ms_4_threshold %}{% assign lbl = ms_4_label %}{% assign dsp = ms_4_display %}{% assign ico = ms_4_icon %}
-        {% endcase %}
-        <div class="rpb__lbl {% if current_cart_total >= t %}done{% endif %}" style="left: {{ pos }}%;">
-          <span class="rpb__ico">
-            {% if ico == 'truck' %}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            {% elsif ico == 'gift' %}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-            {% elsif ico == 'star' %}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            {% elsif ico == 'percent' %}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-            {% endif %}
-          </span>
-          <span class="rpb__lbl-t">{{ lbl }}</span>
-          <span class="rpb__lbl-v">&#8377;{{ dsp }}+</span>
-        </div>
-      {% endfor %}
-    </div>
+        </span>
+        <span class="rpb__name">{{ ms_lbl }}</span>
+        <span class="rpb__amt">&#8377;{{ ms_disp }}+</span>
+      </div>
+    {% endfor %}
   </div>
 </div>
 
 <style>
   .rpb {
     padding: 10px 16px 4px;
-    background: linear-gradient(180deg, #f4faf7, #edf5f0);
-    border-bottom: 1px solid #e0ebe5;
+    background: #f4faf7;
+    border-bottom: 1px solid #dde8e2;
   }
 
   /* Message */
-  .rpb__msg {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  .rpb__msg-text {
+  .rpb__msg { text-align: center; margin-bottom: 10px; }
+  .rpb__txt {
     font-size: 12px;
-    font-weight: 500;
     color: #555;
     font-family: 'Roboto Slab', serif;
   }
-  .rpb__msg-text strong {
-    color: #235A49;
-  }
+  .rpb__txt strong { color: #235A49; }
   .rpb__pill {
     display: inline-block;
     font-size: 11.5px;
@@ -231,45 +220,33 @@
     font-family: 'Roboto Slab', serif;
   }
 
-  /* Bar area - right padding so last milestone label doesn't clip */
-  .rpb__area {
-    position: relative;
-    padding-right: 30px;
-  }
-
   /* Track */
   .rpb__track {
     position: relative;
-    height: 5px;
+    height: 6px;
     background: #dce5df;
     border-radius: 10px;
-  }
-  .rpb__fill {
-    height: 100%;
-    background: linear-gradient(90deg, #2d7a5f, #235A49);
-    border-radius: 10px;
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    position: relative;
-  }
-  .rpb__fill::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-    animation: rpbShine 2s ease-in-out infinite;
-  }
-  @keyframes rpbShine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    margin: 0 14px;
   }
 
-  /* Marker dots sitting ON the track */
+  /* Sliding green bar */
+  .rpb__slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #235A49;
+    border-radius: 10px;
+    transition: width 1s ease;
+    z-index: 1;
+  }
+
+  /* Milestone dots ON the track */
   .rpb__dot {
     position: absolute;
     top: 50%;
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #fff;
     border: 2.5px solid #c5d0c9;
@@ -278,128 +255,111 @@
     align-items: center;
     justify-content: center;
     z-index: 3;
-    transition: all 0.35s ease;
+    transition: none;
   }
-  .rpb__dot svg {
-    width: 9px;
-    height: 9px;
-  }
+  .rpb__dot svg { width: 10px; height: 10px; }
   .rpb__dot.done {
     background: #235A49;
-    border-color: #235A49;
-    box-shadow: 0 0 0 3px rgba(35,90,73,0.15);
+    border-color: #1a4538;
+    box-shadow: 0 0 0 3px rgba(35,90,73,0.15), 0 2px 6px rgba(35,90,73,0.2);
+    transform: translate(-50%, -50%) scale(1.1);
   }
 
-  /* Labels row - positioned BELOW the track with relative layout */
+  /* Labels row */
   .rpb__labels {
     position: relative;
-    height: 46px;
-    margin-top: 2px;
+    height: 50px;
+    margin: 0 14px;
   }
-  .rpb__lbl {
+  .rpb__label {
     position: absolute;
-    top: 4px;
+    top: 6px;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px;
+    gap: 0;
   }
   .rpb__ico {
-    color: #a8b2ab;
     display: flex;
-    transition: color 0.3s;
+    color: #a8b2ab;
+    transition: none;
   }
-  .rpb__lbl.done .rpb__ico {
-    color: #235A49;
-  }
-  .rpb__lbl-t {
-    font-size: 10.5px;
+  .rpb__ico svg { width: 15px; height: 15px; }
+  .rpb__label.done .rpb__ico { color: #235A49; }
+
+  .rpb__name {
+    font-size: 10px;
     font-weight: 600;
     color: #888;
     font-family: 'Roboto Slab', serif;
     white-space: nowrap;
-    transition: color 0.3s;
+    transition: none;
   }
-  .rpb__lbl.done .rpb__lbl-t {
-    color: #235A49;
-    font-weight: 700;
-  }
-  .rpb__lbl-v {
-    font-size: 9.5px;
+  .rpb__label.done .rpb__name { color: #235A49; font-weight: 700; }
+
+  .rpb__amt {
+    font-size: 9px;
     color: #aaa;
     font-family: 'Roboto Slab', serif;
-    transition: color 0.3s;
+    transition: none;
   }
-  .rpb__lbl.done .rpb__lbl-v {
-    color: #3a8f6e;
-  }
+  .rpb__label.done .rpb__amt { color: #3a8f6e; }
 
   /* Mobile */
   @media (max-width: 480px) {
-    .rpb {
-      padding: 8px 12px 2px;
-    }
-    .rpb__area {
-      padding-right: 24px;
-    }
-    .rpb__msg-text { font-size: 11px; }
+    .rpb { padding: 8px 10px 2px; }
+    .rpb__track { margin: 0 10px; height: 5px; }
+    .rpb__labels { margin: 0 10px; height: 44px; }
+    .rpb__txt { font-size: 11px; }
     .rpb__pill { font-size: 10.5px; padding: 4px 10px; }
-    .rpb__dot { width: 15px; height: 15px; }
-    .rpb__dot svg { width: 7px; height: 7px; }
-    .rpb__ico svg { width: 12px; height: 12px; }
-    .rpb__lbl-t { font-size: 9.5px; }
-    .rpb__lbl-v { font-size: 8.5px; }
-    .rpb__labels { height: 40px; }
+    .rpb__dot { width: 18px; height: 18px; }
+    .rpb__dot svg { width: 8px; height: 8px; }
+    .rpb__ico svg { width: 13px; height: 13px; }
+    .rpb__name { font-size: 9px; }
+    .rpb__amt { font-size: 8px; }
   }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  var fill = document.getElementById('rpbFill');
-  if (fill) {
-    var target = fill.style.width;
-    fill.style.width = '0%';
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() { fill.style.width = target; });
-    });
+  var slider = document.getElementById('rpbSlider');
+  if (slider) {
+    var target = slider.style.width;
+    slider.style.width = '0%';
+    setTimeout(function() {
+      slider.style.width = target;
+    }, 100);
   }
 });
 
-/*
-  Dynamic update function.
-  Call: window.updateCartRewards(cartTotalInPaise)
-  Milestones config is baked in from Liquid at render time.
-*/
 window.updateCartRewards = function(cartTotal) {
   var milestones = [
-    {% for i in (1..milestone_count) %}
-      {% case i %}
-        {% when 1 %}{ threshold: {{ ms_1_threshold }}, msg: '{{ ms_1_msg }}' }{% unless milestone_count == 1 %},{% endunless %}
-        {% when 2 %}{ threshold: {{ ms_2_threshold }}, msg: '{{ ms_2_msg }}' }{% unless milestone_count == 2 %},{% endunless %}
-        {% when 3 %}{ threshold: {{ ms_3_threshold }}, msg: '{{ ms_3_msg }}' }{% unless milestone_count == 3 %},{% endunless %}
-        {% when 4 %}{ threshold: {{ ms_4_threshold }}, msg: '{{ ms_4_msg }}' }
-      {% endcase %}
+    {% for ms in milestones %}
+      {% assign p = ms | split: ':' %}
+      { threshold: {{ p[0] }}, msg: '{{ p[3] }}' }{% unless forloop.last %},{% endunless %}
     {% endfor %}
   ];
 
   var total = cartTotal || {{ current_cart_total | default: 0 }};
   var count = milestones.length;
   var seg = 100 / count;
-  var fill = document.getElementById('rpbFill');
-  var msg = document.getElementById('rpbMessage');
-  if (!fill) return;
+  var slider = document.getElementById('rpbSlider');
+  var msg = document.getElementById('rpbMsg');
+  if (!slider) return;
 
   var reached = 0;
-  var nextMsg = '';
-  var nextRem = 0;
+  var nextMsg = '', nextRem = 0, allDone = true;
 
   for (var i = 0; i < count; i++) {
     if (total >= milestones[i].threshold) {
       reached++;
-    } else if (!nextMsg) {
-      nextMsg = milestones[i].msg;
-      nextRem = Math.ceil((milestones[i].threshold - total) / 100);
+    } else {
+      allDone = false;
+      if (!nextMsg) {
+        nextMsg = milestones[i].msg;
+        nextRem = Math.ceil((milestones[i].threshold - total) / 100);
+      }
     }
   }
 
@@ -409,28 +369,27 @@ window.updateCartRewards = function(cartTotal) {
   } else if (reached > 0) {
     var prevT = milestones[reached - 1].threshold;
     var currT = milestones[reached].threshold;
-    var partial = (total - prevT) / (currT - prevT) * seg;
+    var partial = ((total - prevT) / (currT - prevT)) * seg;
     pct = reached * seg + partial;
   } else if (total > 0) {
     pct = (total / milestones[0].threshold) * seg;
   }
 
-  fill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  slider.style.width = Math.min(100, Math.max(0, pct)) + '%';
 
   if (msg) {
-    if (reached >= count) {
-      msg.innerHTML = '<div class="rpb__pill">All rewards unlocked!</div>';
-    } else {
-      msg.innerHTML = '<div class="rpb__msg-text">Add <strong>\u20B9' + nextRem + '</strong> more for <strong>' + nextMsg + '!</strong></div>';
-    }
+    msg.innerHTML = allDone
+      ? '<div class="rpb__pill">All rewards unlocked!</div>'
+      : '<div class="rpb__txt">Add <strong>\u20B9' + nextRem + '</strong> more for <strong>' + nextMsg + '!</strong></div>';
   }
 
   var dots = document.querySelectorAll('.rpb__dot');
-  var lbls = document.querySelectorAll('.rpb__lbl');
+  var lbls = document.querySelectorAll('.rpb__label');
   for (var j = 0; j < count; j++) {
-    var isReached = total >= milestones[j].threshold;
-    if (dots[j]) dots[j].classList.toggle('done', isReached);
-    if (lbls[j]) lbls[j].classList.toggle('done', isReached);
+    var done = total >= milestones[j].threshold;
+    if (dots[j]) dots[j].classList.toggle('done', done);
+    if (lbls[j]) lbls[j].classList.toggle('done', done);
   }
 };
 </script>
+{% endif %}
