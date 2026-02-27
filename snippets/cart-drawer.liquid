@@ -163,7 +163,19 @@
    }
 </script>
  
-<cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
+{% comment %} Count real (non-freebie) items globally {% endcomment %}
+{% assign real_item_count = 0 %}
+{% for item in cart.items %}
+  {% unless item.properties._freebie %}
+    {% assign real_item_count = real_item_count | plus: 1 %}
+  {% endunless %}
+{% endfor %}
+{% assign cart_effectively_empty = false %}
+{% if cart == empty or real_item_count == 0 %}
+  {% assign cart_effectively_empty = true %}
+{% endif %}
+
+<cart-drawer class="drawer{% if cart_effectively_empty %} is-empty{% endif %}">
   <div id="CartDrawer" class="cart-drawer">
      
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
@@ -177,7 +189,7 @@
       tabindex="-1"
     >
        
-      {%- if cart == empty -%}
+      {%- if cart_effectively_empty -%}
         <div class="drawer__inner-empty" onclick="handleCartClick(event)">
           <!-- Close button for empty cart -->
           <button
@@ -270,8 +282,8 @@
       {%- endif -%}
 
      
-      {% if cart != empty %}
-        
+      {% unless cart_effectively_empty %}
+
         <div
           class="drawer__header"
           style="display: flex; align-items: center; padding: 15px 20px; background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;"
@@ -481,10 +493,10 @@
 
         <!-- Future: Dynamic Freebie Notifications Container -->
         <!-- <div id="freebie-notification-container"></div> -->
-      {% endif %}
- 
+      {% endunless %}
+
       <cart-drawer-items
-        {% if cart == empty %}
+        {% if cart_effectively_empty %}
           class=" is-empty"
         {% endif %}
       >
@@ -497,7 +509,7 @@
           method="post"
         >
           <div style="background- w " id="CartDrawer-CartItems" class="drawer__contents js-contents">
-            {%- if cart != empty -%}
+            {%- unless cart_effectively_empty -%}
               <div>
                 {% render 'rewards-progress-bar' %}
               </div>
@@ -684,7 +696,7 @@
               <!-- Hidden Inputs for JavaScript Integration -->
               <input type="hidden" value="{{ winterPrice | divided_by: 100 }}" id="winterCartPrice">
               <input type="hidden" value="{{ winterId }}" id="winterCartId">
-            {%- endif -%}
+            {%- endunless -%}
 
             <!-- Accessibility Live Regions -->
             <p id="CartDrawer-LiveRegionText" class="visually-hidden" role="status"></p>
@@ -702,7 +714,7 @@
         </form>
          
 
-        {% unless cart.empty? %}
+        {% unless cart_effectively_empty %}
           <!-- Cart Freebies System -->
           {% if section.settings.enable %}
             {% render 'cart-freebies', cart: cart, freebies: section.blocks %}
@@ -716,7 +728,7 @@
           {% comment %}{% render 'cart-recommend-product' %}{% endcomment %}
         {% endunless %}
       </cart-drawer-items>
-    {%- unless cart == empty -%}
+    {%- unless cart_effectively_empty -%}
     <div id="freecash-widget-container">
     {% render 'anveshan-coins-widget' %}
   </div>
@@ -868,7 +880,7 @@
             name="checkout2"
             form="CartDrawer-Form"
             style="display:none;"
-            {% if cart == empty %}
+            {% if cart_effectively_empty %}
               disabled
             {% endif %}
           >

@@ -1,28 +1,25 @@
 /**
- * Auto-Freebie System
+ * Auto-Freebie System (Optimized)
  * Automatically adds/removes free gift products based on cart total.
- *
- * Thresholds are compared against the "real" cart total
- * (excluding any items that already have _freebie property).
+ * Uses Shopify sections API to avoid extra round-trips.
  */
 (function () {
   'use strict';
 
-  /* ── CONFIG ─────────────────────────────────────── */
   var FREEBIES = [
     { threshold: 149900, variantId: '47070925095104' },   // Jaggery  (₹1499+)
     { threshold: 299900, variantId: '47503774187712' }    // Festive Duo (₹2999+)
   ];
 
   var _processing = false;
-
-  /* ── HELPERS ────────────────────────────────────── */
+  var SECTION_ID = 'cart-drawer';
 
   function getCart() {
     return fetch('/cart.js', { credentials: 'same-origin' })
       .then(function (r) { return r.json(); });
   }
 
+  /** Add item and get updated section HTML in one call */
   function addItem(variantId) {
     return fetch('/cart/add.js', {
       method: 'POST',
@@ -31,7 +28,8 @@
       body: JSON.stringify({
         id: Number(variantId),
         quantity: 1,
-        properties: { _freebie: 'true' }
+        properties: { _freebie: 'true' },
+        sections: SECTION_ID
       })
     }).then(function (r) {
       if (!r.ok) throw new Error('Failed to add freebie');
@@ -39,38 +37,41 @@
     });
   }
 
+  /** Remove item and get updated section HTML in one call */
   function removeItem(lineKey) {
     return fetch('/cart/change.js', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: lineKey, quantity: 0 })
+      body: JSON.stringify({
+        id: lineKey,
+        quantity: 0,
+        sections: SECTION_ID
+      })
     }).then(function (r) {
       if (!r.ok) throw new Error('Failed to remove freebie');
       return r.json();
     });
   }
 
-  function refreshCartDrawer() {
-    var url = window.routes && window.routes.cart_url
-      ? window.routes.cart_url + '?section_id=cart-drawer'
-      : '/cart?section_id=cart-drawer';
-
-    return fetch(url, { credentials: 'same-origin' })
-      .then(function (r) { return r.text(); })
-      .then(function (html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
-        var selectors = ['cart-drawer-items', '.cart-drawer__footer', '.cart__ctas'];
-        selectors.forEach(function (sel) {
-          var oldEl = document.querySelector(sel);
-          var newEl = doc.querySelector(sel);
-          if (oldEl && newEl) oldEl.replaceWith(newEl);
-        });
-      });
+  /** Apply section HTML from API response directly — no extra fetch */
+  function applySectionHTML(response) {
+    var html = response && response.sections && response.sections[SECTION_ID];
+    if (!html) return;
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    // Replace entire drawer inner to handle empty ↔ non-empty transitions correctly
+    var oldDrawer = document.querySelector('#CartDrawer');
+    var newDrawer = doc.querySelector('#CartDrawer');
+    if (oldDrawer && newDrawer) {
+      oldDrawer.innerHTML = newDrawer.innerHTML;
+      // Update is-empty class on cart-drawer element
+      var cartDrawerEl = document.querySelector('cart-drawer');
+      var newCartDrawerEl = doc.querySelector('cart-drawer');
+      if (cartDrawerEl && newCartDrawerEl) {
+        cartDrawerEl.className = newCartDrawerEl.className;
+      }
+    }
   }
-
-  /* ── CORE LOGIC ─────────────────────────────────── */
 
   function manageFreebie() {
     if (_processing) return;
@@ -78,7 +79,12 @@
 
     getCart()
       .then(function (cart) {
-        // 1. Calculate real total (exclude freebie items)
+        // Skip if cart is truly empty
+        if (!cart.items || cart.items.length === 0) {
+          _processing = false;
+          return;
+        }
+
         var realTotal = 0;
         var existingFreebie = null;
 
@@ -90,7 +96,7 @@
           }
         });
 
-        // 2. Determine which freebie qualifies (highest threshold met)
+        // Determine which freebie qualifies (highest threshold met)
         var qualifiedFreebie = null;
         for (var i = FREEBIES.length - 1; i >= 0; i--) {
           if (realTotal >= FREEBIES[i].threshold) {
@@ -99,82 +105,62 @@
           }
         }
 
-        // 3. Decide action
-        var existingVariantId = existingFreebie
-          ? String(existingFreebie.variant_id)
-          : null;
-        var neededVariantId = qualifiedFreebie
-          ? qualifiedFreebie.variantId
-          : null;
+        var existingVid = existingFreebie ? String(existingFreebie.variant_id) : null;
+        var neededVid = qualifiedFreebie ? qualifiedFreebie.variantId : null;
 
-        // Already correct → nothing to do
-        if (existingVariantId === neededVariantId) {
+        // Already correct → skip
+        if (existingVid === neededVid) {
           _processing = false;
           return;
         }
 
-        // Chain: remove old (if any) → add new (if any) → refresh
+        // Build chain: remove old → add new
+        // Last call in chain returns sections HTML, so no extra refresh needed
         var chain = Promise.resolve();
+        var lastResponse = null;
 
-        if (existingFreebie) {
-          chain = chain.then(function () {
-            return removeItem(existingFreebie.key);
-          });
+        if (existingFreebie && qualifiedFreebie) {
+          // Swap: remove old (skip sections), add new (with sections)
+          chain = chain
+            .then(function () { return removeItem(existingFreebie.key); })
+            .then(function () { return addItem(qualifiedFreebie.variantId); })
+            .then(function (resp) { lastResponse = resp; });
+        } else if (existingFreebie) {
+          // Just remove
+          chain = chain
+            .then(function () { return removeItem(existingFreebie.key); })
+            .then(function (resp) { lastResponse = resp; });
+        } else if (qualifiedFreebie) {
+          // Just add
+          chain = chain
+            .then(function () { return addItem(qualifiedFreebie.variantId); })
+            .then(function (resp) { lastResponse = resp; });
         }
 
-        if (qualifiedFreebie) {
-          chain = chain.then(function () {
-            return addItem(qualifiedFreebie.variantId);
-          });
-        }
-
-        chain
-          .then(function () {
-            return refreshCartDrawer();
-          })
-          .then(function () {
-            // Update progress bar if function exists
-            if (typeof window.updateCartRewards === 'function') {
-              getCart().then(function (c) {
-                var rt = 0;
-                c.items.forEach(function (item) {
-                  if (!(item.properties && item.properties._freebie)) {
-                    rt += item.final_line_price;
-                  }
-                });
-                window.updateCartRewards(rt);
-              });
-            }
-          })
-          .catch(function (err) {
-            console.error('[Auto-Freebie]', err);
-          })
-          .then(function () {
-            _processing = false;
-          });
+        return chain.then(function () {
+          if (lastResponse) applySectionHTML(lastResponse);
+        });
       })
       .catch(function (err) {
-        console.error('[Auto-Freebie] getCart failed:', err);
+        console.error('[Auto-Freebie]', err);
+      })
+      .then(function () {
         _processing = false;
       });
   }
 
-  /* ── EVENT HOOKS ────────────────────────────────── */
-
-  // Run on initial load
+  // Run on initial load (minimal delay)
   document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(manageFreebie, 500);
+    setTimeout(manageFreebie, 80);
   });
 
   // Hook into Shopify PubSub cart updates
   if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
     subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
-      // Skip if we triggered this update ourselves
       if (event.source === 'auto-freebie') return;
-      setTimeout(manageFreebie, 300);
+      setTimeout(manageFreebie, 80);
     });
   }
 
-  // Expose for manual trigger
   window.manageCartFreebie = manageFreebie;
 })();
