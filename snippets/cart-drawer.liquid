@@ -163,19 +163,7 @@
    }
 </script>
  
-{% comment %} Count real (non-freebie) items globally {% endcomment %}
-{% assign real_item_count = 0 %}
-{% for item in cart.items %}
-  {% unless item.properties._freebie %}
-    {% assign real_item_count = real_item_count | plus: 1 %}
-  {% endunless %}
-{% endfor %}
-{% assign cart_effectively_empty = false %}
-{% if cart == empty or real_item_count == 0 %}
-  {% assign cart_effectively_empty = true %}
-{% endif %}
-
-<cart-drawer class="drawer{% if cart_effectively_empty %} is-empty{% endif %}">
+<cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
   <div id="CartDrawer" class="cart-drawer">
      
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
@@ -189,7 +177,7 @@
       tabindex="-1"
     >
        
-      {%- if cart_effectively_empty -%}
+      {%- if cart == empty -%}
         <div class="drawer__inner-empty" onclick="handleCartClick(event)">
           <!-- Close button for empty cart -->
           <button
@@ -282,7 +270,7 @@
       {%- endif -%}
 
      
-      {% unless cart_effectively_empty %}
+      {% unless cart == empty %}
 
         <div
           class="drawer__header"
@@ -496,7 +484,7 @@
       {% endunless %}
 
       <cart-drawer-items
-        {% if cart_effectively_empty %}
+        {% if cart == empty %}
           class=" is-empty"
         {% endif %}
       >
@@ -509,7 +497,7 @@
           method="post"
         >
           <div style="background- w " id="CartDrawer-CartItems" class="drawer__contents js-contents">
-            {%- unless cart_effectively_empty -%}
+            {%- unless cart == empty -%}
               <div>
                 {% render 'rewards-progress-bar' %}
               </div>
@@ -714,7 +702,7 @@
         </form>
          
 
-        {% unless cart_effectively_empty %}
+        {% unless cart == empty %}
           <!-- Cart Freebies System -->
           {% if section.settings.enable %}
             {% render 'cart-freebies', cart: cart, freebies: section.blocks %}
@@ -728,7 +716,7 @@
           {% comment %}{% render 'cart-recommend-product' %}{% endcomment %}
         {% endunless %}
       </cart-drawer-items>
-    {%- unless cart_effectively_empty -%}
+    {%- unless cart == empty -%}
     <div id="freecash-widget-container">
     {% render 'anveshan-coins-widget' %}
   </div>
@@ -880,7 +868,7 @@
             name="checkout2"
             form="CartDrawer-Form"
             style="display:none;"
-            {% if cart_effectively_empty %}
+            {% if cart == empty %}
               disabled
             {% endif %}
           >
