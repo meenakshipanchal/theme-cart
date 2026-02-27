@@ -1,7 +1,6 @@
 /**
- * Auto-Freebie System — Final Production Version
- * Adds/removes free gift products based on cart total.
- * Zero performance impact: all work is async, no blocking.
+ * Auto-Freebie System
+ * Adds/removes free gift based on cart total.
  */
 (function () {
   'use strict';
@@ -11,65 +10,28 @@
     { threshold: 299900, variantId: '47503774187712' }
   ];
 
-  var SECTION_ID = 'cart-drawer';
+  var SECTION = 'cart-drawer';
   var _busy = false;
-  var _busyTimer = null;
-  var _pendingCart = null;
-
-  /* ── Helpers ─────────────────────────────────────── */
-
-  function lock() {
-    _busy = true;
-    clearTimeout(_busyTimer);
-    _busyTimer = setTimeout(function () { _busy = false; }, 15000);
-  }
-
-  function unlock() {
-    _busy = false;
-    clearTimeout(_busyTimer);
-    if (_pendingCart !== null) {
-      var cart = _pendingCart;
-      _pendingCart = null;
-      run(cart);
-    }
-  }
+  var _selfUpdate = false;
 
   function fetchCart() {
-    return fetch('/cart.js', { credentials: 'same-origin' })
-      .then(function (r) { return r.json(); });
+    return fetch('/cart.js', { credentials: 'same-origin' }).then(function (r) { return r.json(); });
   }
 
-  function addToCart(variantId) {
+  function addToCart(vid) {
     return fetch('/cart/add.js', {
-      method: 'POST',
-      credentials: 'same-origin',
+      method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: Number(variantId),
-        quantity: 1,
-        properties: { _freebie: 'true' },
-        sections: SECTION_ID
-      })
-    }).then(function (r) {
-      if (!r.ok) throw new Error('add-fail');
-      return r.json();
-    });
+      body: JSON.stringify({ id: Number(vid), quantity: 1, properties: { _freebie: 'true' }, sections: SECTION })
+    }).then(function (r) { if (!r.ok) throw new Error('add'); return r.json(); });
   }
 
-  function removeFromCart(lineKey) {
+  function removeFromCart(key) {
     return fetch('/cart/change.js', {
-      method: 'POST',
-      credentials: 'same-origin',
+      method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: lineKey,
-        quantity: 0,
-        sections: SECTION_ID
-      })
-    }).then(function (r) {
-      if (!r.ok) throw new Error('remove-fail');
-      return r.json();
-    });
+      body: JSON.stringify({ id: key, quantity: 0, sections: SECTION })
+    }).then(function (r) { if (!r.ok) throw new Error('rm'); return r.json(); });
   }
 
   function hideFreebies() {
@@ -78,136 +40,106 @@
   }
 
   function patchDrawer(resp) {
-    var html = resp && resp.sections && resp.sections[SECTION_ID];
+    var html = resp && resp.sections && resp.sections[SECTION];
     if (!html) return;
     var doc = new DOMParser().parseFromString(html, 'text/html');
     var oldD = document.querySelector('#CartDrawer');
     var newD = doc.querySelector('#CartDrawer');
     if (!oldD || !newD) return;
 
+    _selfUpdate = true;
     oldD.innerHTML = newD.innerHTML;
 
     var el = document.querySelector('cart-drawer');
     var nel = doc.querySelector('cart-drawer');
     if (el && nel) {
-      var wasA = el.classList.contains('active');
-      var wasAn = el.classList.contains('animate');
+      var a = el.classList.contains('active');
+      var an = el.classList.contains('animate');
       el.className = nel.className;
-      if (wasA) el.classList.add('active');
-      if (wasAn) el.classList.add('animate');
+      if (a) el.classList.add('active');
+      if (an) el.classList.add('animate');
     }
     var ov = document.querySelector('#CartDrawer-Overlay');
     if (ov && el) ov.addEventListener('click', function () { el.close(); });
+
+    setTimeout(function () { _selfUpdate = false; }, 100);
   }
 
-  /* ── Main logic ──────────────────────────────────── */
+  function run() {
+    if (_busy) return;
+    _busy = true;
 
-  function run(cartData) {
-    if (_busy) {
-      _pendingCart = cartData || true;
-      return;
-    }
-    lock();
-
-    var p = (cartData && cartData.items) ? Promise.resolve(cartData) : fetchCart();
-
-    p.then(function (cart) {
-      if (!cart || !cart.items || cart.items.length === 0) {
-        unlock();
-        return;
-      }
+    fetchCart().then(function (cart) {
+      if (!cart || !cart.items || cart.items.length === 0) return;
 
       var realTotal = 0;
       var freebie = null;
-
       for (var i = 0; i < cart.items.length; i++) {
-        var it = cart.items[i];
-        if (it.properties && it.properties._freebie) {
-          freebie = it;
+        if (cart.items[i].properties && cart.items[i].properties._freebie) {
+          freebie = cart.items[i];
         } else {
-          realTotal += it.final_line_price;
+          realTotal += cart.items[i].final_line_price;
         }
       }
 
-      // Progress bar — instant
-      if (typeof window.updateCartRewards === 'function') {
-        window.updateCartRewards(realTotal);
-      }
+      if (typeof window.updateCartRewards === 'function') window.updateCartRewards(realTotal);
 
-      // Which freebie should be in the cart?
       var target = null;
       for (var j = FREEBIES.length - 1; j >= 0; j--) {
-        if (realTotal >= FREEBIES[j].threshold) {
-          target = FREEBIES[j];
-          break;
-        }
+        if (realTotal >= FREEBIES[j].threshold) { target = FREEBIES[j]; break; }
       }
 
-      var haveVid = freebie ? String(freebie.variant_id) : null;
-      var wantVid = target ? target.variantId : null;
+      var have = freebie ? String(freebie.variant_id) : null;
+      var want = target ? target.variantId : null;
 
-      // Correct freebie already present
-      if (haveVid === wantVid) {
-        unlock();
-        return;
-      }
+      if (have === want) return;
 
-      // Wrong freebie visible → hide instantly
       if (freebie) hideFreebies();
 
-      // Build API chain
       var chain = Promise.resolve();
       var last = null;
 
       if (freebie && target) {
-        // Swap
-        chain = chain
-          .then(function () { return removeFromCart(freebie.key); })
+        chain = chain.then(function () { return removeFromCart(freebie.key); })
           .then(function () { return addToCart(target.variantId); })
           .then(function (r) { last = r; });
       } else if (freebie) {
-        // Remove only
-        chain = chain
-          .then(function () { return removeFromCart(freebie.key); })
+        chain = chain.then(function () { return removeFromCart(freebie.key); })
           .then(function (r) { last = r; });
       } else if (target) {
-        // Add only
-        chain = chain
-          .then(function () { return addToCart(target.variantId); })
+        chain = chain.then(function () { return addToCart(target.variantId); })
           .then(function (r) { last = r; });
       }
 
       return chain.then(function () {
         if (last) {
           patchDrawer(last);
-          if (typeof window.updateCartRewards === 'function') {
-            window.updateCartRewards(realTotal);
-          }
+          if (typeof window.updateCartRewards === 'function') window.updateCartRewards(realTotal);
         }
       });
     })
     .catch(function (e) { console.error('[Freebie]', e); })
-    .then(function () { unlock(); });
+    .then(function () { _busy = false; });
   }
 
-  /* ── Triggers ────────────────────────────────────── */
-
-  // 1) Page load — works whether DOM is ready or not
-  function init() { setTimeout(run, 80); }
-
+  // Trigger 1: Page load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 80); });
   } else {
-    init();
+    setTimeout(run, 80);
   }
 
-  // 2) Cart changes via theme PubSub
-  if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
-    subscribe(PUB_SUB_EVENTS.cartUpdate, function (ev) {
-      if (ev.source === 'auto-freebie') return;
-      var cart = (ev.cartData && ev.cartData.items) ? ev.cartData : null;
-      setTimeout(function () { run(cart); }, 0);
-    });
+  // Trigger 2: Cart drawer content changes (covers add-to-cart, qty change, remove — everything)
+  var _debounce = null;
+  function onDrawerChange() {
+    if (_selfUpdate) return;
+    clearTimeout(_debounce);
+    _debounce = setTimeout(run, 300);
+  }
+
+  var drawer = document.getElementById('CartDrawer');
+  if (drawer) {
+    new MutationObserver(onDrawerChange).observe(drawer, { childList: true, subtree: true });
   }
 
   window.manageCartFreebie = run;
