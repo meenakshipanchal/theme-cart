@@ -561,18 +561,29 @@
                     font-family: Roboto Slab;
                   "
                 >
-                  Total items: <span id="cart-item-count">{{ cart.item_count }}</span>
+                  {% assign freebie_item_count = 0 %}
+                  {% for item in cart.items %}
+                    {% if item.properties._freebie %}
+                      {% assign freebie_item_count = freebie_item_count | plus: 1 %}
+                    {% endif %}
+                  {% endfor %}
+                  Total items: <span id="cart-item-count">{{ cart.item_count | minus: freebie_item_count }}</span>
                 </div>
               </div>
 
               <div class="drawer__cart-items-wrapper">
                 <div class="cart-items">
                   
+                  {% assign freebie_total = 0 %}
                   {%- for item in cart.items -%}
                     {% liquid
-                      assign _total = _total | plus: item.original_line_price
-                      assign item_mrp = item.variant.compare_at_price | times: item.quantity
-                      assign _mrp = _mrp | plus: item_mrp
+                      if item.properties._freebie
+                        assign freebie_total = freebie_total | plus: item.final_line_price
+                      else
+                        assign _total = _total | plus: item.original_line_price
+                        assign item_mrp = item.variant.compare_at_price | times: item.quantity
+                        assign _mrp = _mrp | plus: item_mrp
+                      endif
                       if item.properties._type == 'winter'
                         assign winterPrice = winterPrice | plus: item.final_price
                         assign winterId = item.index | plus: 1
@@ -735,9 +746,9 @@
         <div id="cartSummary" class="cart-drawer__footer" style="display:none;" {{ block.shopify_attributes }}>
          
           {% liquid
-            assign cart_total = cart.total_price
-            if cart.total_price <= 49900
-              assign cart_total = cart.total_price | plus: 4900
+            assign cart_total = cart.total_price | minus: freebie_total
+            if cart_total <= 49900
+              assign cart_total = cart_total | plus: 4900
             endif
             assign prepaid_discount = cart_total | times: 0.02
             assign online_pay = cart_total | minus: prepaid_discount
@@ -765,7 +776,8 @@
           <div>
             <span>Shipping</span>
             <span>
-              {% if cart.total_price > 49900 %}
+              {% assign real_cart_total = cart.total_price | minus: freebie_total %}
+              {% if real_cart_total > 49900 %}
                 Free <s>₹49</s>
               {% else %}
                 ₹49
@@ -870,3 +882,4 @@
     </div>
   </div>
 </cart-drawer>
+<script src="{{ 'cart-auto-freebie.js' | asset_url }}" defer></script>

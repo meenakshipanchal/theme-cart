@@ -8,6 +8,11 @@
   if item.variant.quantity_price_breaks.size > 0
     assign has_vol_pricing = true
   endif
+
+  assign is_freebie = false
+  if item.properties._freebie
+    assign is_freebie = true
+  endif
 -%}
 
 {%- comment -%}
@@ -60,31 +65,25 @@
     </a>
     {%- comment -%} ADD VARIANT INFO HERE {%- endcomment -%}
     <div style="display: flex; gap: 8px; align-items: center; margin: 6px 0;">
-      {% comment %}
-        <p style="background-color: #B4EFFF; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
-          {{ item.variant.title }}
+      {% if is_freebie %}
+        <p style="background-color: #235A49; color: #fff; font-family: Roboto Slab; font-weight: 600; font-size: 8px; line-height: 100%; letter-spacing: 0.5px; margin: 0; padding: 4px 10px; border-radius: 4px; text-transform: uppercase;">
+          FREE
         </p>
-      {% endcomment %}
-
-      <p style="background-color: #B4EFFF; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
-        {% if item.variant.title == blank
-          or item.variant.title == 'Default Title'
-          or item.variant.title == 'Top Choice'
-        %}
-          Top Choice
-        {% else %}
-          {{ item.variant.title }}
-        {% endif %}
-      </p>
-      {% comment %} <p style="background-color: #D1FFC5; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
-        {% if item.variant.available %}
-          {% if item.variant.inventory_quantity and item.variant.inventory_quantity > 0 %}
-            In Stock
+        <p style="background-color: #e8f5e9; color: #235A49; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; margin: 0; padding: 4px 8px; border-radius: 4px;">
+          Complimentary Gift
+        </p>
+      {% else %}
+        <p style="background-color: #B4EFFF; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
+          {% if item.variant.title == blank
+            or item.variant.title == 'Default Title'
+            or item.variant.title == 'Top Choice'
+          %}
+            Top Choice
+          {% else %}
+            {{ item.variant.title }}
           {% endif %}
-        {% else %}
-          Out of Stock
-        {% endif %}
-      </p> {% endcomment %}
+        </p>
+      {% endif %}
     </div>
     {%- comment -%}
       ===== PRICING SECTION =====
@@ -95,6 +94,17 @@
       {%- render 'loading-spinner' -%}
 
       <div style="background-color:" class="cart-item__price-wrapper">
+        {% if is_freebie %}
+          {%- comment -%} Freebie: show original value struck through + FREE label {%- endcomment -%}
+          <div class="cart-item__discounted-prices" style="display: flex; align-items: center; gap: 6px;">
+            <s style="color: #999; font-size: 13px; font-family: Roboto Slab;">
+              {{ item.original_line_price | money }}
+            </s>
+            <strong style="color: #235A49; font-size: 14px; font-family: Roboto Slab; font-weight: 700;">
+              FREE
+            </strong>
+          </div>
+        {% else %}
         {%- comment -%}
           DISCOUNT PRICING LOGIC:
           If item has a compare_at_price different from original_price, show discount
@@ -153,6 +163,7 @@
             {{ item.unit_price_measurement.reference_unit }}
           </div>
         {%- endif -%}
+        {% endif %}
       </div>
     </div>
 
@@ -195,7 +206,13 @@
     {%- comment -%}
       ===== QUANTITY CONTROLS & REMOVE BUTTON SECTION =====
       Bottom section with quantity adjustment and remove functionality
+      Hidden for freebie items (system-managed)
     {%- endcomment -%}
+    {% if is_freebie %}
+      <div style="padding: 4px 0; font-family: Roboto Slab; font-size: 10px; color: #888;">
+        Auto-added gift
+      </div>
+    {% else %}
     <div style="background-color:" class="cartdraw-item-with-qty">
       {%- comment -%}
         ===== QUANTITY POPOVER CONTAINER =====
@@ -419,6 +436,7 @@
         </button>
       </cart-remove-button>
     </div>
+    {% endif %}
   </div>
 </div>
 <!-- Add this horizontal line after each cart item (except the last one) -->

@@ -14,18 +14,18 @@
   assign enable_free_shipping = true
   assign shipping_threshold = 49900
   assign shipping_display = '499'
-  assign shipping_label = 'Free Shipping'
-  assign shipping_msg = 'FREE Shipping'
+  assign shipping_label = 'Free Delivery'
+  assign shipping_msg = 'FREE Delivery'
 
   assign enable_free_gift = true
   assign gift_threshold = 149900
   assign gift_display = '1499'
   assign gift_label = 'Free Gift'
-  assign gift_msg = 'FREE Surprise Gift'
+  assign gift_msg = 'a FREE Gift'
 
-  assign enable_premium_gift = false
-  assign premium_threshold = 249900
-  assign premium_display = '2499'
+  assign enable_premium_gift = true
+  assign premium_threshold = 299900
+  assign premium_display = '2999'
   assign premium_label = 'Premium Gift'
   assign premium_msg = 'a Premium Gift'
 
@@ -35,7 +35,16 @@
   assign vip_label = 'VIP Reward'
   assign vip_msg = 'VIP Reward'
 
-  assign current_cart_total = cart.total_price
+  comment
+    Calculate cart total excluding freebie items
+  endcomment
+  assign freebie_cart_total = 0
+  for item in cart.items
+    if item.properties._freebie
+      assign freebie_cart_total = freebie_cart_total | plus: item.final_line_price
+    endif
+  endfor
+  assign current_cart_total = cart.total_price | minus: freebie_cart_total
 
   comment
     Build active milestones list as | separated string
