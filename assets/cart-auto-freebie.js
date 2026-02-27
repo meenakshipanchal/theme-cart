@@ -1,7 +1,7 @@
 /**
  * Auto-Freebie System (Optimized)
  * Automatically adds/removes free gift products based on cart total.
- * Uses Shopify sections API to avoid extra round-trips.
+ * Uses event cart data for instant UI updates — no extra fetch.
  */
 (function () {
   'use strict';
@@ -19,7 +19,6 @@
       .then(function (r) { return r.json(); });
   }
 
-  /** Add item and get updated section HTML in one call */
   function addItem(variantId) {
     return fetch('/cart/add.js', {
       method: 'POST',
@@ -37,7 +36,6 @@
     });
   }
 
-  /** Remove item and get updated section HTML in one call */
   function removeItem(lineKey) {
     return fetch('/cart/change.js', {
       method: 'POST',
@@ -54,15 +52,15 @@
     });
   }
 
-  /** Instantly hide freebie items from DOM (before API call completes) */
+  /** Instantly hide freebie items from DOM */
   function hideFreebieItems() {
-    var freebieEls = document.querySelectorAll('[data-freebie]');
-    for (var i = 0; i < freebieEls.length; i++) {
-      freebieEls[i].style.display = 'none';
+    var els = document.querySelectorAll('[data-freebie]');
+    for (var i = 0; i < els.length; i++) {
+      els[i].style.display = 'none';
     }
   }
 
-  /** Apply section HTML from API response directly — no extra fetch */
+  /** Apply section HTML from API response */
   function applySectionHTML(response) {
     var html = response && response.sections && response.sections[SECTION_ID];
     if (!html) return;
@@ -71,7 +69,6 @@
     var newDrawer = doc.querySelector('#CartDrawer');
     if (oldDrawer && newDrawer) {
       oldDrawer.innerHTML = newDrawer.innerHTML;
-      // Update is-empty class but PRESERVE active/animate classes
       var cartDrawerEl = document.querySelector('cart-drawer');
       var newCartDrawerEl = doc.querySelector('cart-drawer');
       if (cartDrawerEl && newCartDrawerEl) {
@@ -81,7 +78,6 @@
         if (wasActive) cartDrawerEl.classList.add('active');
         if (wasAnimate) cartDrawerEl.classList.add('animate');
       }
-      // Re-bind overlay click handler (lost during innerHTML replacement)
       var overlay = document.querySelector('#CartDrawer-Overlay');
       if (overlay && cartDrawerEl) {
         overlay.addEventListener('click', function () { cartDrawerEl.close(); });
@@ -89,87 +85,88 @@
     }
   }
 
-  function manageFreebie() {
+  /**
+   * Process cart data and determine what freebie action is needed.
+   * Returns null if no change needed, or action object.
+   * Updates progress bar and hides freebie items INSTANTLY.
+   */
+  function processCartData(cart) {
+    if (!cart.items || cart.items.length === 0) return null;
+
+    var realTotal = 0;
+    var existingFreebie = null;
+
+    cart.items.forEach(function (item) {
+      if (item.properties && item.properties._freebie) {
+        existingFreebie = item;
+      } else {
+        realTotal += item.final_line_price;
+      }
+    });
+
+    // Update progress bar INSTANTLY
+    if (typeof window.updateCartRewards === 'function') {
+      window.updateCartRewards(realTotal);
+    }
+
+    // Determine which freebie qualifies (highest threshold met)
+    var qualifiedFreebie = null;
+    for (var i = FREEBIES.length - 1; i >= 0; i--) {
+      if (realTotal >= FREEBIES[i].threshold) {
+        qualifiedFreebie = FREEBIES[i];
+        break;
+      }
+    }
+
+    var existingVid = existingFreebie ? String(existingFreebie.variant_id) : null;
+    var neededVid = qualifiedFreebie ? qualifiedFreebie.variantId : null;
+
+    // Already correct → no action needed
+    if (existingVid === neededVid) return null;
+
+    // Freebie needs removal or swap → hide it INSTANTLY from UI
+    if (existingFreebie) {
+      hideFreebieItems();
+    }
+
+    return {
+      existingFreebie: existingFreebie,
+      qualifiedFreebie: qualifiedFreebie,
+      realTotal: realTotal
+    };
+  }
+
+  /** Execute the freebie add/remove API calls in background */
+  function executeFreebieChange(action) {
     if (_processing) return;
     _processing = true;
 
-    getCart()
-      .then(function (cart) {
-        // Skip if cart is truly empty
-        if (!cart.items || cart.items.length === 0) {
-          _processing = false;
-          return;
-        }
+    var chain = Promise.resolve();
+    var lastResponse = null;
 
-        var realTotal = 0;
-        var existingFreebie = null;
+    if (action.existingFreebie && action.qualifiedFreebie) {
+      chain = chain
+        .then(function () { return removeItem(action.existingFreebie.key); })
+        .then(function () { return addItem(action.qualifiedFreebie.variantId); })
+        .then(function (resp) { lastResponse = resp; });
+    } else if (action.existingFreebie) {
+      chain = chain
+        .then(function () { return removeItem(action.existingFreebie.key); })
+        .then(function (resp) { lastResponse = resp; });
+    } else if (action.qualifiedFreebie) {
+      chain = chain
+        .then(function () { return addItem(action.qualifiedFreebie.variantId); })
+        .then(function (resp) { lastResponse = resp; });
+    }
 
-        cart.items.forEach(function (item) {
-          if (item.properties && item.properties._freebie) {
-            existingFreebie = item;
-          } else {
-            realTotal += item.final_line_price;
+    chain
+      .then(function () {
+        if (lastResponse) {
+          applySectionHTML(lastResponse);
+          if (typeof window.updateCartRewards === 'function') {
+            window.updateCartRewards(action.realTotal);
           }
-        });
-
-        // Determine which freebie qualifies (highest threshold met)
-        var qualifiedFreebie = null;
-        for (var i = FREEBIES.length - 1; i >= 0; i--) {
-          if (realTotal >= FREEBIES[i].threshold) {
-            qualifiedFreebie = FREEBIES[i];
-            break;
-          }
         }
-
-        var existingVid = existingFreebie ? String(existingFreebie.variant_id) : null;
-        var neededVid = qualifiedFreebie ? qualifiedFreebie.variantId : null;
-
-        // Update progress bar immediately (before any API calls)
-        if (typeof window.updateCartRewards === 'function') {
-          window.updateCartRewards(realTotal);
-        }
-
-        // Already correct → done
-        if (existingVid === neededVid) {
-          _processing = false;
-          return;
-        }
-
-        // Freebie needs to be removed or swapped → hide it INSTANTLY from UI
-        if (existingFreebie) {
-          hideFreebieItems();
-        }
-
-        // Build chain: remove old → add new
-        var chain = Promise.resolve();
-        var lastResponse = null;
-
-        if (existingFreebie && qualifiedFreebie) {
-          // Swap: remove old, add new
-          chain = chain
-            .then(function () { return removeItem(existingFreebie.key); })
-            .then(function () { return addItem(qualifiedFreebie.variantId); })
-            .then(function (resp) { lastResponse = resp; });
-        } else if (existingFreebie) {
-          // Just remove
-          chain = chain
-            .then(function () { return removeItem(existingFreebie.key); })
-            .then(function (resp) { lastResponse = resp; });
-        } else if (qualifiedFreebie) {
-          // Just add
-          chain = chain
-            .then(function () { return addItem(qualifiedFreebie.variantId); })
-            .then(function (resp) { lastResponse = resp; });
-        }
-
-        return chain.then(function () {
-          if (lastResponse) {
-            applySectionHTML(lastResponse);
-            if (typeof window.updateCartRewards === 'function') {
-              window.updateCartRewards(realTotal);
-            }
-          }
-        });
       })
       .catch(function (err) {
         console.error('[Auto-Freebie]', err);
@@ -179,15 +176,47 @@
       });
   }
 
-  // Run on initial load (minimal delay)
+  /** Full flow: fetch cart → process → execute (used on initial load) */
+  function manageFreebie() {
+    if (_processing) return;
+    _processing = true;
+
+    getCart()
+      .then(function (cart) {
+        var action = processCartData(cart);
+        if (action) {
+          _processing = false;
+          executeFreebieChange(action);
+        } else {
+          _processing = false;
+        }
+      })
+      .catch(function (err) {
+        console.error('[Auto-Freebie]', err);
+        _processing = false;
+      });
+  }
+
+  // Run on initial load
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(manageFreebie, 80);
   });
 
-  // Hook into Shopify PubSub cart updates
+  // Hook into Shopify PubSub — use event data directly (NO extra fetch)
   if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
     subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
       if (event.source === 'auto-freebie') return;
+
+      // Use cart data from event INSTANTLY — no network delay
+      if (event.cartData && event.cartData.items) {
+        var action = processCartData(event.cartData);
+        if (action) {
+          executeFreebieChange(action);
+        }
+        return;
+      }
+
+      // Fallback: fetch cart if event has no data
       setTimeout(manageFreebie, 50);
     });
   }
