@@ -1,0 +1,98 @@
+{% if cart.total_price < 99900 %}
+  {% liquid
+    assign kitdata = shop.metaobjects.bundle_variants_item['cart-recommended']
+    assign items = kitdata.item.value
+  %}
+  {% capture id_list %}
+  {% for item in cart.items %}
+    {{ item.product_id }},
+  {% endfor %}
+{% endcapture %}
+  <div class="recommended-product">
+    <h3>Recommended for your cart</h3>
+    <ul class="recommended-products">
+      {%- for card_product in items -%}
+        {% unless id_list contains card_product.product.id %}
+          {% if card_product.available %}
+            {% liquid
+              assign feature_media = card_product.featured_media
+              assign title = card_product.title
+              if card_product.title == 'Top Choice'
+                assign feature_media = card_product.product.featured_media
+                assign title = card_product.product.metafields.custom.variant_title
+              endif
+            %}
+            <li>
+              <div class="recommended--product cart-item">
+                <figure>
+                  <a href="{{ card_product.url }}">
+                    {{
+                      feature_media
+                      | image_url: width: 200
+                      | image_tag:
+                        widths: '50,100,200',
+                        class: 'motion-reduce',
+                        loading: 'lazy',
+                        alt: card_product.title
+                    }}
+                  </a>
+                </figure>
+                <div>
+                  <small>{{ title }}</small>
+                  <h5>{{ card_product.product.title | truncate: 22 | escape }}</h5>
+                  <div class="button-with-price">
+                    <span class="price"
+                      ><s>{{ card_product.compare_at_price | money }}</s> {{ card_product.price | money -}}
+                    </span>
+                    <div class="quick-add no-js-hidden">
+                      {%- liquid
+                        assign ids = card_product.id
+                        assign product_form_id = 'quick-add-' | append: section_id | append: ids
+                      -%}
+                      <product-form data-section-id="{{ section.id }}">
+                        {%- form 'product',
+                          card_product.product,
+                          id: product_form_id,
+                          class: 'form',
+                          novalidate: 'novalidate',
+                          data-type: 'add-to-cart-form'
+                        -%}
+                          <input
+                            type="hidden"
+                            name="id"
+                            value="{{ ids }}"
+                            class="product-variant-id"
+                            {% unless card_product.available %}
+                              disabled
+                            {% endunless %}
+                          >
+                          <input type="hidden" name="properties[_type]" value="recommend">
+                          <button
+                            id="{{ product_form_id }}-submit"
+                            type="submit"
+                            name="add"
+                            class="quick-add__submit button button--primary"
+                            aria-haspopup="dialog"
+                            aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ ids }}"
+                            aria-live="polite"
+                            data-sold-out-message="true"
+                            {% unless card_product.available %}
+                              disabled
+                            {% endunless %}
+                          >
+                            <span> Add </span>
+                            {%- render 'loading-spinner' -%}
+                          </button>
+                        {%- endform -%}
+                      </product-form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endif %}
+        {% endunless %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

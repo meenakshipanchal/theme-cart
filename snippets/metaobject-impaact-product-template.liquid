@@ -1,0 +1,410 @@
+{% liquid
+  assign title = metaobject.title.value
+  assign id = metaobject._id.value
+  assign impact_image = metaobject.impact_image.value
+%}
+
+<div class="page-width simple-images-gallery quick-add-hidden">
+  {% if impact_image %}
+    <div class="images-container">
+      <div class="image-item">
+        <div class="text-overlay">
+          <div class="impact-text">
+            <div class="content-wrapper">
+              <h2 class="title"> Creating Healthier Families and Happy Farmers</h2>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <span class="big-number">7,000+</span>
+                  <span class="small-text">Farmers<br>Empowered</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <span class="big-number">5+</span>
+                  <span class="small-text">Women-Led<br>Processing Units</span>
+                </div>
+                <div class="stat-item">
+                  <span class="big-number">20+</span>
+                  <span class="small-text">Micro-processing<br>units established</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <span class="big-number">40+</span>
+                  <span class="small-text">In-House Tests<br>Per Batch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <img 
+          src="{{ impact_image | image_url: master }}"
+          srcset="
+            {{ impact_image | image_url: width: 800 }} 800w,
+            {{ impact_image | image_url: width: 1200 }} 1200w,
+            {{ impact_image | image_url: width: 1600 }} 1600w,
+            {{ impact_image | image_url: master }} 2000w
+          "
+          sizes="100vw"
+          loading="lazy" 
+          alt="{{ impact_image.alt | default: 'Impact Image' }}"
+        >
+      </div>
+    </div>
+  {% else %}
+    <div class="no-images-found">
+      <p>No image found</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+/* ENHANCED IMPACT GALLERY */
+.simple-images-gallery {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.page-width {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.images-container {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.image-item {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  max-height: 900px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  border-radius: 12px;
+  display: block;
+}
+
+/* TEXT OVERLAY */
+.text-overlay {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px;
+  z-index: 10;
+}
+
+/* IMPACT TEXT */
+.impact-text {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 30px 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  color: #2c5530;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: 800px;
+  flex-wrap: nowrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+  min-width: 140px;
+  flex: 1;
+}
+
+/* Single separation line style */
+.stat-divider {
+  width: 1px;
+  height: 70px;
+  background: #2c5530;
+  opacity: 1;
+  flex-shrink: 0;
+  margin: 0 20px; /* Space between items */
+}
+
+.big-number {
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 800;
+  color: #2c5530;
+  display: block;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.small-text {
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  color: #555;
+  display: block;
+  line-height: 1.4;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* MOBILE OPTIMIZATION */
+@media screen and (max-width: 768px) {
+  .image-item {
+    height: 65vh;
+    min-height: 450px;
+    max-height: 600px;
+    border-radius: 8px;
+  }
+  
+  .image-item img {
+    border-radius: 8px;
+    object-position: center 10%;
+  }
+  
+  .text-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 15px;
+    right: 15px;
+    transform: none;
+    width: auto;
+    max-width: none;
+  }
+  
+  .impact-text {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+  
+  .content-wrapper {
+    gap: 16px;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+    line-height: 1.3;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+    max-width: none;
+    width: 100%;
+  }
+  
+  .stat-item {
+    flex: none;
+    min-width: auto;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .stat-divider {
+    display: none; /* Remove dividers on mobile */
+  }
+  
+  .big-number {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+  
+  .small-text {
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+}
+
+/* TABLET */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .image-item {
+    height: 70vh;
+    min-height: 500px;
+    max-height: 700px;
+  }
+  
+  .image-item img {
+    object-position: center 12%;
+  }
+  
+  .text-overlay {
+    bottom: 25px;
+    width: 85%;
+  }
+  
+  .impact-text {
+    padding: 25px 20px;
+  }
+  
+  .stat-item {
+    padding: 0 15px;
+    min-width: 120px;
+  }
+}
+
+/* DESKTOP */
+@media screen and (min-width: 1025px) and (max-width: 1199px) {
+  .image-item {
+    height: 75vh;
+    min-height: 550px;
+    max-height: 800px;
+  }
+  
+  .image-item img {
+    object-position: center 18%;
+  }
+  
+  .impact-text {
+    padding: 30px 25px;
+  }
+  
+  .content-wrapper {
+    gap: 25px;
+  }
+  
+  .stat-item {
+    padding: 0 20px;
+    min-width: 150px;
+  }
+  
+  .text-overlay {
+    bottom: 35px;
+    max-width: 950px;
+  }
+}
+
+/* LARGE DESKTOP */
+@media screen and (min-width: 1200px) {
+  .image-item {
+    height: 80vh;
+    min-height: 600px;
+    max-height: 900px;
+  }
+  
+  .image-item img {
+    object-position: center 20%;
+  }
+  
+  .impact-text {
+    padding: 35px 30px;
+  }
+  
+  .content-wrapper {
+    gap: 30px;
+  }
+  
+  .stat-item {
+    padding: 0 25px;
+    min-width: 160px;
+  }
+  
+  .text-overlay {
+    bottom: 40px;
+    max-width: 1100px;
+  }
+}
+
+/* ULTRA LARGE SCREENS */
+@media screen and (min-width: 1400px) {
+  .image-item {
+    height: 85vh;
+    min-height: 650px;
+    max-height: 1000px;
+  }
+  
+  .image-item img {
+    object-position: center 25%;
+  }
+  
+  .impact-text {
+    padding: 40px 35px;
+  }
+  
+  .content-wrapper {
+    gap: 35px;
+  }
+  
+  .text-overlay {
+    bottom: 50px;
+    max-width: 1200px;
+  }
+}
+
+.no-images-found {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+/* HOVER EFFECTS */
+@media (hover: hover) {
+  .impact-text {
+    transition: all 0.3s ease;
+  }
+  
+  .image-item:hover .impact-text {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* ANIMATION */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.impact-text {
+  animation: slideUp 0.6s ease-out;
+}
+</style>

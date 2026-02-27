@@ -1,0 +1,59 @@
+{% assign product_form_id = 'quick-add-' | append: section_id | append: card_product.id %}
+<div class="quick-add no-js-hidden">
+  {%- liquid
+    assign qty_rules = false
+    if card_product.quantity_rule.min > 1 or card_product.quantity_rule.max != null or card_product.quantity_rule.increment > 1
+      assign qty_rules = true
+    endif
+    unless button_txt
+     assign button_txt = 'Add to Cart'
+    endunless
+  -%}
+  <product-form data-section-id="{{ section.id }}">
+    {%- form 'product',
+      product,
+      id: product_form_id,
+      class: 'form',
+      novalidate: 'novalidate',
+      data-type: 'add-to-cart-form'
+    -%}
+      <input
+        type="hidden"
+        name="id"
+        value="{{ card_product.id }}"
+        class="product-variant-id"
+        {% if card_product.available == false %}
+          disabled
+        {% endif %}
+      >
+      <button
+        id="{{ product_form_id }}-submit"
+        type="submit"
+        name="add"
+        class="quick-add__submit button button--primary{% if horizontal_quick_add %} card--horizontal__quick-add{% endif %}"
+        aria-haspopup="dialog"
+        aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
+        aria-live="polite"
+        data-sold-out-message="true"
+        {% if card_product.available == false %}
+          disabled
+        {% endif %}
+      >
+        <span>
+          {%- if card_product.available -%}
+            {{ button_txt }}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- endif -%}
+        </span>
+        <span class="sold-out-message hidden">
+          {{ 'products.product.sold_out' | t }}
+        </span>
+        {%- if horizontal_quick_add -%}
+          <span class="icon-wrap">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+        {%- endif -%}
+        {%- render 'loading-spinner' -%}
+      </button>
+    {%- endform -%}
+  </product-form>
+</div>

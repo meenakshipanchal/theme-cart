@@ -1,0 +1,60 @@
+{%- comment -%}
+  Renders: Earn Purity Coins message
+  Usage: {% render 'purity-coins-earn', product: product %}
+{%- endcomment -%}
+
+{% assign variant = product.selected_or_first_available_variant %}
+{% assign mrp = variant.price | divided_by: 100.0 %}
+{% assign coins_to_earn = mrp | times: 0.05 | floor %}
+
+{% if coins_to_earn > 0 %}
+  <div class="purity-coins-wrapper" style="
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+  ">
+    <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7176.png?v=1767773245"
+         alt="Purity Coins"
+         style="width: 36px; height: 28px; flex-shrink: 0; margin-right: -6px; z-index: 1; position: relative;">
+    <div class="purity-coins-earn" style="
+      display: flex;
+      align-items: center;
+      padding: 8px 16px 8px 20px;
+      background: #E8F5E9;
+      border-radius: 8px;
+    ">
+      <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1B5E20;">
+        Buy now & earn <span class="purity-coins-amount" style="color: #1B5E20; font-weight: 700;">{{ coins_to_earn }}</span> Purity Coins instantly
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Update coins when variant changes
+    if (!window.purityCoinsVariantListener) {
+      window.purityCoinsVariantListener = true;
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const variantSelects = document.querySelectorAll('variant-selects, variant-radios');
+
+        variantSelects.forEach(selector => {
+          selector.addEventListener('change', function(e) {
+            const selectedVariant = e.target.closest('variant-selects, variant-radios')?.currentVariant;
+
+            if (selectedVariant && selectedVariant.price) {
+              const mrp = selectedVariant.price; // Price in paise
+              const coinsToEarn = Math.floor((mrp / 100) * 0.05);
+
+              const coinAmountEl = document.querySelector('.purity-coins-amount');
+              if (coinAmountEl) {
+                coinAmountEl.textContent = coinsToEarn;
+              }
+
+              console.log('Variant changed - Coins to earn:', coinsToEarn);
+            }
+          });
+        });
+      });
+    }
+  </script>
+{% endif %}

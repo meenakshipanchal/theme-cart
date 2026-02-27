@@ -1,0 +1,82 @@
+
+{% for block in section.blocks %}
+<picture class="offer-banner-bogo">
+      <source media="(min-width: 750px)"
+        srcset="{{ block.settings.big_image | image_url: width: 900 }} 900w,
+          {{ block.settings.big_image | image_url: width: 1200 }} 1200w,
+          {{ block.settings.big_image | image_url: width: 1600 }} 1600w,
+          {{ block.settings.big_image | image_url: width: 2400 }} 2400w">
+        {{ block.settings.image | image_url: width: 720 |
+            image_tag: widths: '360, 480, 720', height: 'auto'
+        }}
+    </picture>
+{% endfor %}
+{% comment %}
+<div class="countdown-outer">
+  <div class="countdown-container">
+    <h3>Triple the Goodness, Pay for Two!<br>
+    <span>Stock up on your favorites and pay for only two! Grab this limited-time offer on our healthy, chemical-free products like cold-pressed oils and A2 ghee.</span>
+    </h3>
+    {% render 'page-timer-clock', timer: section.settings.timer %}
+  </div>
+</div> {% endcomment %}
+<style>
+  .countdown-outer { background: #26463c; }
+  .offer-banner-bogo img { display: block; width: 100%  }
+  .shop-now { background: #fff;
+    color: #26463c;
+    font-weight: 600;
+    border-radius: 33px;
+    margin-top: 5px; }
+</style>  
+{% schema %}
+  {
+    "name": "Offer Banner with Timer",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Banner"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "type": "image_picker",
+        "id": "big_image",
+        "label": "Desktop Image"
+      },
+      {
+        "type": "header",
+        "content": "Banner"
+      },
+      {
+        "type": "text",
+        "id": "timer",
+        "label": "Timer Clock",
+        "default": "2024-12-21 11:59:59",
+        "info": "2024-12-21 11:59:59"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "Image",
+        "name": "t:sections.slideshow.blocks.slide.name",
+        "limit": 3,
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "image_picker",
+            "id": "big_image",
+            "label": "Desktop Image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,984 @@
+{% comment %}
+=============================================================================
+COMPACT CART REWARDS PROGRESS BAR COMPONENT - CONNECTED MILESTONES
+=============================================================================
+Optimized version with reduced spacing for laptop and mobile screens
+FIXED: SVG icons now properly visible with correct colors and sizes
+UPDATED: First icon (truck) made bigger, gift icons bold when active
+=============================================================================
+{% endcomment %}
+
+{% comment %}
+===== REWARD MILESTONES CONFIGURATION =====
+Define the reward thresholds and values
+{% endcomment %}
+{% liquid
+  assign free_shipping_threshold = 49900
+  assign first_gift_threshold = 149900
+  
+  assign first_delivery = 499
+  assign first_gift_value = 1499
+  
+  assign current_cart_total = cart.total_price
+  
+ 
+%}
+
+<div class="rewards-progress-container">
+  <!-- Rewards Progress Bar -->
+  <div class="rewards-progress-bar">
+    
+    <!-- Connected Milestones Section -->
+    <div  class="connected-milestones">
+      <!-- Progress Connection Line -->
+      <div  class="connection-line">
+        <div  class="connection-fill" id="connectionProgressFill"></div>
+        
+        <!-- Moving Progress Indicator -->
+        <div  class="progress-indicator" id="progressIndicator">
+          <div class="indicator-dot"></div>
+          <div class="indicator-label" id="indicatorLabel">₹{{ current_cart_total | divided_by: 100 }}</div>
+        </div>
+      </div>
+      
+      <!-- Milestone Icons -->
+      <div  class="milestone-wrapper">
+        <!-- Free Shipping Milestone -->
+        <div class="reward-milestone milestone-center" data-threshold="{{ free_shipping_threshold }}">
+          <div class="milestone-connector"></div>
+          <div class="reward-icon-wrapper truck-icon {% if current_cart_total >= free_shipping_threshold %}active{% endif %}">
+            <!-- 
+            =============================================================================
+            FREE SHIPPING TRUCK ICON - MADE BIGGER (55x27px instead of 45x22px)
+            =============================================================================
+            -->
+ <svg width="55" height="27" viewBox="0 0 45 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M44.1435 16.6969C43.981 16.5004 43.7242 16.4313 43.4762 16.4488C43.6902 15.2853 44.0151 13.505 44.2291 12.3327C44.3488 11.6654 44.1688 10.9552 43.6902 10.4844C43.1512 9.95416 40.6267 7.48899 40.1383 7.01035C40.2843 6.95879 40.3952 6.83038 40.4205 6.66791C40.652 5.5297 39.8047 4.48584 38.6489 4.51114H34.1223L34.6019 1.85821C34.7722 1.00212 34.1223 0.19758 33.2497 0.214118H12.8396C12.0088 0.214118 11.2393 0.864945 11.0846 1.69477L10.8365 3.04702H5.47911C5.23104 3.04702 5.03452 3.24353 5.03452 3.4916C5.03452 3.73968 5.23104 3.93619 5.47911 3.93619H10.6741L9.24496 11.749H4.68333C4.43526 11.749 4.23874 11.9456 4.23874 12.1936C4.23874 12.4417 4.43526 12.6382 4.68333 12.6382H9.09028C8.89376 13.7336 8.59413 15.3339 8.39665 16.4294C7.9433 16.3778 7.48996 16.6687 7.40435 17.1395L7.22438 18.1318C7.13001 18.5764 7.46369 19.0132 7.91801 19.0045H11.2218C11.7782 22.7275 16.7504 22.0164 17.9314 19.0045H32.3858C32.9423 22.7275 37.9144 22.0164 39.0867 19.0045H43.3059C43.6999 19.0045 44.0501 18.6961 44.127 18.2943C44.161 17.8575 44.5035 17.0617 44.1445 16.694L44.1435 16.6969ZM40.3864 8.49004L43.0646 11.1089L43.125 11.1692H37.9728L38.4524 8.55035C38.4612 8.52506 38.504 8.49004 38.5205 8.49004H40.3864ZM33.9599 5.39155H38.6499C39.1208 5.3828 39.4885 5.68243 39.5566 6.13577H33.8227L33.9599 5.39155ZM9.65549 14.472H10.8453C10.82 14.831 10.606 15.1909 10.212 15.1997H9.52708L9.65549 14.472ZM11.3677 17.5608C11.2996 17.7407 11.2646 17.9373 11.2305 18.126H8.13301L8.27893 17.339H11.4455C11.4202 17.4071 11.394 17.4849 11.3687 17.5617L11.3677 17.5608ZM17.3069 18.0229C16.8788 20.7954 12.2578 22.0193 12.0954 18.5793C12.1294 16.9615 13.7385 15.4984 15.2707 15.5246C16.6142 15.4731 17.5987 16.7397 17.3078 18.0238L17.3069 18.0229ZM17.9995 16.371C16.87 13.7609 13.2929 14.3689 11.9232 16.4391H9.3043L9.36462 16.0966H10.212C10.9056 16.0966 11.5554 15.5577 11.6839 14.8641L11.821 14.1111C11.8726 13.8455 11.6498 13.5809 11.3842 13.5809H9.82671L9.99793 12.6479H10.8025C11.3842 12.6479 11.3842 11.7578 10.8025 11.7578H10.1604L11.5895 3.94495H14.722C14.9701 3.94495 15.1666 3.74843 15.1666 3.50036C15.1666 3.25229 14.9701 3.05577 14.722 3.05577H11.7529L11.967 1.85724C12.0438 1.4467 12.4466 1.10426 12.8483 1.10426H33.2584C33.5921 1.10426 33.7974 1.36985 33.7293 1.69477C33.096 5.16099 31.6922 12.8795 31.0423 16.4478H18.0345C18.0258 16.4225 18.0092 16.3963 18.0005 16.371H17.9995ZM32.522 17.5783C32.4617 17.7583 32.4189 17.946 32.3936 18.1347H18.1882C18.2223 17.8692 18.2398 17.6123 18.231 17.3477H32.6076C32.5736 17.4158 32.5473 17.4936 32.522 17.5792V17.5783ZM38.4524 18.0229C38.1868 19.4948 36.749 20.6845 35.3121 20.6845C34.1058 20.7021 33.1894 19.7944 33.2409 18.5793C33.275 16.9615 34.8753 15.4984 36.4163 15.5246C37.7685 15.4731 38.7521 16.7397 38.4534 18.0238L38.4524 18.0229ZM39.1538 16.371C38.0331 13.7609 34.4473 14.3689 33.0775 16.4391H31.9393L33.6593 7.02592H38.8883L39.47 7.59892H38.5118C38.0584 7.59892 37.6479 7.95011 37.5623 8.3947L37.0749 11.0651C37.0321 11.322 37.0924 11.5788 37.2549 11.7666C37.4086 11.9553 37.6489 12.0662 37.9057 12.0662H43.3652C43.3652 12.1002 43.3565 12.1343 43.3477 12.1693L43.0909 13.5809H41.3709C41.1569 13.5809 40.9692 13.7346 40.9341 13.9486C40.831 14.4788 40.6092 15.2493 41.0372 15.6861C41.3797 16.157 42.1152 16.1054 42.6376 16.0966L42.5772 16.4391H39.1966C39.1791 16.4216 39.1626 16.3963 39.1538 16.371ZM42.9284 14.472L42.7913 15.1997C42.5948 15.1744 41.7902 15.2678 41.7212 15.1141C41.5927 14.9857 41.7299 14.6267 41.7387 14.472H42.9284ZM43.2446 18.126H39.3426C39.3766 17.8604 39.3941 17.5958 39.3854 17.339H43.3905L43.2446 18.126ZM14.9185 16.5344C13.0021 16.5169 12.2831 19.5385 14.508 19.6747C16.4167 19.666 17.1609 16.7056 14.9185 16.5344ZM15.4069 18.0229C15.3213 18.699 14.0634 19.1951 14.0206 18.2884C13.9778 17.4927 15.5013 16.9537 15.4069 18.0229ZM36.0738 16.5344C34.1651 16.5091 33.4384 19.5298 35.6633 19.6747C37.572 19.6835 38.3162 16.6969 36.0738 16.5344ZM36.5525 18.0229C36.4581 18.4509 36.0563 18.7846 35.6623 18.7846C35.1662 18.8099 35.0543 18.2456 35.3034 17.8944C35.603 17.3127 36.6809 17.2008 36.5525 18.0229ZM16.2708 6.29921C16.2708 6.54728 16.0743 6.7438 15.8262 6.7438H13.4641L13.1733 8.31882H15.3729C15.6209 8.31882 15.8174 8.51533 15.8174 8.7634C15.8174 9.01148 15.6209 9.20799 15.3729 9.20799H13.0108L12.6256 11.3132C12.5147 11.8862 11.6411 11.7237 11.7442 11.1507L12.6431 6.21263C12.6859 5.9986 12.8659 5.8449 13.0799 5.8449H15.8097C16.0752 5.85365 16.2718 6.05892 16.2718 6.29824L16.2708 6.29921ZM26.326 6.29921C26.326 6.54728 26.1295 6.7438 25.8814 6.7438H23.5194L23.2285 8.31882H25.4281C25.6762 8.31882 25.8727 8.51533 25.8727 8.7634C25.8727 9.01148 25.6762 9.20799 25.4281 9.20799H23.066L22.7752 10.783H24.9747C25.2228 10.783 25.4193 10.9795 25.4193 11.2276C25.4193 11.4757 25.2228 11.6722 24.9747 11.6722H22.245C22.1166 11.6722 21.9881 11.6119 21.9025 11.5097C21.8169 11.4076 21.7829 11.2704 21.8082 11.142L22.7071 6.20387C22.7499 5.98985 22.9298 5.83614 23.1439 5.83614H25.8736C26.1305 5.85365 26.327 6.05892 26.327 6.29824L26.326 6.29921ZM28.5772 6.7438L28.2863 8.31882H30.4859C30.7339 8.31882 30.9305 8.51533 30.9305 8.7634C30.9305 9.01148 30.7339 9.20799 30.4859 9.20799H28.1238L27.8329 10.783H30.0325C30.6143 10.7918 30.623 11.6644 30.0325 11.6732H27.3027C27.0294 11.6819 26.8066 11.4076 26.8659 11.143L27.7648 6.20484C27.8076 5.99082 27.9876 5.83711 28.2016 5.83711H30.9314C31.5132 5.83711 31.5132 6.72726 30.9314 6.72726C30.9402 6.74477 28.5781 6.74477 28.5781 6.74477L28.5772 6.7438ZM20.3012 6.08519C20.2244 5.93926 20.0697 5.85365 19.9072 5.85365H18.0841C17.8701 5.85365 17.6824 6.00736 17.6473 6.22138L16.7484 11.1595C16.7056 11.3988 16.8681 11.6391 17.1074 11.6819C17.3467 11.7247 17.587 11.571 17.6298 11.3229L17.7923 10.4503H18.9733L19.5298 11.4514C19.6154 11.5973 19.7613 11.6829 19.9238 11.6829C20.2487 11.6916 20.4802 11.3064 20.3178 11.0243L19.7876 10.0748C19.8985 9.92108 20.8227 9.04747 20.8149 8.85096L21.0377 7.61838C21.0552 7.51526 21.0377 7.41311 20.9861 7.31874L20.3012 6.08616V6.08519ZM19.9588 8.56689L19.0434 9.55919H17.948L18.4616 6.7438H19.6426L20.1222 7.60768L19.9598 8.56592L19.9588 8.56689ZM7.6534 1.90004H1.09843C0.51667 1.90004 0.51667 1.0099 1.09843 1.0099H7.6534C8.23515 1.0099 8.24391 1.90004 7.6534 1.90004ZM7.7643 6.47043H1.59457C1.01282 6.47043 1.01282 5.58028 1.59457 5.58028H7.77306C8.34606 5.58028 8.35481 6.47043 7.7643 6.47043ZM4.99172 8.32757H8.99688C9.57864 8.32757 9.57864 9.21772 8.99688 9.21772H4.99172C4.40996 9.21772 4.40121 8.32757 4.99172 8.32757ZM6.82357 14.8397C6.82357 15.0878 6.62706 15.2843 6.37898 15.2843H2.37284C2.12477 15.2843 1.92826 15.0878 1.92826 14.8397C1.92826 14.5917 2.12477 14.3952 2.37284 14.3952H6.37801C6.62608 14.3952 6.8226 14.5917 6.8226 14.8397H6.82357Z"    stroke-width="0.5"/>
+</svg>
+
+          </div>
+          <p  class="reward-text">Free shipping<br><span class="reward-value">on order above ₹{{ first_delivery }}</span></p>
+        </div>
+
+        <!-- First Gift Milestone -->
+        <div class="reward-milestone milestone-center" data-threshold="{{ first_gift_threshold }}">
+          <div class="milestone-connector"></div>
+          <div class="reward-icon-wrapper gift-icon {% if current_cart_total >= first_gift_threshold %}active{% endif %}">
+            <!-- 
+            =============================================================================
+            FIRST GIFT BOX ICON - NOW WITH BOLD STYLING WHEN ACTIVE
+            =============================================================================
+            -->
+<svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.9082 15.0179C4.11518 15.018 4.2832 15.1869 4.2832 15.3939C4.28308 15.6008 4.1151 15.7687 3.9082 15.7689C3.7012 15.7689 3.53235 15.6008 3.53223 15.3939C3.53223 15.1868 3.70112 15.0179 3.9082 15.0179Z" fill="#68B584" stroke="#606060" stroke-width="0.0887286"/>
+<path d="M12.1222 5.89964C11.1817 5.89432 10.5624 5.50391 10.2643 4.99017C10.1258 4.75149 10.0566 4.48531 10.0566 4.22001C10.0566 3.86066 10.1844 3.50131 10.4382 3.20762C10.778 2.81455 11.3459 2.53949 12.14 2.53949C12.9829 2.53949 13.5694 2.84827 13.9004 3.27771C14.1169 3.55721 14.2242 3.88816 14.2242 4.21912C14.2242 4.46046 14.1666 4.70181 14.0521 4.92274C13.769 5.46842 13.1382 5.89432 12.1586 5.89964" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.2641 4.99015C10.2641 4.99015 7.8924 6.38408 7.8853 6.38763C7.8924 6.38319 7.88352 6.38763 7.85069 6.40804C7.84537 6.4107 7.84005 6.41425 7.83384 6.4178C7.84448 6.41159 7.83561 6.41691 7.81432 6.42933C7.80633 6.43377 7.79834 6.4382 7.79036 6.44353C7.73535 6.47547 7.67856 6.50919 7.67856 6.50919C7.32542 6.71681 6.88887 6.79933 6.43104 6.69463C5.58279 6.50031 5.10188 5.40718 5.01404 4.21821C4.89514 2.62465 5.48075 0.858948 6.82765 0.858948C7.21451 0.858948 7.5712 0.989379 7.85513 1.20943C7.85513 1.20943 7.93321 1.26976 7.93853 1.2742C7.94829 1.28218 7.95983 1.29106 7.9616 1.29283L8.02549 1.34252L8.02726 1.34341L10.4362 3.20759" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16.5488 6.39026L16.556 6.39506" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.9023 3.27769L16.5749 1.20943C16.8597 0.989379 17.2155 0.858948 17.6023 0.858948C18.9483 0.858948 19.5348 2.62465 19.4159 4.21821C19.3281 5.40718 18.8481 6.50031 17.9998 6.69463C17.542 6.79933 17.1063 6.7177 16.7523 6.50919L16.5802 6.40804C16.5509 6.39118 16.5447 6.38763 16.558 6.39473C16.5553 6.39295 16.5518 6.39118 16.55 6.3894L16.5349 6.38053H16.5331V6.37964L14.0541 4.92272" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.0532 4.92358L18.4275 10.9385L16.1321 10.3236L15.5172 12.619L12.1233 5.90049H12.1606L8.76674 12.619L8.15186 10.3236L5.85645 10.9385L10.2663 4.99013" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.4296 4.21997H21.2131C21.6771 4.21997 22.0533 4.59618 22.0533 5.06023V8.42127H16.5947" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.72203 8.42042H1.3877V5.05938C1.3877 4.59533 1.7639 4.21912 2.22796 4.21912H5.00073" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.2164 8.42041V20.6871C21.2164 21.1512 20.5882 21.5274 20.1242 21.5274H3.06878C2.60473 21.5274 2.22852 21.1512 2.22852 20.6871V8.42041" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8.35938 4.21997H10.0559" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.2246 4.21997H15.9211" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.4014 8.43103V21.5274" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.8809 21.5274V8.43103" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.9082 17.0741V19.8469" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+          </div>
+          <p class="reward-text">Free Gift<br><span class="reward-value">on order above ₹{{ first_gift_value }}</span></p>
+        </div>
+
+        <!-- Second Gift Milestone -->
+        {% comment %} <div class="reward-milestone milestone-right" data-threshold="{{ second_gift_threshold }}">
+          <div class="milestone-connector"></div>
+          <div class="reward-icon-wrapper gift-icon {% if current_cart_total >= second_gift_threshold %}active{% endif %}">
+            <!-- 
+            =============================================================================
+            PREMIUM GIFT ICON - NOW WITH BOLD STYLING WHEN ACTIVE
+            =============================================================================
+            -->
+<svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.9082 15.0179C4.11518 15.018 4.2832 15.1869 4.2832 15.3939C4.28308 15.6008 4.1151 15.7687 3.9082 15.7689C3.7012 15.7689 3.53235 15.6008 3.53223 15.3939C3.53223 15.1868 3.70112 15.0179 3.9082 15.0179Z" fill="#68B584" stroke="#606060" stroke-width="0.0887286"/>
+<path d="M12.1222 5.89964C11.1817 5.89432 10.5624 5.50391 10.2643 4.99017C10.1258 4.75149 10.0566 4.48531 10.0566 4.22001C10.0566 3.86066 10.1844 3.50131 10.4382 3.20762C10.778 2.81455 11.3459 2.53949 12.14 2.53949C12.9829 2.53949 13.5694 2.84827 13.9004 3.27771C14.1169 3.55721 14.2242 3.88816 14.2242 4.21912C14.2242 4.46046 14.1666 4.70181 14.0521 4.92274C13.769 5.46842 13.1382 5.89432 12.1586 5.89964" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.2641 4.99015C10.2641 4.99015 7.8924 6.38408 7.8853 6.38763C7.8924 6.38319 7.88352 6.38763 7.85069 6.40804C7.84537 6.4107 7.84005 6.41425 7.83384 6.4178C7.84448 6.41159 7.83561 6.41691 7.81432 6.42933C7.80633 6.43377 7.79834 6.4382 7.79036 6.44353C7.73535 6.47547 7.67856 6.50919 7.67856 6.50919C7.32542 6.71681 6.88887 6.79933 6.43104 6.69463C5.58279 6.50031 5.10188 5.40718 5.01404 4.21821C4.89514 2.62465 5.48075 0.858948 6.82765 0.858948C7.21451 0.858948 7.5712 0.989379 7.85513 1.20943C7.85513 1.20943 7.93321 1.26976 7.93853 1.2742C7.94829 1.28218 7.95983 1.29106 7.9616 1.29283L8.02549 1.34252L8.02726 1.34341L10.4362 3.20759" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M16.5488 6.39026L16.556 6.39506" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.9023 3.27769L16.5749 1.20943C16.8597 0.989379 17.2155 0.858948 17.6023 0.858948C18.9483 0.858948 19.5348 2.62465 19.4159 4.21821C19.3281 5.40718 18.8481 6.50031 17.9998 6.69463C17.542 6.79933 17.1063 6.7177 16.7523 6.50919L16.5802 6.40804C16.5509 6.39118 16.5447 6.38763 16.558 6.39473C16.5553 6.39295 16.5518 6.39118 16.55 6.3894L16.5349 6.38053H16.5331V6.37964L14.0541 4.92272" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.0532 4.92358L18.4275 10.9385L16.1321 10.3236L15.5172 12.619L12.1233 5.90049H12.1606L8.76674 12.619L8.15186 10.3236L5.85645 10.9385L10.2663 4.99013" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.4296 4.21997H21.2131C21.6771 4.21997 22.0533 4.59618 22.0533 5.06023V8.42127H16.5947" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.72203 8.42042H1.3877V5.05938C1.3877 4.59533 1.7639 4.21912 2.22796 4.21912H5.00073" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.2164 8.42041V20.6871C21.2164 21.1512 20.5882 21.5274 20.1242 21.5274H3.06878C2.60473 21.5274 2.22852 21.1512 2.22852 20.6871V8.42041" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8.35938 4.21997H10.0559" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.2246 4.21997H15.9211" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.4014 8.43103V21.5274" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.8809 21.5274V8.43103" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.9082 17.0741V19.8469" stroke="#606060" stroke-width="0.798558" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+          </div>
+          <p class="reward-text">Premium Gift<br><span class="reward-value">worth ₹{{ second_gift_value }}</span></p>
+        </div> {% endcomment %}
+      </div>
+    </div>
+
+    <!-- Dynamic Message -->
+    <!-- Dynamic Message -->
+<div class="rewards-message" id="rewardsMessage">
+  {% if current_cart_total >= first_gift_threshold %}
+    <span class="success-message">🎉 You've unlocked a FREE surpirse Gift</span>
+  {% else %}
+    {% assign remaining = first_gift_threshold | minus: current_cart_total %}
+    <span class="progress-message">₹{{ remaining | divided_by: 100 }} more to get your free gift</span>
+  {% endif %}
+</div>
+  </div>
+</div>
+
+<script>
+// --- BEGIN Confetti Setup ---
+
+// Simple confetti utility
+{% comment %} function launchConfetti(targetSelector) {
+  if (document.getElementById('cartConfettiCanvas')) return; // Only one instance
+  const cart = document.querySelector(targetSelector);
+  if (!cart) return;
+  // Create canvas
+  const confettiCanvas = document.createElement('canvas');
+  confettiCanvas.id = 'cartConfettiCanvas';
+  confettiCanvas.style.position = 'fixed';
+  confettiCanvas.style.top = 0;
+  confettiCanvas.style.left = 0;
+  confettiCanvas.style.width = '100vw';
+  confettiCanvas.style.height = '100vh';
+  confettiCanvas.style.pointerEvents = 'none';
+  confettiCanvas.style.zIndex = 9999;
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+  document.body.appendChild(confettiCanvas);
+
+  // Confetti parameters
+  const colors = ['#53B276', '#FFC700', '#FF5252', '#36C6F0', '#904CDE', '#FA9E84'];
+  const confettiCount = 120;
+  const confetti = [];
+  
+  for(let i = 0; i < confettiCount; i++) {
+    confetti.push({
+      x: Math.random() * confettiCanvas.width,
+      y: Math.random() * -confettiCanvas.height,
+      w: 12 + Math.random() * 8,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      deg: Math.random() * 360,
+      speed: 2 + Math.random() * 2,
+      dAngle: (Math.random() - 0.5) * 2
+    });
+  }
+
+  let running = true;
+  function drawConfetti() {
+    if (!running) return;
+    const ctx = confettiCanvas.getContext('2d');
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    for(const p of confetti) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.deg * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+
+      p.deg += p.dAngle;
+      p.y += p.speed;
+      p.x += Math.sin(p.y / 30) * 1.2; // Wavy
+      if (p.y > confettiCanvas.height + 10) {
+        p.y = -12;
+        p.x = Math.random() * confettiCanvas.width;
+      }
+    }
+    requestAnimationFrame(drawConfetti);
+  }
+  drawConfetti();
+
+  // Remove after 4s
+  setTimeout(() => {
+    running = false;
+    confettiCanvas.remove();
+  }, 4000);
+} {% endcomment %}
+
+// --- END Confetti Setup ---
+</script>
+
+<!-- Compact Styles -->
+<style>
+  .rewards-progress-container {
+    width: 100%;
+    {% comment %} margin: 6px 0; {% endcomment %}
+    {% comment %} padding: 1px 6px; {% endcomment %}
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    {% comment %} background:red {% endcomment %}
+  }
+
+  .rewards-progress-bar {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Connected Milestones Layout - Reduced spacing */
+  .connected-milestones {
+    position: relative;
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  /* Connection Line - Compact */
+  .connection-line {
+    position: absolute;
+    top: 32%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: translateY(-50%);
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .connection-line::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc(10% + 16px);
+    right: calc(10% + 16px);
+    height: 2px;
+    background-color: #e0e0e0;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  .connection-fill {
+    position: absolute;
+    top: 50%;
+    left: calc(10% + 16px);
+    height: 2px;
+    background-color: #51a530;
+    transform: translateY(-50%);
+    z-index: 2;
+    transition: width 0.4s ease;
+  }
+
+  .connection-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-15px); }
+    100% { transform: translateX(15px); }
+  }
+
+  /* Milestone Wrapper - Compact */
+  .milestone-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+    padding: 0;
+  }
+
+  /* Individual Milestones - Compact */
+  .reward-milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  /* Milestone Connectors - Smaller */
+  .milestone-connector {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e9ecef;
+    border: 3px solid #ffffff;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+    z-index: 3;
+  }
+
+  .reward-milestone.active .milestone-connector,
+  .reward-milestone[data-threshold] .milestone-connector {
+    background: #235A49;
+    border-color: #235A49;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* 
+  =============================================================================
+  ICON WRAPPER STYLING - BIGGER TRUCK ICON & BOLD GIFT ICONS WHEN ACTIVE
+  =============================================================================
+  */
+  
+  /* Default icon wrapper */
+  .reward-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    {% comment %} margin-bottom: 10px; {% endcomment %}
+    position: relative;
+    border: none;
+    z-index: 4;
+  }
+
+  /* BIGGER TRUCK ICON - Special styling for truck */
+  .reward-icon-wrapper.truck-icon {
+    width: 60px;  /* Made bigger - was 50px */
+    height: 60px; /* Made bigger - was 50px */
+  }
+
+  /* Truck icon SVG bigger on all screen sizes */
+  .reward-icon-wrapper.truck-icon svg {
+    width: 55px !important;  /* Made bigger */
+    height: 27px !important; /* Made bigger */
+  }
+
+  /* Default state - Light grey for inactive icons */
+  .reward-icon-wrapper svg path,
+  .reward-icon-wrapper svg circle {
+    fill: rgb(255, 255, 255) !important;
+    stroke: #A0A0A0 !important;
+    transition: all 0.3s ease;
+  }
+
+  /* Active state - Light green */
+  .reward-icon-wrapper.active svg path,
+  .reward-icon-wrapper.active svg circle {
+    stroke: #235A49 !important;
+  }
+
+  /* BOLD GIFT ICONS WHEN ACTIVE - Thicker stroke weight */
+  .reward-icon-wrapper.gift-icon.active svg path,
+  .reward-icon-wrapper.gift-icon.active svg circle {
+    stroke: #235A49 !important;
+    stroke-width: 1.5 !important; /* Made bolder - was 0.798558 */
+    {% comment %} fill: #68B584 !important; /* Added slight fill for boldness */ {% endcomment %}
+  }
+
+  /* Scale effect on active */
+  .reward-icon-wrapper.active {
+    transform: scale(1.1);
+  }
+
+  /* Bigger scale for truck when active */
+  .reward-icon-wrapper.truck-icon.active {
+    transform: scale(1.15); /* Slightly bigger scale for truck */
+  }
+
+  /* Moving Progress Indicator - Compact */
+  .progress-indicator {
+    position: absolute;
+    top: -10px;
+    left: calc(16.67% + 20px);
+    height: calc(100% + 20px);
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .indicator-dot {
+    width: 6px;
+    height: 6px;
+    background: #007bff;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 6px rgba(0, 123, 255, 0.3);
+    animation: indicatorPulse 2s infinite;
+  }
+
+  @keyframes indicatorPulse {
+    0%, 100% { 
+      transform: translate(-50%, -50%) scale(1);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+    }
+    50% { 
+      transform: translate(-50%, -50%) scale(1.2);
+      box-shadow: 0 3px 10px rgba(0, 123, 255, 0.6);
+    }
+  }
+
+  .indicator-label {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #007bff;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 1px 6px rgba(0, 123, 255, 0.25);
+  }
+
+  .indicator-label::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 3px solid transparent;
+    border-top-color: #007bff;
+  }
+
+  /* Text Styles - Compact */
+  .reward-text {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+    {% comment %} line-height: 1.1; {% endcomment %}
+    font-family: 'Roboto Slab', serif;
+    z-index: 4;
+    position: relative;
+  }
+
+  .reward-milestone.active .reward-text {
+    color: #235A49;
+    font-weight: 700;
+  }
+
+  .reward-value {
+    font-size:12px;
+    font-weight: 500;
+    color: #6c757d;
+  }
+
+  .reward-milestone.active .reward-value {
+    color: #235A49;
+  }
+
+  /* Message - Compact */
+  .rewards-message {
+    text-align: center;
+    margin-top: 8px;
+    font-family: 'Roboto Slab', serif;
+  }
+
+  .success-message {
+    font-size: 12px;
+    font-weight: 700;
+    color: #235A49;
+    text-shadow: 0 1px 2px rgba(40, 167, 69, 0.2);
+  }
+
+  .progress-message {
+    font-size: 11px;
+    font-weight: 600;
+    color: #495057;
+  }
+
+  /* 
+  =============================================================================
+  RESPONSIVE ICON SIZES - UPDATED FOR BIGGER TRUCK & BOLD GIFTS
+  =============================================================================
+  */
+
+  /* Laptop/Desktop (Medium screens) */
+  @media (min-width: 769px) and (max-width: 1200px) {
+    .rewards-progress-container {
+      padding: 6px 4px;
+      margin: 4px auto;
+    }
+
+    .connected-milestones {
+      padding: 6px 0;
+    }
+
+    .reward-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 8px;
+    }
+
+    /* Bigger truck on laptop */
+    .reward-icon-wrapper.truck-icon {
+      width: 54px;  /* Bigger truck */
+      height: 54px;
+    }
+
+    .reward-icon-wrapper.truck-icon svg {
+      width: 50px !important;
+      height: 25px !important;
+    }
+
+    .reward-icon-wrapper svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .reward-text {
+      font-size:12px;
+    }
+
+    .reward-value {
+      font-size: 7px;
+    }
+
+    .milestone-connector {
+      top: 22px;
+      width: 14px;
+      height: 14px;
+      border-width: 2px;
+    }
+
+    .success-message {
+      font-size: 11px;
+    }
+
+    .progress-message {
+      font-size: 10px;
+    }
+  }
+
+  /* Mobile (Small screens) */
+  @media (max-width: 768px) {
+    .rewards-progress-container {
+      padding: 5px 3px;
+      margin: 3px auto;
+    }
+
+    .connected-milestones {
+      padding: 5px 0;
+    }
+
+    .milestone-wrapper {
+      padding: 0 2%;
+    }
+
+    .connection-line {
+      left: 2%;
+      right: 2%;
+      height: 3px;
+    }
+
+    .reward-icon-wrapper {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 6px;
+      border-width: 2px;
+    }
+
+    /* Bigger truck on mobile */
+    .reward-icon-wrapper.truck-icon {
+      width: 46px;  /* Bigger truck */
+      height: 46px;
+    }
+
+    .reward-icon-wrapper.truck-icon svg {
+      width: 42px !important;
+      height: 21px !important;
+    }
+
+    .reward-icon-wrapper svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .reward-text {
+      font-size: 10px;
+    }
+
+    .reward-value {
+      font-size: 8px;
+    }
+
+    .connection-line::before {
+      left: calc(12% + 12px);
+      right: calc(12% + 12px);
+    }
+
+    .connection-fill {
+      left: calc(12% + 12px);
+    }
+
+    .milestone-connector {
+      top: 18px;
+      width: 12px;
+      height: 12px;
+      border-width: 2px;
+    }
+
+    .indicator-label {
+      font-size: 10px;
+      padding: 1px 4px;
+      top: -18px;
+    }
+
+    .indicator-dot {
+      width: 5px;
+      height: 5px;
+      border-width: 1px;
+    }
+
+    .progress-indicator {
+      top: -8px;
+      height: calc(100% + 16px);
+    }
+
+    .rewards-message {
+      margin-top: 6px;
+    }
+
+    .success-message {
+      font-size: 11px;
+    }
+
+    .progress-message {
+      font-size: 11px;
+    }
+  }
+
+  /* Extra Small Mobile */
+  @media (max-width: 480px) {
+    .rewards-progress-container {
+      padding: 4px 2px;
+    }
+
+    .connected-milestones {
+      padding: 4px 0;
+    }
+
+    .reward-icon-wrapper {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
+    }
+
+    /* Bigger truck on small mobile */
+    .reward-icon-wrapper.truck-icon {
+      width: 42px;  /* Bigger truck */
+      height: 42px;
+    }
+
+    .reward-icon-wrapper.truck-icon svg {
+      width: 38px !important;
+      height: 19px !important;
+    }
+
+    .reward-icon-wrapper svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .reward-text {
+      font-size: 11px;
+    }
+
+    .reward-value {
+      font-size: 8px;
+    }
+
+    .milestone-connector {
+      top: 16px;
+      width: 10px;
+      height: 10px;
+      border-width: 2px;
+    }
+
+    .indicator-label {
+      font-size: 10px;
+      padding: 1px 3px;
+      top: -16px;
+    }
+
+    .indicator-dot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .progress-indicator {
+      top: -6px;
+      height: calc(100% + 12px);
+    }
+
+    .rewards-message {
+      margin-top: 4px;
+    }
+
+    .success-message {
+      font-size: 11px;
+    }
+
+    .progress-message {
+      font-size: 10px;
+    }
+  }
+</style>
+
+<!-- JavaScript for Dynamic Updates -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    {% comment %} updateRewardsProgressWithConfetti(); {% endcomment %}
+  }, 200);
+});
+
+// Update the window functions
+window.updateCartRewards = function() {
+  {% comment %} updateRewardsProgressWithConfetti(); {% endcomment %}
+};
+
+window.debugRewards = function() {
+  const currentTotal = {{ current_cart_total | default: 0 }};
+  console.log('Current cart total:', currentTotal);
+  console.log('In rupees:', currentTotal / 100);
+  {% comment %} updateRewardsProgressWithConfetti(); {% endcomment %}
+};
+
+// Enhanced Cart Confetti Animation
+{% comment %} function createCartConfetti() {
+  // Check if confetti library is loaded
+  if (typeof confetti === 'undefined') {
+    console.warn('Canvas-confetti library not loaded');
+    return;
+  } {% endcomment %}
+
+  // Get the cart drawer element
+  const cartDrawer = document.querySelector('#CartDrawer, .cart-drawer, cart-drawer');
+  if (!cartDrawer) {
+    console.warn('Cart drawer not found');
+    return;
+  }
+
+  // Create a dedicated canvas for cart confetti
+  {% comment %} let confettiCanvas = document.getElementById('cartConfettiCanvas');
+  if (confettiCanvas) {
+    confettiCanvas.remove(); // Remove existing canvas {% endcomment %}
+  }
+{% comment %} 
+  confettiCanvas = document.createElement('canvas');
+  confettiCanvas.id = 'cartConfettiCanvas'; {% endcomment %}
+  
+  // Position canvas to cover only the cart drawer
+  {% comment %} const cartRect = cartDrawer.getBoundingClientRect();
+  confettiCanvas.style.position = 'fixed';
+  confettiCanvas.style.top = cartRect.top + 'px';
+  confettiCanvas.style.left = cartRect.left + 'px';
+  confettiCanvas.style.width = cartRect.width + 'px';
+  confettiCanvas.style.height = cartRect.height + 'px';
+  confettiCanvas.style.pointerEvents = 'none';
+  confettiCanvas.style.zIndex = '9999';
+  confettiCanvas.style.borderRadius = '8px'; // Match cart drawer styling
+  confettiCanvas.width = cartRect.width;
+  confettiCanvas.height = cartRect.height; {% endcomment %}
+
+  // Append to cart drawer
+  {% comment %} cartDrawer.appendChild(confettiCanvas); {% endcomment %}
+
+  // Create confetti instance bound to our canvas
+  {% comment %} const cartConfetti = confetti.create(confettiCanvas, {
+    resize: true,
+    useWorker: true
+  }); {% endcomment %}
+
+  // Launch multiple confetti bursts
+  {% comment %} const animationEnd = Date.now() + (3 * 1000); // 3 seconds
+  const colors = ['#235A49', '#53B276', '#FFC700', '#FF5252', '#36C6F0'];
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  } {% endcomment %}
+
+  // Continuous confetti fall
+  {% comment %} const confettiInterval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      clearInterval(confettiInterval);
+      // Clean up canvas after animation
+      setTimeout(() => {
+        if (confettiCanvas && confettiCanvas.parentNode) {
+          confettiCanvas.remove();
+        }
+      }, 1000);
+      return;
+    }
+
+    const particleCount = 50 * (timeLeft / 3000);
+
+    // Burst from top of cart
+    cartConfetti(Object.assign({}, {
+      particleCount: Math.floor(particleCount),
+      spread: 70,
+      startVelocity: 30,
+      decay: 0.9,
+      gravity: 0.8,
+      origin: { 
+        x: randomInRange(0.1, 0.9), 
+        y: 0 
+      },
+      colors: colors,
+      shapes: ['square', 'circle'],
+      scalar: randomInRange(0.8, 1.2)
+    }));
+
+  }, 250); {% endcomment %}
+
+  // Add some side bursts for extra effect
+  {% comment %} setTimeout(() => {
+    cartConfetti({
+      particleCount: 30,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.6 },
+      colors: colors
+    });
+  }, 500);
+
+  setTimeout(() => {
+    cartConfetti({
+      particleCount: 30,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.6 },
+      colors: colors
+    });
+  }, 700); {% endcomment %}
+}
+
+// Function to check if confetti should trigger
+{% comment %} function shouldTriggerConfetti() {
+  const currentTotal = {{ current_cart_total | default: 0 }};
+  const secondGiftThreshold = {{ second_gift_threshold }};
+  const rewardsMessage = document.getElementById('rewardsMessage');
+  
+  // Check both conditions
+  const hasReachedThreshold = currentTotal >= secondGiftThreshold;
+  const hasUnlockedMessage = rewardsMessage && 
+    rewardsMessage.innerHTML.includes('You\'ve unlocked all rewards!');
+  
+  return hasReachedThreshold && hasUnlockedMessage;
+} {% endcomment %}
+
+// Track if confetti has been triggered in this session
+{% comment %} let confettiTriggered = false; {% endcomment %}
+
+// Enhanced update function with confetti trigger
+{% comment %} function updateRewardsProgressWithConfetti() {
+  const currentTotal = {{ current_cart_total | default: 0 }};
+  const freeShippingThreshold = {{ free_shipping_threshold }};
+  const firstGiftThreshold = {{ first_gift_threshold }};
+  
+  const connectionFill = document.getElementById('connectionProgressFill');
+  const progressIndicator = document.getElementById('progressIndicator');
+  const indicatorLabel = document.getElementById('indicatorLabel');
+  const rewardsMessage = document.getElementById('rewardsMessage');
+ 
+  if (!connectionFill) return;
+  
+  let progressPercentage = 0;
+  let messageText = '';
+  
+  // Calculate progress percentage for ONLY 2 milestones
+  if (currentTotal >= firstGiftThreshold) {
+    progressPercentage = 100;
+    messageText = '<span class="success-message">🎉 You\'ve unlocked all rewards!</span>';
+    
+    // Trigger confetti when reaching first gift threshold (only once per session)
+    if (!confettiTriggered) {
+      confettiTriggered = true;
+      setTimeout(() => {
+        createCartConfetti();
+      }, 500);
+    }
+    
+  } else {
+    // Reset trigger flag if cart value goes below threshold
+    confettiTriggered = false;
+    
+    if (currentTotal >= freeShippingThreshold) {
+      const progressInGiftSegment = (currentTotal - freeShippingThreshold) / (firstGiftThreshold - freeShippingThreshold);
+      progressPercentage = 50 + (progressInGiftSegment * 50);
+      const remaining = Math.ceil((firstGiftThreshold - currentTotal) / 100);
+      messageText = `<span class="progress-message">₹${remaining} more to get your free gift</span>`;
+    } else {
+      const progressInShippingSegment = currentTotal / freeShippingThreshold;
+      progressPercentage = Math.min(progressInShippingSegment * 50, 50);
+      const remaining = Math.ceil((freeShippingThreshold - currentTotal) / 100);
+      messageText = `<span class="progress-message">₹${remaining} more for free shipping</span>`;
+    }
+  }
+  
+  progressPercentage = Math.max(0, Math.min(100, progressPercentage));
+  
+  // Rest of the animation code remains the same...
+  // [Keep the existing animation code]
+} {% endcomment %}
+
+function updateMilestoneStates(currentTotal) {
+  const freeShippingThreshold = {{ free_shipping_threshold }};
+  const firstGiftThreshold = {{ first_gift_threshold }};
+  
+  // Free shipping milestone
+  const milestone1 = document.querySelector('.reward-milestone[data-threshold="' + freeShippingThreshold + '"]');
+  const iconWrapper1 = milestone1?.querySelector('.reward-icon-wrapper');
+  
+  if (currentTotal >= freeShippingThreshold) {
+    iconWrapper1?.classList.add('active');
+    milestone1?.classList.add('active');
+  } else {
+    iconWrapper1?.classList.remove('active');
+    milestone1?.classList.remove('active');
+  }
+  
+  // First gift milestone
+  const milestone2 = document.querySelector('.reward-milestone[data-threshold="' + firstGiftThreshold + '"]');
+  const iconWrapper2 = milestone2?.querySelector('.reward-icon-wrapper');
+  
+  if (currentTotal >= firstGiftThreshold) {
+    iconWrapper2?.classList.add('active');
+    milestone2?.classList.add('active');
+  } else {
+    iconWrapper2?.classList.remove('active');
+    milestone2?.classList.remove('active');
+  }
+  
+  // REMOVE: All second gift milestone code
+}
+
+{% comment %} window.updateCartRewards = function() {
+  updateRewardsProgressWithConfetti();
+}; {% endcomment %}
+
+window.debugRewards = function() {
+  const currentTotal = {{ current_cart_total | default: 0 }};
+  console.log('Current cart total:', currentTotal);
+  console.log('In rupees:', currentTotal / 100);
+  {% comment %} updateRewardsProgressWithConfetti(); {% endcomment %}
+};
+</script>

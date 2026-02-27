@@ -1,0 +1,1309 @@
+<!-- Sticky Rewards Bar -->
+<style>
+  .sticky-rewards-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 15px;
+    font-family: var(--font-body-family);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .sticky-rewards-bar:hover {
+    background-color: {{ section.settings.bg_color | color_darken: 5 }};
+  }
+
+  .sticky-rewards-bar__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .sticky-rewards-bar__text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sticky-rewards-bar__highlight {
+    font-weight: 700;
+  }
+
+  .sticky-rewards-bar__divider {
+    margin: 0 2px;
+    opacity: 0.7;
+  }
+
+  .sticky-rewards-bar__coins {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: {{ section.settings.coin_bg_color }};
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: {{ section.settings.coin_text_color }};
+    line-height: 1;
+  }
+
+  .sticky-rewards-bar__coins img,
+  .sticky-rewards-bar__coins svg {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .sticky-rewards-bar__arrow {
+    margin-left: 4px;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .sticky-rewards-bar__coin-inline {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-left: 4px;
+    margin-right: 2px;
+  }
+
+  #sticky-bar-coins-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  #sticky-bar-message {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  #sticky-bar-coin-img {
+    flex-shrink: 0;
+  }
+
+  /* ========== TABLET STYLES (750px - 989px) ========== */
+  @media screen and (max-width: 989px) {
+    .sticky-rewards-bar {
+      height: 38px;
+      padding: 0 12px;
+    }
+
+    .sticky-rewards-bar__content {
+      font-size: 12px;
+      gap: 5px;
+    }
+  }
+
+  /* ========== MOBILE STYLES - position above tab bar (max 749px) ========== */
+  @media screen and (max-width: 749px) {
+    .sticky-rewards-bar {
+      bottom: 60px;
+      height: 36px;
+      padding: 0 10px;
+    }
+
+    .sticky-rewards-bar__content {
+      font-size: 11px;
+      gap: 3px;
+    }
+
+    .sticky-rewards-bar__coins {
+      padding: 2px 6px;
+      gap: 2px;
+    }
+
+    .sticky-rewards-bar__coins img,
+    .sticky-rewards-bar__coins svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sticky-rewards-bar__coin-inline {
+      width: 14px;
+      height: 14px;
+      margin-left: 2px;
+      margin-right: 1px;
+    }
+
+    .sticky-rewards-bar__arrow {
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
+    .sticky-rewards-bar__divider {
+      margin: 0 1px;
+    }
+
+    #sticky-bar-coin-img {
+      width: 16px !important;
+      height: 16px !important;
+      margin: 0 2px !important;
+    }
+  }
+
+  /* ========== SMALL PHONES (max 374px) ========== */
+  @media screen and (max-width: 374px) {
+    .sticky-rewards-bar {
+      height: 34px;
+      padding: 0 8px;
+    }
+
+    .sticky-rewards-bar__content {
+      font-size: 10px;
+      gap: 2px;
+    }
+
+    .sticky-rewards-bar__highlight {
+      display: none;
+    }
+
+    .sticky-rewards-bar__divider {
+      display: none;
+    }
+
+    .sticky-rewards-bar__coins img,
+    .sticky-rewards-bar__coins svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .sticky-rewards-bar__coin-inline {
+      width: 12px;
+      height: 12px;
+    }
+
+    #sticky-bar-coin-img {
+      width: 14px !important;
+      height: 14px !important;
+      margin: 0 1px !important;
+    }
+  }
+
+  {% if request.path contains '/products' %}
+  @media screen and (max-width: 749px) {
+    .sticky-rewards-bar {
+      bottom: 0;
+    }
+  }
+  {% endif %}
+
+  /* ========== POPUP STYLES ========== */
+  .rewards-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .rewards-popup-overlay.active {
+    display: flex;
+  }
+
+  .rewards-popup {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: popupSlideIn 0.3s ease;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  .rewards-popup::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  @keyframes popupSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .rewards-popup__header {
+    background: #235A49;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+  }
+
+  .rewards-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+
+  .rewards-popup__close:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .rewards-popup__welcome {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .rewards-popup__brand {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    line-height: 1;
+  }
+
+  .rewards-popup__logo {
+    height: 28px;
+    width: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+  }
+
+  .rewards-popup__balance {
+    background: #E2F1E4;
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .rewards-popup__balance-title {
+    color: #235A49;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .rewards-popup__coins-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .rewards-popup__coin-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+  }
+
+  .rewards-popup__coin-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .rewards-popup__coin-svg {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+  }
+
+  .rewards-popup__coins-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .rewards-popup__buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .rewards-popup__btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    min-width: 110px;
+    text-align: center;
+  }
+
+  .rewards-popup__btn--primary {
+    background: #235A49;
+    color: #fff;
+    border: none;
+  }
+
+  .rewards-popup__btn--primary:hover {
+    background: #1a4538;
+  }
+
+  .rewards-popup__btn--secondary {
+    background: #E8D998;
+    color: #235A49;
+    border: none;
+  }
+
+  .rewards-popup__btn--secondary:hover {
+    background: #dcc985;
+  }
+
+  .rewards-popup__earn {
+    padding: 20px;
+  }
+
+  .rewards-popup__earn-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #235A49;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .rewards-popup__earn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: #F1F8F5;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .rewards-popup__earn-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .rewards-popup__earn-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .rewards-popup__earn-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .rewards-popup__earn-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #404040;
+    margin: 0 0 4px 0;
+  }
+
+  .rewards-popup__earn-content p {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .rewards-popup__earn-content p strong {
+    color: #235A49;
+  }
+
+  .rewards-popup__faqs {
+    padding: 0 20px 20px;
+  }
+
+  .rewards-popup__faqs-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #235A49;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .rewards-popup__faq-item {
+    margin-bottom: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .rewards-popup__faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #404040;
+    background: #E8E8E8;
+    border-radius: 8px;
+  }
+
+  .rewards-popup__faq-item.active .rewards-popup__faq-question {
+    border-radius: 8px 8px 0 0;
+    background: #F1F8F5;
+    color: #235A49;
+  }
+
+  .rewards-popup__faq-question:hover {
+    color: #235A49;
+  }
+
+  .rewards-popup__faq-arrow {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .rewards-popup__faq-arrow img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .rewards-popup__faq-item.active .rewards-popup__faq-arrow {
+    transform: rotate(180deg);
+  }
+
+  .rewards-popup__faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 14px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    background: #F1F8F5;
+    border-radius: 0 0 8px 8px;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  .rewards-popup__faq-item.active .rewards-popup__faq-answer {
+    max-height: 200px;
+    padding: 12px 14px;
+  }
+
+  /* ========== INTRO SECTION (Not Logged In) ========== */
+  .rewards-popup__intro {
+    padding: 30px 20px;
+    text-align: center;
+    background: #E2F1E4;
+    display: none;
+  }
+
+  .rewards-popup__intro.active {
+    display: block;
+  }
+
+  .rewards-popup__intro-coin {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+  }
+
+  .rewards-popup__intro-coin img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .rewards-popup__intro-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #235A49;
+    margin-bottom: 12px;
+  }
+
+  .rewards-popup__intro-desc {
+    font-size: 14px;
+    color: #404040;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .rewards-popup__intro-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: #235A49;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+  }
+
+  .rewards-popup__intro-btn:hover {
+    background: #1a4538;
+  }
+
+  /* Balance section hidden by default until login confirmed */
+  .rewards-popup__balance {
+    background: #E2F1E4;
+    padding: 24px 20px;
+    text-align: center;
+    display: none;
+  }
+
+  .rewards-popup__balance.active {
+    display: block;
+  }
+
+  /* ========== MOBILE POPUP (max 749px) ========== */
+  @media screen and (max-width: 749px) {
+    .rewards-popup-overlay {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    .rewards-popup {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 16px 16px 0 0;
+      animation: popupSlideUp 0.3s ease;
+    }
+
+    @keyframes popupSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .rewards-popup__header {
+      padding: 16px;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .rewards-popup__logo {
+      height: 22px;
+    }
+
+    .rewards-popup__welcome {
+      font-size: 16px;
+    }
+
+    .rewards-popup__balance {
+      padding: 20px 16px;
+    }
+
+    .rewards-popup__coins-display {
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .rewards-popup__coin-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .rewards-popup__coin-svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .rewards-popup__coins-amount {
+      font-size: 26px;
+    }
+
+    .rewards-popup__btn {
+      padding: 8px 18px;
+      font-size: 13px;
+      min-width: 95px;
+    }
+
+    .rewards-popup__earn {
+      padding: 16px;
+    }
+
+    .rewards-popup__earn-title {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .rewards-popup__earn-item {
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .rewards-popup__earn-icon {
+      width: 34px;
+      height: 34px;
+    }
+
+    .rewards-popup__earn-content h4 {
+      font-size: 13px;
+    }
+
+    .rewards-popup__earn-content p {
+      font-size: 11px;
+    }
+
+    .rewards-popup__faqs {
+      padding: 0 16px 16px;
+    }
+
+    .rewards-popup__faqs-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .rewards-popup__faq-question {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    .rewards-popup__faq-answer {
+      font-size: 11px;
+    }
+
+    .rewards-popup__faq-item.active .rewards-popup__faq-answer {
+      padding: 10px 12px;
+    }
+
+    .rewards-popup__intro {
+      padding: 24px 16px;
+    }
+
+    .rewards-popup__intro-coin {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+    }
+
+    .rewards-popup__intro-title {
+      font-size: 18px;
+    }
+
+    .rewards-popup__intro-desc {
+      font-size: 13px;
+      max-width: 260px;
+    }
+
+    .rewards-popup__intro-btn {
+      padding: 10px 28px;
+      font-size: 13px;
+    }
+  }
+
+  /* ========== SMALL PHONES POPUP (max 374px) ========== */
+  @media screen and (max-width: 374px) {
+    .rewards-popup__header {
+      padding: 14px 12px;
+    }
+
+    .rewards-popup__logo {
+      height: 20px;
+    }
+
+    .rewards-popup__welcome {
+      font-size: 14px;
+    }
+
+    .rewards-popup__balance {
+      padding: 16px 12px;
+    }
+
+    .rewards-popup__coins-display {
+      gap: 6px;
+    }
+
+    .rewards-popup__coin-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .rewards-popup__coin-svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .rewards-popup__coins-amount {
+      font-size: 22px;
+    }
+
+    .rewards-popup__buttons {
+      gap: 8px;
+    }
+
+    .rewards-popup__btn {
+      padding: 7px 14px;
+      font-size: 12px;
+      min-width: 85px;
+    }
+
+    .rewards-popup__earn {
+      padding: 14px 12px;
+    }
+
+    .rewards-popup__earn-title {
+      font-size: 16px;
+    }
+
+    .rewards-popup__earn-item {
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .rewards-popup__earn-icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .rewards-popup__earn-content h4 {
+      font-size: 12px;
+    }
+
+    .rewards-popup__earn-content p {
+      font-size: 10px;
+    }
+
+    .rewards-popup__faqs {
+      padding: 0 12px 14px;
+    }
+
+    .rewards-popup__faqs-title {
+      font-size: 16px;
+    }
+
+    .rewards-popup__faq-question {
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+
+    .rewards-popup__faq-answer {
+      font-size: 10px;
+    }
+
+    .rewards-popup__intro-coin {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 14px;
+    }
+
+    .rewards-popup__intro-title {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .rewards-popup__intro-desc {
+      font-size: 12px;
+      max-width: 240px;
+      margin-bottom: 16px;
+    }
+
+    .rewards-popup__intro-btn {
+      padding: 9px 24px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+
+{% if section.settings.enable_bar and template.name != 'product' %}
+<!-- Sticky Bar -->
+<div class="sticky-rewards-bar" id="sticky-rewards-bar" onclick="openRewardsPopup()">
+  <div class="sticky-rewards-bar__content">
+    <span class="sticky-rewards-bar__text">
+      <span class="sticky-rewards-bar__highlight">{{ section.settings.title }}</span>
+      <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7176.png?v=1767773245" alt="Purity Coins" id="sticky-bar-coin-img" width="20" height="20" style="object-fit: contain; vertical-align: middle; margin: 0 4px;">
+      <span class="sticky-rewards-bar__divider">|</span>
+      <span id="sticky-bar-message">Get Upto 25% Off with Purity Coins!</span>
+    </span>
+    <span class="sticky-rewards-bar__arrow">→</span>
+  </div>
+</div>
+
+<!-- Rewards Popup -->
+<div class="rewards-popup-overlay" id="rewards-popup-overlay" onclick="closeRewardsPopup(event)">
+  <div class="rewards-popup" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div class="rewards-popup__header">
+      <button class="rewards-popup__close" onclick="closeRewardsPopup()">&times;</button>
+      <div class="rewards-popup__welcome">Welcome to</div>
+      <div class="rewards-popup__brand" style="display: flex; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1;">
+        <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/anveshan-logo-updates-register-mark.png?v=1728463199" alt="Anveshan" class="rewards-popup__logo" style="height: 28px; width: auto; display: block; filter: brightness(0) invert(1);">
+        <span style="font-size: 22px; font-weight: 600; font-style: normal;">Rewards</span>
+      </div>
+    </div>
+
+    <!-- Intro Section (Not Logged In) -->
+    <div class="rewards-popup__intro active" id="rewards-intro-section">
+      <div class="rewards-popup__intro-coin">
+        {% if section.settings.coin_icon != blank %}
+          <img src="{{ section.settings.coin_icon | image_url: width: 160 }}" alt="Purity Coins">
+        {% else %}
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/image_85_3e81e5e7-b708-40f9-957b-7ca7ff42339f.png?v=1767863906" alt="Purity Coins">
+        {% endif %}
+      </div>
+      <div class="rewards-popup__intro-title">Introducing Anveshan Purity Coins!</div>
+      <div class="rewards-popup__intro-desc">
+        Earn coins with every order, redeem them for discounts, and enjoy exclusive rewards. Start your journey to pure savings today!
+      </div>
+      <button class="rewards-popup__intro-btn" onclick="triggerLogin()">Login to View Balance</button>
+    </div>
+
+    <!-- Balance Section (Logged In) -->
+    <div class="rewards-popup__balance" id="rewards-balance-section">
+      <div class="rewards-popup__balance-title">Your Purity Balance</div>
+      <div class="rewards-popup__coins-display">
+        <div class="rewards-popup__coin-icon">
+          {% if section.settings.coin_icon != blank %}
+            <img src="{{ section.settings.coin_icon | image_url: width: 100 }}" alt="Purity Coins">
+          {% else %}
+            <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/image_85_3e81e5e7-b708-40f9-957b-7ca7ff42339f.png?v=1767863906" alt="Purity Coins" class="rewards-popup__coin-svg">
+          {% endif %}
+        </div>
+        <div class="rewards-popup__coins-amount" id="rewards-coins-amount">{{ section.settings.coin_count }} Coins</div>
+      </div>
+      <div class="rewards-popup__buttons">
+        <a href="{{ section.settings.redeem_link | default: '/collections/al-products' }}" class="rewards-popup__btn rewards-popup__btn--primary">Redeem</a>
+        <a href="{{ section.settings.earn_more_link | default: '/pages/rewards' }}" class="rewards-popup__btn rewards-popup__btn--secondary">Earn More</a>
+      </div>
+    </div>
+
+    <!-- How to Earn Section -->
+    <div class="rewards-popup__earn">
+      <div class="rewards-popup__earn-title">How to Start Earning:</div>
+
+      <div class="rewards-popup__earn-item">
+        <div class="rewards-popup__earn-icon">
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Asset_28image.svg?v=1767864383" alt="Sign Up">
+        </div>
+        <div class="rewards-popup__earn-content">
+          <h4>First-Time Sign-Up</h4>
+          <p>Get your first batch of <strong>100 Purity Coins!</strong></p>
+        </div>
+      </div>
+
+      <div class="rewards-popup__earn-item">
+        <div class="rewards-popup__earn-icon">
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_1_78804357-8308-45ea-885b-9e8264206364.svg?v=1767864380" alt="Order">
+        </div>
+        <div class="rewards-popup__earn-content">
+          <h4>With Every Order</h4>
+          <p>Every purchase gives you <strong>5% back as coins.</strong></p>
+        </div>
+      </div>
+
+      <div class="rewards-popup__earn-item">
+        <div class="rewards-popup__earn-icon">
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7185.svg?v=1767864380" alt="Referral">
+        </div>
+        <div class="rewards-popup__earn-content">
+          <h4>With Every Referral</h4>
+          <p>Invite friends and family, and earn Purity Coins together! Stay tuned – <strong>launching soon!</strong></p>
+        </div>
+      </div>
+
+      <div class="rewards-popup__earn-item">
+        <div class="rewards-popup__earn-icon">
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_1e56e5d6-b5a2-414c-93af-f8d91dca87eb.svg?v=1767864379" alt="Birthday">
+        </div>
+        <div class="rewards-popup__earn-content">
+          <h4>Your Birthday</h4>
+          <p>Extra coins on your <strong>special day!</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQs Section -->
+    <div class="rewards-popup__faqs">
+      <div class="rewards-popup__faqs-title">FAQs</div>
+
+      <div class="rewards-popup__faq-item">
+        <div class="rewards-popup__faq-question" onclick="toggleFaq(this)">
+          <span>1. What are Anveshan Purity Coins?</span>
+          <span class="rewards-popup__faq-arrow"><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Vector_1_938e48ec-2a6c-4908-9e2f-b735d881325d.svg?v=1767867738" alt=""></span>
+        </div>
+        <div class="rewards-popup__faq-answer">
+          Purity Coins are reward points you earn with every purchase and activity on Anveshan. You can redeem them for discounts on future orders.
+        </div>
+      </div>
+
+      <div class="rewards-popup__faq-item">
+        <div class="rewards-popup__faq-question" onclick="toggleFaq(this)">
+          <span>2. How many Purity Coins do I get on each order?</span>
+          <span class="rewards-popup__faq-arrow"><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Vector_1_938e48ec-2a6c-4908-9e2f-b735d881325d.svg?v=1767867738" alt=""></span>
+        </div>
+        <div class="rewards-popup__faq-answer">
+          You earn 5% of your order value back as Purity Coins. For example, on a ₹1000 order, you'll earn 50 Purity Coins.
+        </div>
+      </div>
+
+      <div class="rewards-popup__faq-item">
+        <div class="rewards-popup__faq-question" onclick="toggleFaq(this)">
+          <span>3. How soon can I redeem my Purity Coins?</span>
+          <span class="rewards-popup__faq-arrow"><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Vector_1_938e48ec-2a6c-4908-9e2f-b735d881325d.svg?v=1767867738" alt=""></span>
+        </div>
+        <div class="rewards-popup__faq-answer">
+          Your Purity Coins are available for redemption immediately after your order is delivered. You can use them on your very next purchase!
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // API Configuration
+  const REWARDS_API_BASE = 'https://puritycoins.anveshan.farm/api/v1/user';
+  const REWARDS_API_KEY = '242b8492f3e718988f127bc4e94fbd7d3274d2cc6c8ca328d324ab7825d100b3';
+
+  // State
+  let rewardsUserLoggedIn = false;
+  let rewardsUserPhone = null;
+  let rewardsUserBalance = 0;
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    initRewardsBar();
+  });
+
+  async function initRewardsBar() {
+    // Try to detect user phone
+    rewardsUserPhone = detectUserPhone();
+
+    if (rewardsUserPhone) {
+      // Check if user exists in database
+      await checkUserAndUpdateUI(rewardsUserPhone);
+    } else {
+      // Show intro section (not logged in)
+      showIntroSection();
+    }
+  }
+
+  function detectUserPhone() {
+    let phone = null;
+
+    // Method 1: Check Shopify customer object
+    {% if customer and customer.phone %}
+      phone = '{{ customer.phone }}';
+      if (phone) {
+        return formatPhone(phone);
+      }
+    {% endif %}
+
+    // Method 2: Check localStorage
+    const storedPhone = localStorage.getItem('customer_phone') || localStorage.getItem('userPhone');
+    if (storedPhone) {
+      return formatPhone(storedPhone);
+    }
+
+    // Method 3: Check window.customer object (if set by other scripts)
+    if (window.customer && window.customer.phone) {
+      return formatPhone(window.customer.phone);
+    }
+
+    return null;
+  }
+
+  function formatPhone(phone) {
+    if (!phone) return null;
+    // Remove all non-digits
+    let cleaned = phone.toString().replace(/\D/g, '');
+    // Normalize to +91XXXXXXXXXX format
+    if (cleaned.length === 10) {
+      return '+91' + cleaned;
+    } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      return '+' + cleaned;
+    } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+      return '+91' + cleaned.substring(1);
+    } else if (cleaned.length > 10) {
+      return '+91' + cleaned.slice(-10);
+    }
+    return null;
+  }
+
+  async function checkUserAndUpdateUI(phone) {
+    try {
+      console.log('🪙 Rewards Bar: Checking wallet for phone:', phone);
+
+      // API Headers with authentication
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-API-Key': REWARDS_API_KEY,
+        'X-User-Phone': phone
+      };
+
+      const response = await fetch(`${REWARDS_API_BASE}/${phone}/wallet`, {
+        method: 'GET',
+        headers: headers
+      });
+
+      console.log('🪙 Rewards Bar: API response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🪙 Rewards Bar: API data:', data);
+        console.log('🪙 Rewards Bar: Wallet object:', data.wallet);
+
+        if (data.success) {
+          rewardsUserLoggedIn = true;
+          // Handle various possible field names for balance
+          // Check wallet object fields: balance, coins, total, currentBalance, available
+          let balance = 0;
+          if (data.wallet) {
+            balance = data.wallet.balance || data.wallet.coins || data.wallet.total ||
+                      data.wallet.currentBalance || data.wallet.available ||
+                      data.wallet.purityCoins || data.wallet.coin_balance || 0;
+          }
+          // Fallback to direct fields
+          if (balance === 0) {
+            balance = data.balance || data.coins || data.total || 0;
+          }
+          rewardsUserBalance = balance;
+          console.log('🪙 Rewards Bar: Balance found:', rewardsUserBalance);
+          showBalanceSection(rewardsUserBalance);
+        } else {
+          // API returned success: false
+          console.log('🪙 Rewards Bar: API success false, showing intro');
+          showIntroSection();
+        }
+      } else {
+        // User not found, show intro
+        console.log('🪙 Rewards Bar: API error, showing intro');
+        showIntroSection();
+      }
+    } catch (error) {
+      console.error('🪙 Rewards Bar: API Error:', error);
+      showIntroSection();
+    }
+  }
+
+  function showIntroSection() {
+    const introSection = document.getElementById('rewards-intro-section');
+    const balanceSection = document.getElementById('rewards-balance-section');
+    const stickyBarMessage = document.getElementById('sticky-bar-message');
+    const stickyBarCoinImg = document.getElementById('sticky-bar-coin-img');
+
+    if (introSection) introSection.classList.add('active');
+    if (balanceSection) balanceSection.classList.remove('active');
+
+    // Keep coin image always visible
+
+    // Not logged in message
+    if (stickyBarMessage) {
+      stickyBarMessage.textContent = 'Get Upto 25% Off with Purity Coins!';
+    }
+  }
+
+  function showBalanceSection(balance) {
+    const introSection = document.getElementById('rewards-intro-section');
+    const balanceSection = document.getElementById('rewards-balance-section');
+    const coinsAmount = document.getElementById('rewards-coins-amount');
+    const stickyBarMessage = document.getElementById('sticky-bar-message');
+    const stickyBarCoinImg = document.getElementById('sticky-bar-coin-img');
+
+    if (introSection) introSection.classList.remove('active');
+    if (balanceSection) balanceSection.classList.add('active');
+
+    // Coin image always visible
+
+    // Update popup coin display
+    if (coinsAmount) coinsAmount.textContent = balance + ' Coins';
+
+    // Update sticky bar message based on balance
+    if (stickyBarMessage) {
+      if (balance > 0) {
+        // User has coins - show use message
+        stickyBarMessage.textContent = 'Use ₹' + balance + ' on your next purchase!';
+      } else {
+        // User has 0 coins - show earn message
+        stickyBarMessage.textContent = 'Earn 5% cashback in your Anveshan Wallet!';
+      }
+    }
+  }
+
+  function triggerLogin() {
+    // Close popup first
+    closeRewardsPopup();
+
+    // Try to open account login
+    {% if shop.customer_accounts_enabled %}
+      {% if customer %}
+        window.location.href = '{{ routes.account_url }}';
+      {% else %}
+        // Try to trigger the account login modal/page
+        if (typeof accountLogin === 'function') {
+          accountLogin(new Event('click'));
+        } else {
+          window.location.href = '/account/login';
+        }
+      {% endif %}
+    {% else %}
+      window.location.href = '/account/login';
+    {% endif %}
+  }
+
+  function openRewardsPopup() {
+    document.getElementById('rewards-popup-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Re-check login status when popup opens (in case user logged in)
+    if (!rewardsUserLoggedIn) {
+      const phone = detectUserPhone();
+      if (phone && phone !== rewardsUserPhone) {
+        rewardsUserPhone = phone;
+        checkUserAndUpdateUI(phone);
+      }
+    }
+  }
+
+  function closeRewardsPopup(event) {
+    if (!event || event.target.id === 'rewards-popup-overlay' || event.target.classList.contains('rewards-popup__close')) {
+      document.getElementById('rewards-popup-overlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function toggleFaq(element) {
+    const faqItem = element.parentElement;
+    faqItem.classList.toggle('active');
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeRewardsPopup();
+    }
+  });
+
+  // Listen for login events (if other scripts dispatch them)
+  window.addEventListener('customerLogin', function(e) {
+    if (e.detail && e.detail.phone) {
+      rewardsUserPhone = formatPhone(e.detail.phone);
+      if (rewardsUserPhone) {
+        checkUserAndUpdateUI(rewardsUserPhone);
+      }
+    }
+  });
+
+  // Also check for phone number in localStorage periodically
+  setInterval(function() {
+    if (!rewardsUserLoggedIn) {
+      const phone = detectUserPhone();
+      if (phone && phone !== rewardsUserPhone) {
+        rewardsUserPhone = phone;
+        checkUserAndUpdateUI(phone);
+      }
+    }
+  }, 3000);
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sticky Rewards Bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_bar",
+      "label": "Enable Sticky Rewards Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title Text",
+      "default": "Anveshan Rewards"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle Text",
+      "default": "Get Upto 25% Off"
+    },
+    {
+      "type": "image_picker",
+      "id": "coin_icon",
+      "label": "Coin Icon (optional)"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Bar Link (optional)"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#1a4d42"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "coin_bg_color",
+      "label": "Coin Badge Background",
+      "default": "#2a5d52"
+    },
+    {
+      "type": "color",
+      "id": "coin_text_color",
+      "label": "Coin Badge Text Color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sticky Rewards Bar"
+    }
+  ]
+}
+{% endschema %}

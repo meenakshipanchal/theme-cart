@@ -1,0 +1,169 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "about-custom": {
+      "type": "main-about",
+      "blocks": {
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "stat_number": "20+ products",
+            "stat_label": "from farm to your kitchen"
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "stat_number": "15 lakh",
+            "stat_label": "happy customers served"
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "stat_number": "Available on",
+            "stat_label": "Amazon, Blinkit, Zepto & more"
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "stat_number": "Featured in",
+            "stat_label": "Shark Tank, Forbes, Economic Times"
+          }
+        },
+        "testimonial_1": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Priya",
+            "location": "Mumbai",
+            "testimonial": "I trust Anveshan because they're transparent about every step—from farm to bottle. The quality is unmatched, and I can finally feel good about what I'm feeding my family."
+          }
+        },
+        "testimonial_2": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Ravi",
+            "location": "Bangalore",
+            "testimonial": "Switching to Anveshan's cold-pressed oils and A2 ghee has been life-changing. I've noticed the difference in taste and health. This is what real food should be like."
+          }
+        },
+        "testimonial_3": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Anjali",
+            "location": "Delhi",
+            "testimonial": "I love that Anveshan supports local farmers and uses traditional methods. It's not just about buying food—it's about being part of a movement that values purity and ethics."
+          }
+        },
+        "testimonial_4": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Karan",
+            "location": "Pune",
+            "testimonial": "The bilona ghee is exactly like what my grandmother used to make. Anveshan has brought back the taste and trust that modern brands have forgotten. Highly recommend!"
+          }
+        },
+        "cert_1": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "ISO"
+          }
+        },
+        "cert_2": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "FSSAI"
+          }
+        },
+        "cert_3": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "FDA"
+          }
+        },
+        "cert_4": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "Halal"
+          }
+        },
+        "cert_5": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "AYUSH"
+          }
+        },
+        "cert_6": {
+          "type": "certification",
+          "settings": {
+            "cert_name": "APEDA"
+          }
+        }
+      },
+      "block_order": [
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4",
+        "testimonial_1",
+        "testimonial_2",
+        "testimonial_3",
+        "testimonial_4",
+        "cert_1",
+        "cert_2",
+        "cert_3",
+        "cert_4",
+        "cert_5",
+        "cert_6"
+      ],
+      "settings": {
+        "hero_desktop": "shopify://shop_images/42478615568dfcf9e7e24f1ca20f472ca82c6639_1_c3631735-fddf-42f0-b7fc-1a20209e444c.jpg",
+        "hero_mobile": "shopify://shop_images/94bce88f717424a00ef39ec0187142bcc5f0ac51_1.jpg",
+        "hero_title": "India's Most Trusted Staples. From Farmers. For Families.",
+        "hero_subtitle": "We bring purity, process, and purpose back to your everyday food. Ghee, oils, and staples made with care.",
+        "founder_img": "shopify://shop_images/2fe38f27667d4e793f4cc5fcc823d8b0243fc788_0efd8dbd-ad42-4169-a906-940cd72c6338.png",
+        "founder_heading": "Founder's Note",
+        "founder_text": "Anveshan wasn't born in a boardroom. It started with a memory. Of ghee that filled the house with aroma. Of cold-pressed oil that poured from steel cans. Of food that was deeply personal.\n\nBy 2020, most of it had vanished. In its place were processed, polished, packaged imitations. The gap between what we ate and what we trusted kept growing.\n\nSo we left our jobs. Went back to the villages. Sat with farmers. Set up our own micro-units. One cow. One kolhu. One farmer. One family at a time.\nAnd just like that, Anveshan began.",
+        "way_img": "shopify://shop_images/71c33ce840e3a3c690b2c97981d6e777f3127cb5_1.jpg",
+        "way_heading": "The Anveshan Way",
+        "way_text": "Our model is simple. Source the best. Process with care. Test like scientists.\n\nWe use only native seeds and indigenous breeds. Every batch is made in small, rural units run by farmer families. No brokers. No blending. No shortcuts.\n\nWe run 17-plus quality tests per batch. From A2 protein to heavy metals. From SNF to pesticide traces. Because purity is a promise that should come with proof.\n\nWhen a batch sells out, we pause. No overproduction. No rush. Just like harvests, we let food take its time.",
+        "fixing_img": "shopify://shop_images/c43727c9645f3f15b9d79ccea056ce7cc78175c3.png",
+        "fixing_heading": "What We're Fixing",
+        "fixing_text": "Most brands still follow the old commodity model. Produce is bought in bulk. Mixed across farms. Processed in heat. Stored in plastic. Tested for shelf life, not nutrition.\n\nThis model pushes farmers out. And pulls quality down. We built Anveshan to change that.",
+        "values_heading": "Our Values",
+        "native_img": "shopify://shop_images/dcc9f01509fc66693d2e6c6c405509d9314b6bfd.png",
+        "native_heading": "Native Sourcing",
+        "native_text": "We begin where food begins: at the farm. Every item every drop, every grain is traced back to small farms and collectives across India, where native seeds and indigenous cattle breeds (Sahiwal, Gir, Rathi, Tharparkar) are preserved.\n\nWe work with over 7000 farmers, all of whom know us by name and trust us with their best harvests. Each ingredient is procured directly, which creates a traceability that very few brands can promise.",
+        "processing_img": "shopify://shop_images/fdbec1cf75382d4064b26f58eb6176f1c6620d89.jpg",
+        "processing_heading": "Best Processing",
+        "processing_text": "We don't just procure the best, we process them with integrity.\n\nOur oil is cold-pressed (under 40°C) so its nutritional content remains intact. Our ghee is crafted using the traditional bilona method, a 30-hour process that revolves around small batches, slow churning, and careful simmering. No heating shortcuts, no blending.\n\nWe don't rush. We don't scale recklessly. Every batch, every bottle, respects the time it takes to make food right.",
+        "quality_img": "shopify://shop_images/check.jpg",
+        "quality_heading": "17+ Quality Checks",
+        "quality_text": "Quality, for us, isn't a claim. It's a checklist.\n\nEvery batch undergoes 17+ quality tests. From A2 protein to SNF (Solid Not Fat) percentages, from antioxidant levels to heavy metals and pesticide contamination. Every test is done by certified third-party labs, and every product only reaches you if it meets the highest standards.\n\nYou don't just have to trust us  you can trust the science. And that's exactly how it should be.",
+        "impact_img": "shopify://shop_images/db166fe9e27b437e8b6315ae2815b7d1279f20eb.jpg",
+        "impact_heading": "Impact We Make",
+        "impact_text": "Change isn't a headline for us; it's a daily effort for better, not just for people, for nature and cows as well.\n\nWe've empowered 7000+ farmers by offering fair prices for their best-quality produce, guaranteeing timely payments, giving them financial confidence and security. This is possible only through micro-units - you could call it FMCG in reverse - which employs rural communities, strengthens local economies, and builds prosperity without displacement.\n\nWe don't chase scaling. We focus on doing it right. Better food. Better farms. Better livelihoods.",
+        "stats_heading": "Where We Are Now",
+        "community_heading": "The Anveshan Community",
+        "community_subtitle": "We are a growing circle of conscious eaters. Together, we're reclaiming the narrative. Re-learning what food can (and should) be. Here's what some of our community has to say:",
+        "cta_heading": "Join the Movement",
+        "cta_text": "Follow us daily. Weekly. All year. every. We're just really happy to share whatever we're doing to share recipes. Products. Passion. We're a scroll away if you just wanna say hello!",
+        "cta_button_text": "Shop Now",
+        "cta_button_url": "/collections/all-products",
+        "bottom_tagline": "Purity aur aapka connection"
+      }
+    }
+  },
+  "order": [
+    "about-custom"
+  ]
+}

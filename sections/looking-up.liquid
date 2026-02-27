@@ -1,0 +1,45 @@
+<div class="page-width">
+  <div class="">
+    <h2>{{ section.settings.title }}</h2>
+    {{ section.settings.text }}
+  </div>
+  <div>
+    <a href="{{ section.settings.link }}">{{ section.settings.label }}</a>
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Looking Up",
+    "class": "looking-up",
+    "enabled_on": {
+      "templates": ["index"]
+    },
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Tag Line"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      },
+      {
+        "type": "text",
+        "id": "label",
+        "label": "Button Text"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Looking Up"
+      }      
+    ]
+  }
+{% endschema %}

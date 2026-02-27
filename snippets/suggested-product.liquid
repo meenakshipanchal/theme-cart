@@ -1,0 +1,177 @@
+
+<style>
+  @keyframes pulse-animation {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    50% {
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  .suggested-product-pill {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    flex: 1 1 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    animation: pulse-animation 2.5s infinite ease-in-out;
+
+    /* Background Image */
+    background-image: url('https://cdn.shopify.com/s/files/1/0270/3346/9006/files/test_kit_v3.webp?v=1771416274');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .suggested-product-pill:hover {
+    animation-play-state: paused;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .suggested-product-badge {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    background-color: #235a49;
+    color: #e8d998;
+    padding: 4px 12px 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    border-top-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .suggested-product-image-link {
+    flex-shrink: 0;
+  }
+
+  .suggested-product-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #eee;
+    display: block;
+  }
+
+  .suggested-product-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+  }
+
+  .suggested-product-title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .suggested-product-title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .suggested-product-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .suggested-product-price {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .suggested-product-pill .suggested-product-title,
+  .suggested-product-pill .suggested-product-price {
+    color: #404040;
+  }
+
+  /* ✨ OUTLINE BUTTON STYLES ✨ */
+  .suggested-product-pill .product-form__submit {
+    border-radius: 50px;
+    background-color: transparent !important;
+    border: 2px solid #008060 !important;
+    color: #008060 !important;
+    font-weight: 600;
+    padding: 8px 16px !important;
+    transition: all 0.2s ease;
+  }
+
+  .suggested-product-pill .product-form__submit:hover {
+    background-color: rgba(0, 128, 96, 0.05) !important;
+    border-color: #006e52 !important;
+    color: #006e52 !important;
+  }
+
+  .suggested-product-form .suggested-product-add-btn:hover {
+    background-color: transparent;
+  }
+</style>
+
+{%- assign suggested_product_object = all_products[product_to_suggest] -%}
+
+{%- if suggested_product_object != blank -%}
+  {%- assign suggested_form_id = 'product-form-suggested-'
+    | append: section.id
+    | append: suggested_product_object.id
+  -%}
+
+  <div class="suggested-product-pill">
+    <div class="suggested-product-badge">Test. Trust.</div>
+
+    <a href="{{ suggested_product_object.url }}" class="suggested-product-image-link">
+      {%- if suggested_product_object.featured_image -%}
+        {{
+          suggested_product_object.featured_image
+          | image_url: width: 140
+          | image_tag: class: 'suggested-product-image', loading: 'lazy'
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'suggested-product-image' }}
+      {%- endif -%}
+    </a>
+
+    <div class="suggested-product-content">
+      <a href="{{ suggested_product_object.url }}" class="suggested-product-title-link">
+        <span class="suggested-product-title">{{ suggested_product_object.title }}</span>
+      </a>
+
+      <div class="suggested-product-bottom-row">
+        <span class="suggested-product-price">{{ suggested_product_object.price | money }}</span>
+
+        <div>
+          {%- render 'custom-buy-button',
+            block: block,
+            product: suggested_product_object,
+            product_form_id: suggested_form_id,
+            section_id: section.id,
+            show_pickup_availability: false
+          -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+ 
+ 

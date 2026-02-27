@@ -1,0 +1,106 @@
+<table cellpadding="0" cellspacing="0" id="oilsCompare" class="gheeCompare">
+  <thead>
+    <tr>
+      <th></th>
+      <td>
+          <a href="{{ shop.url }}/products/a2-desi-ghee">
+            <img src="{{ 'anv_HCG.png'  | file_img_url: '200x' }}" alt="A2 Desi Cow Ghee" loading="lazy">A2 Desi Cow Ghee
+          </a>
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/gir-cow-ghee"
+          ><img src="{{ 'anv_GCG.png'  | file_img_url: '200x' }}" alt="A2 Gir Cow Ghee" loading="lazy">A2 Gir Cow Ghee</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/desi-buffalo-ghee"
+          ><img src="{{ 'bufflo-ghee-table.jpg'  | file_img_url: '200x' }}" alt="Desi Buffalo Ghee" loading="lazy">Desi Buffalo Ghee</a
+        >
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Uses</th>
+      <td style="vertical-align: top;">
+        <ol>
+          <li>Cooking</li>
+          <li>Massage</li>
+          <li>Skincare</li>
+          <li>Raw Consumption</li>
+        </ol>
+      </td>
+      <td style="vertical-align: top;">
+        <ol>
+          <li>Cooking</li>
+          <li>Massage</li>
+          <li>Raw Consumption</li>
+          <li>Skincare</li>
+          <li>For Pregnant Women</li>
+        </ol>
+      </td>
+      <td style="vertical-align: top;">
+        <ol>
+          <li>Everyday Cooking</li>
+          <li>Massage</li>
+          <li>Raw Consumption</li>
+          <li>Skincare</li>
+          <li>Haircare</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <th>Suitable weather</th>
+      <td>Any Weather</td>
+      <td>Any Weather</td>
+      <td>Any Weather</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Supports Heart Health &amp; Gut Health</td>
+      <td>Supports Heart Health &amp; Gut Health</td>
+      <td>Good For Heart &amp; Aids Digestion</td>
+    </tr>
+    <tr>
+      <th>Aroma</th>
+      <td>Caramelised Sweetish</td>
+      <td>Sweetish Curdy</td>
+      <td>Mild Curdy Aroma</td>
+    </tr>
+    <tr>
+      <th>Flavour</th>
+      <td>Cooked Caramelised</td>
+      <td>Sweetish Curdy</td>
+      <td>Mild, Curdy Flavour</td>
+    </tr>
+    <tr>
+      <th>Process of Making</th>
+      <td>Bilona-churned in small batches</td>
+      <td>Bilona-churned in small batches</td>
+      <td>Bilona-churned in small batches</td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  const fruits = ["","a2-desi-ghee","gir-cow-ghee","desi-buffalo-ghee"];
+  let index = fruits.indexOf('{{ product.handle }}');
+  const table = document.getElementById("oilsCompare");
+  const rows = table.rows;
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].cells;
+    // Get the cell to move
+    const cellToMove = cells[index];
+    // Remove the cell from its current position
+    rows[i].removeChild(cellToMove);
+    // Insert the cell into the target position
+    rows[i].insertBefore(cellToMove, cells[1]);
+  }
+</script>
+<style>
+  .compare-data-content td {
+    background: #fdfdfd;
+  }
+  @media (min-width: 800px) {
+    .compare-data-content table.gheeCompare { max-width: 960px; margin: auto; }
+  }
+</style>

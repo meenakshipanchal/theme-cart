@@ -1,0 +1,109 @@
+{{ 'metaobject-product-template.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign product_object = product.metafields.custom.product_template.value
+%}
+{% for metaobject in product_object.blocks.value %}
+  {% case metaobject.system.type %}
+    {% when 'media_banner' %}
+      {% unless section.settings.hiden %}
+        <div class="page-width-desktop media-banner">
+          <picture>
+            <source
+              media="(min-width:750px)"
+              srcset="
+                {{ metaobject.browser_banner.value | image_url: width: 900 }} 900w,
+                {{ metaobject.browser_banner.value | image_url: width: 1200 }} 1200w,
+                {{ metaobject.browser_banner.value | image_url: width: 1500 }} 1500w
+              "
+            >
+            {{
+              metaobject.item.value.media.value
+              | image_url: width: 720
+              | image_tag: widths: '320,480,720', style: 'width:auto', loading: 'lazy'
+            }}
+          </picture>
+        </div>
+      {% endunless %}
+    {% when 'media_list_accordion' %}
+      {% render 'metaobject-media-list', metaobject: metaobject %}
+    {% when 'rich_text_accordion' %}
+      <div class="page-width product__accordion accordion quick-add-hidden">
+        <details class="product_accordion-tab"{% if forloop.index == 2 %} open{% endif %} id="details_{{ metaobject._id.value }}">
+          <summary>
+            <div class="summary__title">
+              <h4 class="accordion__title">{{ metaobject.title.value }}</h4>
+            </div>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </summary>
+          <div class="accordion__content richtext rte" id="productAccordion_{{ metaobject._id.value }}">
+            {{ metaobject.content | metafield_tag }}
+          </div>
+        </details>
+      </div>
+    {% when 'media_accordion' %}
+      <div class="page-width product__accordion accordion quick-add-hidden">
+        <details class="product_accordion-tab" id="Details-{{ metaobject._id.value }}">
+          <summary>
+            <div class="summary__title">
+              <h4 class="accordion__title">{{ metaobject.title.value }}</h4>
+            </div>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </summary>
+          <div class="accordion__content rte" id="ProductAccordion-{{ metaobject._id.value }}">
+            <figure>{{ metaobject.content.value | image_url: width: 700 | image_tag }}</figure>
+          </div>
+        </details>
+      </div>
+    {% when 'youtube_video' %}
+      {% render 'metaobject-video', metaobject: metaobject %}
+    {% when 'static_content_accordion' %}
+      <div class="page-width  product__accordion accordion only-mobile quick-add-hidden">
+        <details class="product_accordion-tab" open id="Details-{{ metaobject._id.value }}">
+          <summary>
+            <div class="summary__title">
+              <h4 class="accordion__title">{{ metaobject.title.value }}</h4>
+            </div>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </summary>
+          <div class="accordion__content product-description rte" id="ProductAccordion-{{ metaobject._id.value }}">
+            {{ product.description }}
+          </div>
+        </details>
+      </div>
+  {% endcase %}
+{% endfor %}
+
+{% if product.tags contains 'ghee-compare' or product.tags contains 'oil-compare' %}
+  {% comment %} {{ 'compare-table.css' | asset_url | stylesheet_tag }} {% endcomment %}
+  {{ 'compare-table.css' | asset_url | stylesheet_tag }}
+  <div class="compare-data" style="order:1">
+    <h4>Make A Conscious Wellness Choice</h4>
+    <div class="compare-data-content">
+      {% liquid
+        if product.tags contains 'ghee-compare'
+          render 'compare-ghee', product: product
+        else
+          render 'compare-oils', product: product
+        endif
+      %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product Metaobject",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "hiden",
+      "label": "Hide",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,223 @@
+{% liquid
+  assign kitlimit = kitData.limit.value
+  assign kittitle = kitData.bundle_title.value
+  
+  assign tl = 0
+  for k in kitlimit
+    assign tl = tl | plus: k
+  endfor
+  assign big_banner = kitData.desktop_banner.value
+%}
+<div class="kit-banner">
+  <picture>
+    <source
+      media="(min-width: 800px)"
+      srcset="{{ big_banner | image_url: width: 1200 }} 1200w,
+      {{ big_banner | image_url: width: 1600 }} 1600w,
+      {{ big_banner | image_url: width: 2100 }} 2100w,
+      {{ big_banner | image_url: width: 2800 }} 2800w">
+    {% for banner in kitData.banner.value %}
+    {{ banner | image_url: width: 720 |
+      image_tag: widths: '360, 480, 720', height: 'auto', loading: load, style: 'width: 100%' }}
+  {% endfor %}
+  </picture>
+  
+</div>
+  <div id="flexBox">
+    <div class="flex-box">
+      <h4>Choose your Favourite Items</h4>
+      {% if kitData.title != blank %}<p style="margin: -5px 0px 5px; text-align: center;">{{ kitData.title.value }}</p>{% endif %}
+    </div>
+
+    <div class="selected-items-sticky">
+      <div class="selected-items">
+        <div class="selected-item-outer" v-for="(items, index) in itemsBox">
+          <div class="selected-item">
+            <div class="cancle-item" v-on:click="removeBox(index,items.title,items.box)">
+              <img
+                class="close-icon"
+                src="https://cdn.shopify.com/s/files/1/0627/8778/0848/files/Asset_1close.svg?v=1647283408"
+                width="5px"
+              >
+            </div>
+            <figure data-count="{{i}}"><img v-bind:src="items.url" class="img"></figure>
+            <p class="item-title" v-text="items.heading"></p>
+          </div>
+          <span class="dash-line"></span>
+        </div>
+
+        <div class="selected-item-outer" v-for="i in m" :key="i" v-if="itemsBox.length < i">
+          <div class="selected-item">
+            <figure v-bind:data-count="i"><img class="img"></figure>
+            <p class="item-title"><span v-text="j - i + 1"></span> more to go</p>
+          </div>
+          <span class="dash-line"></span>
+        </div>
+
+        <div class="cart-button">
+          <button v-if="itemsBox.length != m" disabled>Add to Cart</button>
+          {%- assign product_form_id = 'product-form-' | append: product.id -%}
+          <product-form class="product-form" data-cart-type="{{ settings.cart_type }}">
+            {%- form 'product',
+              product,
+              id: product_form_id,
+              class: 'form',
+              novalidate: 'novalidate',
+              data-type: 'add-to-cart-form'
+            -%}
+              <span v-for="(items, index) in listsBox"
+                ><input
+                  type="hidden"
+                  v-bind:name="`properties[_bundle_product${index+1}]`"
+                  v-bind:value="`${items.sku}/${items.price}/1`"
+              ></span>
+              <input
+                type="hidden"
+                name="properties[_bundle_productX]"
+                v-bind:value="`{{product.selected_or_first_available_variant.sku}}/0/1`"
+              >
+              <input id="propertiesProd" type="hidden" name="properties[_title]">
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <input
+                class="quantity__input"
+                type="hidden"
+                name="quantity"
+                min="1"
+                value="1"
+                form="{{ product_form_id }}"
+              >
+              <div class="product-form__buttons">
+                <button
+                  type="submit"
+                  name="add"
+                  v-on:click="addtoCart"
+                  class="product-form__submit button button--full-width button--primary active"
+                >
+                  <span>{{ 'products.product.add_to_cart' | t }}</span>
+                  {%- render 'loading-spinner' -%}
+                </button>
+              </div>
+            {%- endform -%}
+          </product-form>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-heading">{{ kittitle[0] }}</div>
+    <div class="flex-box-items" id="app">
+      {%- for sample in kitData.first_bundle.value -%}
+        <div class="flex-box--item">
+          <picture width="150px">
+            {% liquid
+              assign lazy_load = 'eager'
+              if forloop.index > 2
+                assign lazy_load = 'lazy'
+              endif
+              assign title = sample.title
+              assign sku = sample.selected_or_first_available_variant.sku
+            %}
+            {{ sample.featured_media | image_url: width: 150 |
+      image_tag: widths: '75, 150', height: 'auto', loading: lazy_load, style: 'width: 100%', class: 'sample-product-image' }}
+            {%- capture title_image -%}
+              {{- title -}}|{{- sample.featured_media -}}
+            {%- endcapture -%}
+          </picture>
+          <h6>{{ title }}</h6>
+          <label class="giftcheckbox">
+            <input
+              :disabled="fl >= {{ kitlimit[0] }} && skuList.indexOf('{{sku}}') == -1"
+              v-on:change="addBox('{{title}}',{{sample.price | divided_by: 100}},'{{sku}}','{{sample.featured_media | image_url: width: 100 }}','{{title_image}}','one',$event)"
+              type="checkbox"
+              name="giftbox"
+              value="{{title_image}}"
+              v-model="checkedNames"
+            >
+            <span v-if="skuList.indexOf('{{sku}}') != -1">Remove Item</span>
+            <span v-if="skuList.indexOf('{{sku}}') == -1">Add to Box</span>
+          </label>
+        </div>
+      {%- endfor -%}
+    </div>
+    {% if kitData.second_bundle.value != blank %}
+      <div class="cat-heading">{{ kittitle[1] }}</div>
+      
+      <div class="flex-box-items" id="app">
+        {%- for sample in kitData.second_bundle.value -%}
+          <div class="flex-box--item">
+            <picture width="150px">
+              {% liquid
+                assign title = sample.title
+                assign sku = sample.selected_or_first_available_variant.sku
+              %}
+              {{ sample.featured_media | image_url: width: 150 |
+      image_tag: widths: '75, 150', height: 'auto', loading: lazy_load, style: 'width: 100%', class: 'sample-product-image' }}
+              {%- capture title_image -%}
+              {{- title -}}|{{- sample.featured_media -}}
+            {%- endcapture -%}
+            </picture>
+            <h6>{{ title }}</h6>
+            <label class="giftcheckbox">
+              <input
+                :disabled="sl >= {{ kitlimit[1] }} && skuList.indexOf('{{sku}}') == -1"
+                v-on:change="addBox('{{title}}',{{sample.price | divided_by: 100}},'{{sku}}','{{sample.featured_media | image_url: width: 100 }}','{{title_image}}','two',$event)"
+                type="checkbox"
+                name="giftbox"
+                value="{{title_image}}"
+                v-model="checkedNames"
+              >
+              <span v-if="skuList.indexOf('{{sku}}') != -1">Remove Item</span>
+              <span v-if="skuList.indexOf('{{sku}}') == -1">Add to Box</span>
+            </label>
+          </div>
+        {%- endfor -%}
+      </div>
+    {% endif %}
+  </div>
+  
+  <script>
+    var k = {{ tl }};
+    var proid = {{ product.selected_or_first_available_variant.id }};
+    new Vue({
+      el : '#flexBox',
+      data(){
+        return {
+          m: {{ tl }},
+          fl: 0,
+          sl: 0,
+          j: k,
+          itemsBox:[],
+          listsBox:[],
+          checkedNames: [],
+          skuList: [],
+          checkedName: true
+        }
+      },
+      methods: {
+        addBox(t, p, s, u, ti, a, e) {
+          if(e.target.checked) {
+            this.itemsBox.push({title: ti, price: p, sku: s, url: u, box: a, heading: t,});
+            this.skuList.push(s);
+            (a == 'one') ? this.fl++ : this.sl++
+          } else {
+            this.itemsBox.splice(this.skuList.indexOf(s),1);
+            this.skuList.splice(this.skuList.indexOf(s),1);
+            this.checkedNames = this.checkedNames.filter(name => name !== t);
+            (a == 'one') ? this.fl-- : this.sl--
+          }
+        },
+        removeBox(index,checkedN,box) {
+          this.checkedNames = this.checkedNames.filter(name => name !== checkedN);
+          this.itemsBox.splice(index,1);
+          this.skuList.splice(index,1);
+          (box == 'one') ? this.fl-- : this.sl--;
+        },
+    	addtoCart(){
+          this.listsBox = this.itemsBox.slice();
+          document.getElementById('propertiesProd').value=this.checkedNames;
+          this.itemsBox.splice(0);
+          this.checkedNames.splice(0);
+          this.skuList.splice(0);
+        }
+      }
+    });
+  </script>

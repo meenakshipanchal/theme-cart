@@ -1,0 +1,110 @@
+{% liquid
+  assign freebies = freebies | where: 'type', 'freebie'
+%}
+{%- for freebie in freebies -%}
+  {% liquid
+    assign card_product = freebie.settings.product
+    assign freebie_price = freebie.settings.price | times: 1
+    assign freebie_title = freebie.settings.title
+    unless freebie.settings.title != blank
+      assign freebie_title = card_product.title
+    endunless
+    assign cart_price = cart.total_price | divided_by: 100
+  %}
+  {% capture freebie_list %}
+    {{ freebie_list }} 
+    <div class="freebies-list{% if freebie_price < cart_price %} act{% endif %}">
+      <h5>{{ freebie_title | escape }}</h5>
+      <small>worth {{ card_product.price | money }}</small>
+      <span>{{'freebie-icon.svg' | inline_asset_content }}</span>
+    </div>
+  {% endcapture %}
+  {% unless freebie_text %}
+    {% if freebie_price > cart_price %}
+      {% capture freebie_text %}
+        Shop for ₹{{ freebie_price | minus: cart_price }} more & get {{ freebie_title | escape }} FREE!
+      {% endcapture %}
+    {% endif %}
+  {% endunless %}
+{% endfor %}
+{% unless freebie_text %}
+  {% assign freebie_text = "Congratulations! You've unlocked all freebies" %}
+{% endunless %}
+<section class="freebies-announce-bar">
+  <p>{{ freebie_text }}</p>
+  <div class="freebies-lists">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/kisan-hal.png?v=1734432988"
+      alt="anveshan"
+      class="kishan-run"
+    >
+    {{ freebie_list }}
+  </div>
+</section>
+<style>
+  .freebies-announce-bar {
+    background: #235A49;
+    color: #fff;
+    text-align: center;
+    border-bottom: 15px solid transparent;
+    padding: 10px 10px 0;
+  }
+  .freebies-announce-bar * {
+    color: #fff;
+  }
+  .freebies-announce-bar h5 {
+    margin: 0 0 5px;
+    font-family: var(--font-body-family);
+    font-weight: 600;
+  }
+  .freebies-announce-bar p {
+    margin: 0 0 10px;
+  }
+  .freebies-lists {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: -25px;
+    position: relative;
+  }
+  .freebies-lists:after {
+    content: '';
+    position: absolute;
+    bottom: 16px;
+    border-bottom: dashed 0.175rem #fff;
+    left: 35px;
+    right: 29px;
+  }
+  .freebies-list  {
+    display: flex;
+    flex-direction: column;
+    z-index: 9;
+  }
+  .freebies-list span {
+    background: #FFF8F1;
+    padding: 8px;
+    border-radius: 100%;
+    width: max-content;
+    margin: 8px auto 0;
+    border: 1px solid #717070
+  }
+  .freebies-list svg {
+    display: block;
+    fill: #A3A3A3;
+  }
+  .freebies-list.act span {
+    background: #FFD57A;
+    border-color: #235A49;
+  }
+  .freebies-list.act svg {
+    fill: #235A49;
+  }
+  .kishan-run {
+    height: fit-content;
+    position: absolute;
+    bottom: 16px;
+    left: 19%;
+  }
+  cart-drawer-items {
+    padding-top: 10px;
+  }
+</style>

@@ -1,0 +1,50 @@
+{% if cart_price < 49900 %}
+  {% capture message %} {{ "Buy <b>" }}
+    {{ 49900 | minus: cart_price | money }}{{ "</b> more to enjoy free shipping!" }}
+  {% endcapture %}
+  {% assign barprecent = cart_price | divided_by: 1650   %}
+{% elsif cart_item < 3 %}
+  {% capture message %} {{ "You're <b>" }}
+    {{ 3 | minus: cart_item }}{{ " item </b> away from one more discount unlock!" }}
+  {% endcapture %}
+  {% assign offer_acive = 'active_01' %}
+  {% assign barprecent = '53'  %}
+  {% if cart_item == 1 %}{% assign barprecent = '36'  %}{% endif %}
+{% elsif cart_item < 4 %}
+  {% capture message %} {{ "You're <b>" }}
+    {{ 4 | minus: cart_item }}{{ " item </b> away from one more discount unlock!" }}
+  {% endcapture %}
+  {% assign offer_acive = 'active_02' %}
+  {% assign barprecent = '80'  %}
+{% else %}
+  {% capture message %}
+    Free shipping and discount unlocked!
+  {% endcapture %}
+  {% assign offer_acive = 'active_03' %}
+  {% assign barprecent = '100'  %}
+{% endif %}
+<div class="cart-rewards">
+  <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/cart-bar-bg.png?v=1726206915" loading="lazy" alt="" height="auto" width="100%">
+  <div class="cart-rewards-message">{{ message }}</div>
+  <div class="cart-rewards-bar-background">
+    <div class="rewards-bar-foreground" style="width: {{ barprecent -}}%"></div>
+  </div>
+  <div class="cart-rewards-tiers {{ offer_acive }}">
+    <div>&nbsp;</div>
+    <div class="rewards-tier-icon">
+      <svg viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M4 5.25a.75.75 0 0 1 .75-.75h6.991a2.75 2.75 0 0 1 2.645 1.995l.427 1.494a.25.25 0 0 0 .18.173l1.681.421a1.75 1.75 0 0 1 1.326 1.698v1.219a1.75 1.75 0 0 1-1.032 1.597 2.5 2.5 0 1 1-4.955.153h-3.025a2.5 2.5 0 1 1-4.78-.75h-.458a.75.75 0 0 1 0-1.5h2.5c.03 0 .06.002.088.005a2.493 2.493 0 0 1 1.947.745h4.43a2.493 2.493 0 0 1 1.785-.75c.698 0 1.33.286 1.783.748a.25.25 0 0 0 .217-.248v-1.22a.25.25 0 0 0-.19-.242l-1.682-.42a1.75 1.75 0 0 1-1.258-1.217l-.427-1.494a1.25 1.25 0 0 0-1.202-.907h-6.991a.75.75 0 0 1-.75-.75Zm2.5 9.25a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path><path d="M3.25 8a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5Z"></path>
+      </svg>
+    </div>
+    <div class="rewards-tier-icon">
+      <svg viewBox="0 0 20 20">
+        <path d="M13 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path><path fill-rule="evenodd" d="M11.276 3.5a3.75 3.75 0 0 0-2.701 1.149l-4.254 4.417a2.75 2.75 0 0 0 .036 3.852l2.898 2.898a2.5 2.5 0 0 0 3.502.033l4.747-4.571a3.25 3.25 0 0 0 .996-2.341v-2.187a3.25 3.25 0 0 0-3.25-3.25h-1.974Zm-1.62 2.19a2.25 2.25 0 0 1 1.62-.69h1.974c.966 0 1.75.784 1.75 1.75v2.187c0 .475-.194.93-.536 1.26l-4.747 4.572a1 1 0 0 1-1.401-.014l-2.898-2.898a1.25 1.25 0 0 1-.016-1.75l4.253-4.418Z"></path>
+      </svg>
+    </div>
+    <div class="rewards-tier-icon">
+      <svg viewBox="0 0 20 20">
+        <path d="M13 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path><path fill-rule="evenodd" d="M11.276 3.5a3.75 3.75 0 0 0-2.701 1.149l-4.254 4.417a2.75 2.75 0 0 0 .036 3.852l2.898 2.898a2.5 2.5 0 0 0 3.502.033l4.747-4.571a3.25 3.25 0 0 0 .996-2.341v-2.187a3.25 3.25 0 0 0-3.25-3.25h-1.974Zm-1.62 2.19a2.25 2.25 0 0 1 1.62-.69h1.974c.966 0 1.75.784 1.75 1.75v2.187c0 .475-.194.93-.536 1.26l-4.747 4.572a1 1 0 0 1-1.401-.014l-2.898-2.898a1.25 1.25 0 0 1-.016-1.75l4.253-4.418Z"></path>
+      </svg>
+    </div>
+  </div>
+</div>

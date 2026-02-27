@@ -1,0 +1,67 @@
+{% liquid
+  assign js_total = 0
+  for bogo in cart.items
+    if bogo.variant.metafields.custom.quantity
+      assign enable_discount = enable_discount | plus: 1
+    endif
+    assign js_total = js_total | plus: bogo.original_line_price
+  endfor
+%}
+{% if enable_discount > 1 %}
+  {%- capture blogitems -%}
+    {%- assign i = false -%}
+    {%- for bogo in cart.items -%}
+      {%- if bogo.variant.metafields.custom.quantity -%}{%- if i -%},{%- endif -%}{{- bogo.original_line_price | divided_by: 100 -}}{%- assign i = true -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+{% endif %}
+  <div class="recommended-product" style="background: #f7f7f7;">
+    <ul class="offers recommended-products">
+      <li>
+          <div class="offer-discount" id="bogoApply">
+            {% if enable_discount == 1 %}
+              <h3>Unlock Your Offer BOGO</h3>
+              <div class="copy-button" style="margin-top: 0;">
+                <p>Add another selected BOGO item to your cart to unlock Buy 1, Get 1 Free, plus an extra 2% off on prepaid orders – sale ends soon!</p>
+              </div>
+            {% endif %}
+            {% if enable_discount > 1 %}
+              <h3>Click here to apply the code: BOGO</h3>
+              <div class="copy-button">
+                <p style="margin-top:-8px;">Buy 1, Get 1 Free! Plus, grab an extra 2% off on prepaid orders – ending soon!
+                <b style="display:block;padding-top:3px;font-weight:600">*Not applicable on similar products.</b></p>
+                <button onclick='applyBogoDiscount("{{- blogitems -}}")' data-price="{{ js_total }}" class="copybtn" id="couponButton">Apply</button>
+              </div>
+            {% endif %}
+          </div>
+
+        <div class="bogo-applied" id="bogoApplied" style="display:none;">
+          <h3><svg viewBox="0 0 24 24" style="display: inline-block; color: #4fcf64; fill: currentcolor; height: 20px; width: 24px; user-select: none; transition: 450ms cubic-bezier(0.23, 1, 0.32, 1);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg> BOGO Applied</h3>
+          <div class="copy-button">
+            <p>Congrats! Buy One, Get One Free Offer Applied – Don't wait, sale ends soon!</p>
+            <button onclick='closeBogoDiscount()' data-price="{{ js_total }}" class="copybtn" id="couponButton">Remove</button>
+          </div>
+        </div>
+        </li></ul>
+    
+  </div>
+  <style>
+    ul.recommended-products { padding: .8rem 1rem; }
+    ul.offers li { flex: 0 0 99% !important; max-width: 400px; }
+    .offer-discount { color: #fff; flex-direction: column; gap: 0; padding: 10px 15px 15px; border-radius: 0; background: linear-gradient(45deg, #FF8205, #F62664); position: relative; box-shadow: 0 4px 6px 0 rgba(220, 220, 220, 0.2); }
+    .offer-discount h3 { margin: 0 0 3px !important; align-items: center; color: #fff; font-weight: 700; }
+    .offer-discount h3 span { font-size: 0.8em; }
+    .offer-discount svg { margin-right: 8px; }
+    .offer-discount p { margin: 0; font-size: 12px; min-height: 20px; overflow: hidden; font-weight: 600; }
+    .copy-button { margin: 12px 0 -5px 0; min-height: 35px; padding: 3px 0; display: flex; justify-content: space-between; }
+    .copy-button input { width: 100%; height: 100%; border: none; outline: none; font-size: 13px; }
+    .copy-button button { margin-left: 5px; padding: 3px 13px; background-color: #fff; font-weight: 600; color: #f94741; border: 1px solid transparent; font-size: 12px; line-height: 1.5; height: fit-content; border-radius: 3px 3px 12px; cursor: pointer; }
+    .offer-discount::after, .offer-discount::before, .bogo-applied::after, .bogo-applied::before { position: absolute; content: ""; background-color: #f7f7f7; height: 13px; width: 15px; border-radius: 40px; z-index: 1; top: 50%; transform: translateY(-50%); }
+    .offer-discount::after, .bogo-applied::after { right: -9px; }
+    .offer-discount::before, .bogo-applied::before { left: -9px; }
+
+    .bogo-applied { background: #fff; position: relative; padding: 1rem 1.2rem 1.5rem; box-shadow: 0 4px 6px 0 rgba(220, 220, 220, 0.2); }
+    .bogo-applied h3 { margin: 0; color: #4fcf64; display: flex; align-items: center; }
+    .bogo-applied svg { margin-right: 5px; }
+    .bogo-applied p { margin: 0.5rem 0 0; font-size: 13px; }
+  </style>

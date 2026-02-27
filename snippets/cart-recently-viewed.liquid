@@ -1,0 +1,2443 @@
+{% comment %} 
+{% comment %}
+  ===================================================================
+  RECENTLY VIEWED PRODUCTS - OPTIMIZED FOR FAST MOBILE LOADING
+  ✅ FIXED: Now properly shows when products exist
+  ===================================================================
+{% endcomment %}
+
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cart-recently-viewed page-width-desktop"
+  id="recentlyViewedBlock"
+  style="display:none; margin:50px auto; padding:2px;">
+
+  <h2
+  style="padding-left: 15px; text-align:center"
+  class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+  Looks Like You Loved These! <br>Revisit Your Recently Viewed Picks:
+  </h2>
+  <!-- Horizontal scroll container with HIDDEN scrollbar -->
+  <div style="background-color:" class="rv-horizontal-scroll-container" id="rvProductGrid">
+    <div style="background-color:" class="rv-horizontal-product-grid" id="CartRecentlyViewed">
+      <!-- Products loaded dynamically -->
+    </div>
+  </div>
+
+  <!-- Custom scrollbar -->
+  <div class="rv-scrollbar-row" id="rvScrollbarRow" style="display:none;">
+    <div class="rv-custom-scrollbar-track" id="rvCustomScrollbarTrack">
+      <div class="rv-custom-scrollbar-thumb" id="rvCustomScrollbarThumb"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Section hidden by default */
+  #recentlyViewedBlock {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  /* Section fade-in when products loaded */
+  #recentlyViewedBlock.rv-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  /* Center align section */
+  .cart-recently-viewed {
+    max-width: 1600px;
+    margin: 50px auto;
+  }
+
+  /* Enhanced horizontal scroll container - HIDDEN SCROLLBAR */
+  .rv-horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .rv-horizontal-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Horizontal product grid */
+  .rv-horizontal-product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0 20px;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Mobile: 2 cards visible at a time */
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item {
+      width: calc(50vw - 32px);
+      min-width: 160px;
+      max-width: 200px;
+      height: 480px; /* Fixed height for mobile */
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 12px;
+      padding: 0 16px;
+    }
+  }
+
+  /* Desktop: 4 cards visible at a time */
+  @media screen and (min-width: 750px) {
+    .rv-horizontal-grid__item {
+      flex: 0 0 calc(25% - 12px);
+      width: calc(25% - 12px);
+      min-width: 300px;
+      max-width: 300px;
+      height: 630px; /* Fixed height for desktop */
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 16px;
+      padding: 0 20px;
+    }
+  }
+
+  /* ✅ CONSISTENT CARD HEIGHT - All cards same size */
+  .rv-horizontal-grid__item {
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* ✅ Card wrapper takes full height */
+  .rv-horizontal-grid__item .card-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  /* ✅ Card itself takes full height */
+  .rv-horizontal-grid__item .card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  /* ✅ Image container fixed height */
+  .rv-horizontal-grid__item .card__media,
+  .rv-horizontal-grid__item .card__inner {
+    flex-shrink: 0 !important;
+  }
+
+  /* ✅ Content area grows to fill remaining space */
+  .rv-horizontal-grid__item .card__content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 8px 8px 12px 8px !important;
+  }
+
+  /* ✅ Product info section (title, vendor, rating) */
+  .rv-horizontal-grid__item .card__information {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  /* ✅ Title with consistent height and ellipsis for long text */
+  .rv-horizontal-grid__item .card__heading {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-height: 36px !important; /* 2 lines minimum */
+    max-height: 36px !important;
+  }
+
+  /* ✅ Price section stays at bottom */
+  .rv-horizontal-grid__item .price {
+    font-weight: bold !important;
+    margin: 0 !important;
+    padding-top: 4px !important;
+  }
+
+  /* ✅ Compact spacing for all elements */
+  .rv-horizontal-grid__item .rating {
+    margin: 0 !important;
+    padding: 2px 0 !important;
+  }
+
+  .rv-horizontal-grid__item .card__vendor {
+    margin: 0 !important;
+    padding: 2px 0 !important;
+    font-size: 12px !important;
+  }
+
+  .rv-horizontal-grid__item .card__badge {
+    margin: 0 !important;
+  }
+
+  /* ✅ Add to cart button stays at bottom */
+  .rv-horizontal-grid__item .quick-add {
+    margin-top: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Mobile adjustments */
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item .card__content {
+      padding: 6px 6px 8px 6px !important;
+    }
+
+    .rv-horizontal-grid__item .card__heading {
+      font-size: 13px !important;
+      line-height: 1.2 !important;
+      min-height: 31px !important;
+      max-height: 31px !important;
+    }
+
+    .rv-horizontal-grid__item .price {
+      font-size: 13px !important;
+    }
+
+    .rv-horizontal-grid__item .card__vendor {
+      font-size: 11px !important;
+    }
+  }
+
+  /* CUSTOM SCROLLBAR */
+  .rv-scrollbar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 20px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rv-custom-scrollbar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .rv-custom-scrollbar-thumb {
+    height: 100%;
+    background: #404040 !important;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: background-color 0.2s ease;
+    min-width: 20px;
+    cursor: pointer;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 50px;
+  }
+
+  .rv-custom-scrollbar-thumb:hover {
+    background: #2d2d2d !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-scrollbar-row {
+      padding: 12px 16px;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script type="module">
+  (function() {
+    const API_URL = "https://recently-viewed.anveshan.farm/api/recently-viewed";
+    const API_KEY = "2c4010dffce0f7dd1ab3a429acd5d334c94ec2ee7a0e3f8d9f06c9b41afd8f6a";
+    const LIMIT = 12;
+
+    let isLoaded = false;
+
+    console.log('[Recently Viewed] Script loaded');
+
+    // ========================================
+    // 📊 GA4 EVENT TRACKING HELPER
+    // ========================================
+    function sendGA4Event(eventName, eventParams) {
+      try {
+        if (typeof gtag !== 'undefined') {
+          gtag('event', eventName, eventParams);
+        } else if (typeof dataLayer !== 'undefined') {
+          dataLayer.push({
+            event: eventName,
+            ...eventParams
+          });
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+
+    // ========================================
+    // 🎯 ATTACH GA4 EVENT LISTENERS
+    // ========================================
+    function attachGA4EventListeners() {
+      const container = document.getElementById("CartRecentlyViewed");
+      if (!container) return;
+
+      // 🛒 Track Add to Cart clicks
+      container.addEventListener('submit', function(e) {
+        const form = e.target;
+        const cardItem = form.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = cardItem.querySelector('.card__heading a')?.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const variantIdInput = form.querySelector('input[name="id"]');
+        const variantId = variantIdInput ? variantIdInput.value : '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_add_to_cart', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+
+      // 👆 Track product clicks
+      container.addEventListener('click', function(e) {
+        const link = e.target.closest('.card__media a, .card__heading a, a[href*="/products/"]');
+        if (!link) return;
+
+        const cardItem = link.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = link.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const urlParams = new URLSearchParams(productLink.split('?')[1] || '');
+        const variantId = urlParams.get('variant') || '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_product_click', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+    }
+
+    async function loadRecentlyViewed() {
+      if (isLoaded) return;
+      isLoaded = true;
+
+      console.log('[Recently Viewed] Starting to load...');
+
+      let customerId = null;
+
+      {% if customer %}
+        customerId = "{{ customer.id }}";
+        console.log('[Recently Viewed] Logged in customer:', customerId);
+      {% else %}
+        customerId = localStorage.getItem("rv_visitor_id");
+        console.log('[Recently Viewed] Visitor ID:', customerId);
+      {% endif %}
+
+      if (!customerId) {
+        console.log('[Recently Viewed] No customer ID found - hiding section');
+        document.getElementById("recentlyViewedBlock").style.display = "none";
+        return;
+      }
+
+      try {
+        console.log('[Recently Viewed] Fetching from API...');
+        const res = await fetch(`${API_URL}/${customerId}`, {
+          headers: { "x-api-key": API_KEY },
+          priority: "high",
+        });
+
+        const data = await res.json();
+        console.log('[Recently Viewed] API Response:', data);
+
+        // ✅ CHECK IF API RETURNED EMPTY
+        let products = [];
+        if (data.success && data.data?.products?.length > 0) {
+          products = data.data.products;
+          console.log('[Recently Viewed] ✅ Loaded from API:', products.length, 'products');
+        } else if (data.data?.storage === 'localStorage' || customerId.startsWith('visitor_')) {
+          // ✅ FALLBACK TO LOCALSTORAGE FOR VISITORS
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            try {
+              products = JSON.parse(stored);
+              console.log('[Recently Viewed] ✅ Loaded from localStorage:', products.length, 'products');
+            } catch (err) {
+              console.warn('[Recently Viewed] Failed to parse localStorage:', err);
+            }
+          }
+        }
+
+        if (!products.length) {
+          console.log('[Recently Viewed] No products found - hiding section');
+          document.getElementById("recentlyViewedBlock").style.display = "none";
+          return;
+        }
+
+        const productHandles = products
+          .slice(0, LIMIT)
+          .map((p) => p.product_handle)
+          .filter(h => h);
+
+        console.log('[Recently Viewed] Product handles:', productHandles);
+
+        if (!productHandles.length) {
+          console.log('[Recently Viewed] No valid handles - hiding section');
+          document.getElementById("recentlyViewedBlock").style.display = "none";
+          return;
+        }
+
+        // ✅ Parallel fetch for speed
+        console.log('[Recently Viewed] Fetching product cards...');
+        const productPromises = productHandles.map(async (handle) => {
+          try {
+            const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+            const response = await fetch(url, { priority: "high" });
+            return await response.text();
+          } catch (err) {
+            console.warn('[Recently Viewed] Failed to fetch product:', handle, err);
+            return "";
+          }
+        });
+
+        const productCards = await Promise.all(productPromises);
+        const validCards = productCards.filter((c) => c);
+        console.log('[Recently Viewed] Valid product cards:', validCards.length);
+
+        if (!validCards.length) {
+          console.log('[Recently Viewed] No valid cards - hiding section');
+          document.getElementById("recentlyViewedBlock").style.display = "none";
+          return;
+        }
+
+        const container = document.getElementById("CartRecentlyViewed");
+        container.innerHTML = validCards.join("");
+
+        const block = document.getElementById("recentlyViewedBlock");
+        block.style.display = "block";
+        block.classList.add("rv-fade-in");
+
+        console.log('[Recently Viewed] ✅ Section displayed with', validCards.length, 'products');
+
+        // ✅ Initialize scrollbar and GA4 tracking
+        setTimeout(() => {
+          initRVScrollbar();
+          attachGA4EventListeners();
+        }, 100);
+
+      } catch (err) {
+        console.error("[Recently Viewed] API Error:", err);
+
+        // ✅ FALLBACK TO LOCALSTORAGE ON ERROR
+        try {
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            const products = JSON.parse(stored);
+            const productHandles = products
+              .slice(0, LIMIT)
+              .map((p) => p.product_handle)
+              .filter(h => h);
+
+            if (productHandles.length > 0) {
+              console.log('[Recently Viewed] ✅ Using localStorage fallback');
+
+              const productPromises = productHandles.map(async (handle) => {
+                try {
+                  const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+                  const response = await fetch(url, { priority: "high" });
+                  return await response.text();
+                } catch (err) {
+                  return "";
+                }
+              });
+
+              const productCards = await Promise.all(productPromises);
+              const validCards = productCards.filter((c) => c);
+
+              if (validCards.length > 0) {
+                const container = document.getElementById("CartRecentlyViewed");
+                container.innerHTML = validCards.join("");
+
+                const block = document.getElementById("recentlyViewedBlock");
+                block.style.display = "block";
+                block.classList.add("rv-fade-in");
+
+                setTimeout(() => {
+                  initRVScrollbar();
+                  attachGA4EventListeners();
+                }, 100);
+
+                return;
+              }
+            }
+          }
+        } catch (localErr) {
+          console.warn('[Recently Viewed] localStorage fallback failed:', localErr);
+        }
+
+        document.getElementById("recentlyViewedBlock").style.display = "none";
+      }
+    }
+
+    // ✅ INTERSECTION OBSERVER: Load when section comes into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        console.log('[Recently Viewed] IntersectionObserver triggered:', entry.isIntersecting);
+        if (entry.isIntersecting) {
+          loadRecentlyViewed();
+          observer.disconnect();
+        }
+      });
+    }, {
+      rootMargin: "200px"
+    });
+
+    // Start observing when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const block = document.getElementById("recentlyViewedBlock");
+        if (block) {
+          console.log('[Recently Viewed] Starting to observe section');
+          block.style.display = "block"; // Show block for observer
+          observer.observe(block);
+        }
+      });
+    } else {
+      const block = document.getElementById("recentlyViewedBlock");
+      if (block) {
+        console.log('[Recently Viewed] Starting to observe section (immediate)');
+        block.style.display = "block"; // Show block for observer
+        observer.observe(block);
+      }
+    }
+
+    // Scrollbar functionality
+    function initRVScrollbar() {
+      const productGrid = document.getElementById("rvProductGrid");
+      const scrollbarRow = document.getElementById("rvScrollbarRow");
+      const customScrollbarTrack = document.getElementById("rvCustomScrollbarTrack");
+      const customScrollbarThumb = document.getElementById("rvCustomScrollbarThumb");
+
+      if (!productGrid || !customScrollbarTrack || !customScrollbarThumb) return;
+
+      function updateCustomScrollbar() {
+        const gridScrollWidth = productGrid.scrollWidth;
+        const gridClientWidth = productGrid.clientWidth;
+
+        if (gridScrollWidth <= gridClientWidth) {
+          if (scrollbarRow) scrollbarRow.style.display = 'none';
+          return;
+        }
+
+        if (scrollbarRow) scrollbarRow.style.display = 'flex';
+
+        const trackWidth = customScrollbarTrack.clientWidth;
+        const thumbWidth = Math.max((gridClientWidth / gridScrollWidth) * trackWidth, 20);
+        const maxThumbPosition = trackWidth - thumbWidth;
+
+        customScrollbarThumb.style.width = `${thumbWidth}px`;
+
+        function updateThumbPosition() {
+          const scrollPercentage = productGrid.scrollLeft / (gridScrollWidth - gridClientWidth);
+          const thumbPosition = scrollPercentage * maxThumbPosition;
+          customScrollbarThumb.style.left = `${thumbPosition}px`;
+        }
+
+        updateThumbPosition();
+        productGrid.removeEventListener('scroll', updateThumbPosition);
+        productGrid.addEventListener('scroll', updateThumbPosition, { passive: true });
+      }
+
+      function setupCustomScrollbar() {
+        let isDragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        customScrollbarThumb.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          startScrollLeft = productGrid.scrollLeft;
+          customScrollbarThumb.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+
+          const deltaX = e.clientX - startX;
+          const trackWidth = customScrollbarTrack.clientWidth;
+          const thumbWidth = customScrollbarThumb.clientWidth;
+          const maxThumbPosition = trackWidth - thumbWidth;
+
+          const scrollRatio = deltaX / maxThumbPosition;
+          const maxScrollLeft = productGrid.scrollWidth - productGrid.clientWidth;
+          const newScrollLeft = startScrollLeft + (scrollRatio * maxScrollLeft);
+
+          productGrid.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            customScrollbarThumb.style.cursor = 'pointer';
+          }
+        });
+      }
+
+      updateCustomScrollbar();
+      setupCustomScrollbar();
+
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => updateCustomScrollbar(), 150);
+      });
+    }
+  })();
+</script>
+
+{% comment %} {% comment %}
+  ===================================================================
+  RECENTLY VIEWED PRODUCTS - OPTIMIZED FOR FAST MOBILE LOADING
+  Uses Intersection Observer for instant loading when user scrolls
+  WITH GA4 EVENT TRACKING + LOCALSTORAGE FALLBACK
+  ===================================================================
+{% endcomment %}
+
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cart-recently-viewed page-width-desktop"
+  id="recentlyViewedBlock"
+  style="display:block; margin:0 auto; padding:0; min-height:0; overflow:hidden;">
+
+  <div id="recentlyViewedContent" style="display:none;">
+    <h2
+    style="padding-left: 15px; text-align:center"
+    class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  >
+    Looks Like You Loved These! <br>Revisit Your Recently Viewed Picks:
+  </h2>
+    <!-- Horizontal scroll container with HIDDEN scrollbar -->
+    <div class="rv-horizontal-scroll-container" id="rvProductGrid">
+      <div class="rv-horizontal-product-grid" id="CartRecentlyViewed">
+        <!-- Loading placeholder -->
+        <div class="rv-loading-placeholder">Loading your recently viewed products...</div>
+      </div>
+    </div>
+
+    <!-- Custom scrollbar with See All button -->
+    <div class="rv-scrollbar-row" id="rvScrollbarRow">
+      <div class="rv-custom-scrollbar-track" id="rvCustomScrollbarTrack">
+        <div class="rv-custom-scrollbar-thumb" id="rvCustomScrollbarThumb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ✅ Main container - CENTERED on page */
+  #recentlyViewedBlock {
+    min-height: 0;
+    overflow: hidden;
+    margin: 0 auto !important; /* ✅ Center horizontally */
+    max-width: 1400px; /* ✅ Max width for large screens */
+    width: 100%;
+  }
+
+  /* ✅ Content wrapper - controls visibility */
+  #recentlyViewedContent {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  #recentlyViewedContent.rv-show {
+    display: block !important;
+    margin: 50px auto; /* ✅ Center this too */
+    padding: 2px;
+    background-color: rgb(255, 255, 255);
+  }
+
+  /* Section fade-in */
+  #recentlyViewedContent.rv-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  /* Loading placeholder */
+  .rv-loading-placeholder {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  /* Center align section */
+  .cart-recently-viewed {
+    max-width: 1400px;
+    margin: 0 auto; /* ✅ Center alignment */
+  }
+
+  /* Enhanced horizontal scroll container - HIDDEN SCROLLBAR */
+  .rv-horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .rv-horizontal-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* ✅ CENTERED Horizontal product grid */
+  .rv-horizontal-product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0 20px;
+    width: max-content;
+    min-width: 100%;
+    justify-content: center; /* ✅ Center the cards */
+    margin: 0 auto; /* ✅ Center container */
+  }
+
+  /* ✅ FIXED HEIGHT for all cards - Mobile */
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item {
+      width: calc(50vw - 32px);
+      min-width: 160px;
+      max-width: 200px;
+      height: 320px; /* ✅ Fixed height */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    /* ✅ Make card wrapper fill the height */
+    .rv-horizontal-grid__item .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ✅ Image section takes fixed space */
+    .rv-horizontal-grid__item .card__media {
+      flex-shrink: 0;
+      height: 180px; /* Fixed image height */
+    }
+
+    /* ✅ Content section grows to fill remaining space */
+    .rv-horizontal-grid__item .card__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 6px 6px 8px 6px;
+      overflow: hidden;
+    }
+
+    .rv-horizontal-grid__item .card__heading {
+      font-size: 13px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  /* ✅ FIXED HEIGHT for all cards - Desktop */
+  @media screen and (min-width: 750px) {
+    .rv-horizontal-grid__item {
+      flex: 0 0 calc(25% - 12px);
+      width: calc(25% - 12px);
+      min-width: 300px;
+      max-width: 300px;
+      height: 450px; /* ✅ Fixed height */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 16px;
+      padding: 0 20px;
+    }
+
+    /* ✅ Make card wrapper fill the height */
+    .rv-horizontal-grid__item .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ✅ Image section takes fixed space */
+    .rv-horizontal-grid__item .card__media {
+      flex-shrink: 0;
+      height: 280px; /* Fixed image height */
+    }
+
+    /* ✅ Content section grows to fill remaining space */
+    .rv-horizontal-grid__item .card__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 8px 12px 8px;
+      overflow: hidden;
+    }
+
+    .rv-horizontal-grid__item .card__heading {
+      font-size: 14px;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      margin-top: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  /* ✅ Ensure cards maintain their box model */
+  .rv-horizontal-grid__item {
+    box-sizing: border-box;
+  }
+
+  .rv-horizontal-grid__item .price {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  /* Remove extra space */
+  .rv-horizontal-grid__item .rating {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .rv-horizontal-grid__item .card__vendor {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* CUSTOM SCROLLBAR WITH SEE ALL BUTTON */
+  .rv-scrollbar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 20px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rv-custom-scrollbar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .rv-custom-scrollbar-thumb {
+    height: 100%;
+    background: #404040 !important;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: background-color 0.2s ease;
+    min-width: 20px;
+    cursor: pointer;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 50px;
+  }
+
+  .rv-custom-scrollbar-thumb:hover {
+    background: #2d2d2d !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-scrollbar-row {
+      padding: 12px 16px;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script type="module">
+  // ✅ OPTIMIZED: Load IMMEDIATELY when section is visible, not after page load
+  (function() {
+    const API_URL = "https://recently-viewed.anveshan.farm/api/recently-viewed";
+    const API_KEY = "2c4010dffce0f7dd1ab3a429acd5d334c94ec2ee7a0e3f8d9f06c9b41afd8f6a";
+    const LIMIT = 12;
+
+    let isLoaded = false;
+
+    // ========================================
+    // 📊 GA4 EVENT TRACKING HELPER
+    // ========================================
+    function sendGA4Event(eventName, eventParams) {
+      try {
+        if (typeof gtag !== 'undefined') {
+          gtag('event', eventName, eventParams);
+        } else if (typeof dataLayer !== 'undefined') {
+          dataLayer.push({
+            event: eventName,
+            ...eventParams
+          });
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+
+    // ========================================
+    // 🎯 ATTACH GA4 EVENT LISTENERS
+    // ========================================
+    function attachGA4EventListeners() {
+      const container = document.getElementById("CartRecentlyViewed");
+      if (!container) return;
+
+      // 🛒 Track Add to Cart clicks
+      container.addEventListener('submit', function(e) {
+        const form = e.target;
+        const cardItem = form.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = cardItem.querySelector('.card__heading a')?.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const variantIdInput = form.querySelector('input[name="id"]');
+        const variantId = variantIdInput ? variantIdInput.value : '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_add_to_cart', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+
+      // 👆 Track product clicks
+      container.addEventListener('click', function(e) {
+        const link = e.target.closest('.card__media a, .card__heading a, a[href*="/products/"]');
+        if (!link) return;
+
+        const cardItem = link.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = link.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const urlParams = new URLSearchParams(productLink.split('?')[1] || '');
+        const variantId = urlParams.get('variant') || '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_product_click', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+    }
+
+    async function loadRecentlyViewed() {
+      if (isLoaded) return;
+      isLoaded = true;
+
+      let customerId = null;
+
+      {% if customer %}
+        customerId = "{{ customer.id }}";
+      {% else %}
+        customerId = localStorage.getItem("rv_visitor_id");
+      {% endif %}
+
+      // ✅ No customer ID = hide immediately, no space taken
+      if (!customerId) {
+        console.log('[Recently Viewed] No customer ID found');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/${customerId}`, {
+          headers: { "x-api-key": API_KEY },
+          priority: "high",
+        });
+
+        const data = await res.json();
+
+        // ✅ CHECK IF API RETURNED EMPTY (for visitors using localStorage)
+        let products = [];
+        if (data.success && data.data?.products?.length > 0) {
+          products = data.data.products;
+          console.log('[Recently Viewed] ✅ Loaded from API:', products.length, 'products');
+        } else if (data.data?.storage === 'localStorage' || customerId.startsWith('visitor_')) {
+          // ✅ FALLBACK TO LOCALSTORAGE FOR VISITORS
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            try {
+              products = JSON.parse(stored);
+              console.log('[Recently Viewed] ✅ Loaded from localStorage:', products.length, 'products');
+            } catch (err) {
+              console.warn('[Recently Viewed] Failed to parse localStorage:', err);
+            }
+          }
+        }
+
+        if (!products.length) {
+          console.log('[Recently Viewed] No products found');
+          return;
+        }
+
+        const productHandles = products
+          .slice(0, LIMIT)
+          .map((p) => p.product_handle)
+          .filter(h => h);
+
+        if (!productHandles.length) {
+          console.log('[Recently Viewed] No valid product handles');
+          return;
+        }
+
+        // ✅ Parallel fetch for speed
+        const productPromises = productHandles.map(async (handle) => {
+          try {
+            const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+            const response = await fetch(url, { priority: "high" });
+            return await response.text();
+          } catch (err) {
+            return "";
+          }
+        });
+
+        const productCards = await Promise.all(productPromises);
+        const validCards = productCards.filter((c) => c);
+
+        // ✅ No valid cards = don't show section
+        if (!validCards.length) {
+          console.log('[Recently Viewed] No valid product cards rendered');
+          return;
+        }
+
+        const container = document.getElementById("CartRecentlyViewed");
+        container.innerHTML = validCards.join("");
+
+        // ✅ Show section with fade-in
+        const content = document.getElementById("recentlyViewedContent");
+        if (content) {
+          content.classList.add("rv-show");
+          console.log('[Recently Viewed] 🎯 Added rv-show class');
+          
+          // Verify it's visible
+          setTimeout(() => {
+            const isVisible = window.getComputedStyle(content).display !== 'none';
+            console.log('[Recently Viewed] Section visible?', isVisible);
+            content.classList.add("rv-fade-in");
+          }, 50);
+        }
+
+        // ✅ Initialize scrollbar and GA4 tracking after products loaded
+        setTimeout(() => {
+          initRVScrollbar();
+          attachGA4EventListeners();
+        }, 100);
+        
+        console.log('[Recently Viewed] ✅ Section displayed with', validCards.length, 'products');
+      } catch (err) {
+        console.warn("[Recently Viewed] API Error:", err);
+
+        // ✅ FALLBACK TO LOCALSTORAGE ON ERROR
+        try {
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            const products = JSON.parse(stored);
+            const productHandles = products
+              .slice(0, LIMIT)
+              .map((p) => p.product_handle)
+              .filter(h => h);
+
+            if (productHandles.length > 0) {
+              console.log('[Recently Viewed] ✅ Using localStorage fallback after API error');
+
+              const productPromises = productHandles.map(async (handle) => {
+                try {
+                  const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+                  const response = await fetch(url, { priority: "high" });
+                  return await response.text();
+                } catch (err) {
+                  return "";
+                }
+              });
+
+              const productCards = await Promise.all(productPromises);
+              const validCards = productCards.filter((c) => c);
+
+              if (!validCards.length) {
+                console.log('[Recently Viewed] No valid cards in localStorage fallback');
+                return;
+              }
+
+              const container = document.getElementById("CartRecentlyViewed");
+              container.innerHTML = validCards.join("");
+
+              const content = document.getElementById("recentlyViewedContent");
+              if (content) {
+                content.classList.add("rv-show");
+                setTimeout(() => content.classList.add("rv-fade-in"), 50);
+              }
+
+              setTimeout(() => {
+                initRVScrollbar();
+                attachGA4EventListeners();
+              }, 100);
+
+              return;
+            }
+          }
+        } catch (localErr) {
+          console.warn('[Recently Viewed] localStorage fallback failed:', localErr);
+        }
+      }
+    }
+
+    // ✅ INTERSECTION OBSERVER: Load when section comes into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadRecentlyViewed();
+          observer.disconnect();
+        }
+      });
+    }, {
+      rootMargin: "200px"
+    });
+
+    // Start observing when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const block = document.getElementById("recentlyViewedBlock");
+        if (block) {
+          observer.observe(block);
+        }
+      });
+    } else {
+      const block = document.getElementById("recentlyViewedBlock");
+      if (block) {
+        observer.observe(block);
+      }
+    }
+
+    // Scrollbar functionality
+    function initRVScrollbar() {
+      const productGrid = document.getElementById("rvProductGrid");
+      const scrollbarRow = document.getElementById("rvScrollbarRow");
+      const customScrollbarTrack = document.getElementById("rvCustomScrollbarTrack");
+      const customScrollbarThumb = document.getElementById("rvCustomScrollbarThumb");
+
+      if (!productGrid || !customScrollbarTrack || !customScrollbarThumb) return;
+
+      function updateCustomScrollbar() {
+        const gridScrollWidth = productGrid.scrollWidth;
+        const gridClientWidth = productGrid.clientWidth;
+
+        if (gridScrollWidth <= gridClientWidth) {
+          if (scrollbarRow) scrollbarRow.style.display = 'none';
+          return;
+        }
+
+        if (scrollbarRow) scrollbarRow.style.display = 'flex';
+
+        const trackWidth = customScrollbarTrack.clientWidth;
+        const thumbWidth = Math.max((gridClientWidth / gridScrollWidth) * trackWidth, 20);
+        const maxThumbPosition = trackWidth - thumbWidth;
+
+        customScrollbarThumb.style.width = `${thumbWidth}px`;
+
+        function updateThumbPosition() {
+          const scrollPercentage = productGrid.scrollLeft / (gridScrollWidth - gridClientWidth);
+          const thumbPosition = scrollPercentage * maxThumbPosition;
+          customScrollbarThumb.style.left = `${thumbPosition}px`;
+        }
+
+        updateThumbPosition();
+        productGrid.removeEventListener('scroll', updateThumbPosition);
+        productGrid.addEventListener('scroll', updateThumbPosition, { passive: true });
+      }
+
+      function setupCustomScrollbar() {
+        let isDragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        customScrollbarThumb.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          startScrollLeft = productGrid.scrollLeft;
+          customScrollbarThumb.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+
+          const deltaX = e.clientX - startX;
+          const trackWidth = customScrollbarTrack.clientWidth;
+          const thumbWidth = customScrollbarThumb.clientWidth;
+          const maxThumbPosition = trackWidth - thumbWidth;
+
+          const scrollRatio = deltaX / maxThumbPosition;
+          const maxScrollLeft = productGrid.scrollWidth - productGrid.clientWidth;
+          const newScrollLeft = startScrollLeft + (scrollRatio * maxScrollLeft);
+
+          productGrid.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            customScrollbarThumb.style.cursor = 'pointer';
+          }
+        });
+      }
+
+      updateCustomScrollbar();
+      setupCustomScrollbar();
+
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => updateCustomScrollbar(), 150);
+      });
+    }
+  })();
+</script>
+
+{% comment %} {% comment %}
+  ===================================================================
+  RECENTLY VIEWED PRODUCTS - OPTIMIZED FOR FAST MOBILE LOADING
+  Uses Intersection Observer for instant loading when user scrolls
+  WITH GA4 EVENT TRACKING + LOCALSTORAGE FALLBACK
+  ===================================================================
+{% endcomment %}
+
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cart-recently-viewed page-width-desktop"
+  id="recentlyViewedBlock"
+  style="display:block; margin:0; padding:0; min-height:0; overflow:hidden;">
+
+  <div id="recentlyViewedContent" style="display:none;">
+    <h2
+    style="padding-left: 15px; text-align:center"
+    class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  >
+    Looks Like You Loved These! <br>Revisit Your Recently Viewed Picks:
+  </h2>
+    <!-- Horizontal scroll container with HIDDEN scrollbar -->
+    <div style="background-color:" class="rv-horizontal-scroll-container" id="rvProductGrid">
+      <div style="background-color:" class="rv-horizontal-product-grid" id="CartRecentlyViewed">
+        <!-- Loading placeholder -->
+        <div class="rv-loading-placeholder">Loading your recently viewed products...</div>
+      </div>
+    </div>
+
+    <!-- Custom scrollbar with See All button -->
+    <div class="rv-scrollbar-row" id="rvScrollbarRow">
+      <div class="rv-custom-scrollbar-track" id="rvCustomScrollbarTrack">
+        <div class="rv-custom-scrollbar-thumb" id="rvCustomScrollbarThumb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ✅ Main container - no height when hidden */
+  #recentlyViewedBlock {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ✅ Content wrapper - controls visibility */
+  #recentlyViewedContent {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  #recentlyViewedContent.rv-show {
+    display: block !important;
+    margin: 50px auto;
+    padding: 2px;
+    background-color: rgb(255, 255, 255);
+  }
+
+  /* Section fade-in */
+  #recentlyViewedContent.rv-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  /* Loading placeholder */
+  .rv-loading-placeholder {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  /* Center align section */
+  .cart-recently-viewed {
+    max-width: 1400px;
+  }
+
+  /* Enhanced horizontal scroll container - HIDDEN SCROLLBAR */
+  .rv-horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .rv-horizontal-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Horizontal product grid */
+  .rv-horizontal-product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0 20px;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Mobile: 2 cards visible at a time */
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item {
+      width: calc(50vw - 32px);
+      min-width: 160px;
+      max-width: 200px;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 12px;
+      padding: 0 16px;
+    }
+  }
+
+  /* Desktop: 4 cards visible at a time */
+  @media screen and (min-width: 750px) {
+    .rv-horizontal-grid__item {
+      flex: 0 0 calc(25% - 12px);
+      width: calc(25% - 12px);
+      min-width: 300px;
+      max-width: 300px;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 16px;
+      padding: 0 20px;
+    }
+  }
+
+  /* Ensure cards maintain their aspect ratio */
+  .rv-horizontal-grid__item {
+    box-sizing: border-box;
+  }
+
+  /* Adjust card content for smaller sizes */
+  .rv-horizontal-grid__item .card__content {
+    padding: 8px 8px 12px 8px;
+  }
+
+  .rv-horizontal-grid__item .card__heading {
+    font-size: 14px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .rv-horizontal-grid__item .price {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  /* Remove extra space */
+  .rv-horizontal-grid__item .rating {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .rv-horizontal-grid__item .card__vendor {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item .card__content {
+      padding: 6px 6px 8px 6px;
+    }
+
+    .rv-horizontal-grid__item .card__heading {
+      font-size: 13px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .rv-horizontal-grid__item .price {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+  }
+
+  /* CUSTOM SCROLLBAR WITH SEE ALL BUTTON */
+  .rv-scrollbar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 20px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rv-custom-scrollbar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .rv-custom-scrollbar-thumb {
+    height: 100%;
+    background: #404040 !important;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: background-color 0.2s ease;
+    min-width: 20px;
+    cursor: pointer;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 50px;
+  }
+
+  .rv-custom-scrollbar-thumb:hover {
+    background: #2d2d2d !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-scrollbar-row {
+      padding: 12px 16px;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script type="module">
+  // ✅ OPTIMIZED: Load IMMEDIATELY when section is visible, not after page load
+  (function() {
+    const API_URL = "https://recently-viewed.anveshan.farm/api/recently-viewed";
+    const API_KEY = "2c4010dffce0f7dd1ab3a429acd5d334c94ec2ee7a0e3f8d9f06c9b41afd8f6a";
+    const LIMIT = 12;
+
+    let isLoaded = false;
+
+    // ========================================
+    // 📊 GA4 EVENT TRACKING HELPER
+    // ========================================
+    function sendGA4Event(eventName, eventParams) {
+      try {
+        if (typeof gtag !== 'undefined') {
+          gtag('event', eventName, eventParams);
+        } else if (typeof dataLayer !== 'undefined') {
+          dataLayer.push({
+            event: eventName,
+            ...eventParams
+          });
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+
+    // ========================================
+    // 🎯 ATTACH GA4 EVENT LISTENERS
+    // ========================================
+    function attachGA4EventListeners() {
+      const container = document.getElementById("CartRecentlyViewed");
+      if (!container) return;
+
+      // 🛒 Track Add to Cart clicks
+      container.addEventListener('submit', function(e) {
+        const form = e.target;
+        const cardItem = form.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = cardItem.querySelector('.card__heading a')?.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const variantIdInput = form.querySelector('input[name="id"]');
+        const variantId = variantIdInput ? variantIdInput.value : '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_add_to_cart', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+
+      // 👆 Track product clicks
+      container.addEventListener('click', function(e) {
+        const link = e.target.closest('.card__media a, .card__heading a, a[href*="/products/"]');
+        if (!link) return;
+
+        const cardItem = link.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = link.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const urlParams = new URLSearchParams(productLink.split('?')[1] || '');
+        const variantId = urlParams.get('variant') || '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_product_click', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+    }
+
+    async function loadRecentlyViewed() {
+      if (isLoaded) return;
+      isLoaded = true;
+
+      let customerId = null;
+
+      {% if customer %}
+        customerId = "{{ customer.id }}";
+      {% else %}
+        customerId = localStorage.getItem("rv_visitor_id");
+      {% endif %}
+
+      // ✅ No customer ID = hide immediately, no space taken
+      if (!customerId) {
+        console.log('[Recently Viewed] No customer ID found');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/${customerId}`, {
+          headers: { "x-api-key": API_KEY },
+          priority: "high",
+        });
+
+        const data = await res.json();
+
+        // ✅ CHECK IF API RETURNED EMPTY (for visitors using localStorage)
+        let products = [];
+        if (data.success && data.data?.products?.length > 0) {
+          products = data.data.products;
+          console.log('[Recently Viewed] ✅ Loaded from API:', products.length, 'products');
+        } else if (data.data?.storage === 'localStorage' || customerId.startsWith('visitor_')) {
+          // ✅ FALLBACK TO LOCALSTORAGE FOR VISITORS
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            try {
+              products = JSON.parse(stored);
+              console.log('[Recently Viewed] ✅ Loaded from localStorage:', products.length, 'products');
+            } catch (err) {
+              console.warn('[Recently Viewed] Failed to parse localStorage:', err);
+            }
+          }
+        }
+
+        if (!products.length) {
+          console.log('[Recently Viewed] No products found');
+          return;
+        }
+
+        const productHandles = products
+          .slice(0, LIMIT)
+          .map((p) => p.product_handle)
+          .filter(h => h);
+
+        if (!productHandles.length) {
+          console.log('[Recently Viewed] No valid product handles');
+          return;
+        }
+
+        // ✅ Parallel fetch for speed
+        const productPromises = productHandles.map(async (handle) => {
+          try {
+            const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+            const response = await fetch(url, { priority: "high" });
+            return await response.text();
+          } catch (err) {
+            return "";
+          }
+        });
+
+        const productCards = await Promise.all(productPromises);
+        const validCards = productCards.filter((c) => c);
+
+        // ✅ No valid cards = don't show section
+        if (!validCards.length) {
+          console.log('[Recently Viewed] No valid product cards rendered');
+          return;
+        }
+
+        const container = document.getElementById("CartRecentlyViewed");
+        container.innerHTML = validCards.join("");
+
+        // ✅ Show section with fade-in
+        const content = document.getElementById("recentlyViewedContent");
+        if (content) {
+          content.classList.add("rv-show");
+          console.log('[Recently Viewed] 🎯 Added rv-show class');
+          
+          // Verify it's visible
+          setTimeout(() => {
+            const isVisible = window.getComputedStyle(content).display !== 'none';
+            console.log('[Recently Viewed] Section visible?', isVisible);
+            content.classList.add("rv-fade-in");
+          }, 50);
+        }
+
+        // ✅ Initialize scrollbar and GA4 tracking after products loaded
+        setTimeout(() => {
+          initRVScrollbar();
+          attachGA4EventListeners();
+        }, 100);
+        
+        console.log('[Recently Viewed] ✅ Section displayed with', validCards.length, 'products');
+      } catch (err) {
+        console.warn("[Recently Viewed] API Error:", err);
+
+        // ✅ FALLBACK TO LOCALSTORAGE ON ERROR
+        try {
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            const products = JSON.parse(stored);
+            const productHandles = products
+              .slice(0, LIMIT)
+              .map((p) => p.product_handle)
+              .filter(h => h);
+
+            if (productHandles.length > 0) {
+              console.log('[Recently Viewed] ✅ Using localStorage fallback after API error');
+
+              const productPromises = productHandles.map(async (handle) => {
+                try {
+                  const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+                  const response = await fetch(url, { priority: "high" });
+                  return await response.text();
+                } catch (err) {
+                  return "";
+                }
+              });
+
+              const productCards = await Promise.all(productPromises);
+              const validCards = productCards.filter((c) => c);
+
+              if (!validCards.length) {
+                console.log('[Recently Viewed] No valid cards in localStorage fallback');
+                return;
+              }
+
+              const container = document.getElementById("CartRecentlyViewed");
+              container.innerHTML = validCards.join("");
+
+              const content = document.getElementById("recentlyViewedContent");
+              if (content) {
+                content.classList.add("rv-show");
+                setTimeout(() => content.classList.add("rv-fade-in"), 50);
+              }
+
+              setTimeout(() => {
+                initRVScrollbar();
+                attachGA4EventListeners();
+              }, 100);
+
+              return;
+            }
+          }
+        } catch (localErr) {
+          console.warn('[Recently Viewed] localStorage fallback failed:', localErr);
+        }
+      }
+    }
+
+    // ✅ INTERSECTION OBSERVER: Load when section comes into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadRecentlyViewed();
+          observer.disconnect();
+        }
+      });
+    }, {
+      rootMargin: "200px"
+    });
+
+    // Start observing when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const block = document.getElementById("recentlyViewedBlock");
+        if (block) {
+          observer.observe(block);
+        }
+      });
+    } else {
+      const block = document.getElementById("recentlyViewedBlock");
+      if (block) {
+        observer.observe(block);
+      }
+    }
+
+    // Scrollbar functionality
+    function initRVScrollbar() {
+      const productGrid = document.getElementById("rvProductGrid");
+      const scrollbarRow = document.getElementById("rvScrollbarRow");
+      const customScrollbarTrack = document.getElementById("rvCustomScrollbarTrack");
+      const customScrollbarThumb = document.getElementById("rvCustomScrollbarThumb");
+
+      if (!productGrid || !customScrollbarTrack || !customScrollbarThumb) return;
+
+      function updateCustomScrollbar() {
+        const gridScrollWidth = productGrid.scrollWidth;
+        const gridClientWidth = productGrid.clientWidth;
+
+        if (gridScrollWidth <= gridClientWidth) {
+          if (scrollbarRow) scrollbarRow.style.display = 'none';
+          return;
+        }
+
+        if (scrollbarRow) scrollbarRow.style.display = 'flex';
+
+        const trackWidth = customScrollbarTrack.clientWidth;
+        const thumbWidth = Math.max((gridClientWidth / gridScrollWidth) * trackWidth, 20);
+        const maxThumbPosition = trackWidth - thumbWidth;
+
+        customScrollbarThumb.style.width = `${thumbWidth}px`;
+
+        function updateThumbPosition() {
+          const scrollPercentage = productGrid.scrollLeft / (gridScrollWidth - gridClientWidth);
+          const thumbPosition = scrollPercentage * maxThumbPosition;
+          customScrollbarThumb.style.left = `${thumbPosition}px`;
+        }
+
+        updateThumbPosition();
+        productGrid.removeEventListener('scroll', updateThumbPosition);
+        productGrid.addEventListener('scroll', updateThumbPosition, { passive: true });
+      }
+
+      function setupCustomScrollbar() {
+        let isDragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        customScrollbarThumb.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          startScrollLeft = productGrid.scrollLeft;
+          customScrollbarThumb.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+
+          const deltaX = e.clientX - startX;
+          const trackWidth = customScrollbarTrack.clientWidth;
+          const thumbWidth = customScrollbarThumb.clientWidth;
+          const maxThumbPosition = trackWidth - thumbWidth;
+
+          const scrollRatio = deltaX / maxThumbPosition;
+          const maxScrollLeft = productGrid.scrollWidth - productGrid.clientWidth;
+          const newScrollLeft = startScrollLeft + (scrollRatio * maxScrollLeft);
+
+          productGrid.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            customScrollbarThumb.style.cursor = 'pointer';
+          }
+        });
+      }
+
+      updateCustomScrollbar();
+      setupCustomScrollbar();
+
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => updateCustomScrollbar(), 150);
+      });
+    }
+  })();
+</script>
+
+{% comment %} 
+{% comment %}
+  ===================================================================
+  RECENTLY VIEWED PRODUCTS - OPTIMIZED FOR FAST MOBILE LOADING
+  Uses Intersection Observer for instant loading when user scrolls
+  WITH GA4 EVENT TRACKING + LOCALSTORAGE FALLBACK
+  ===================================================================
+{% endcomment %}
+
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="cart-recently-viewed page-width-desktop"
+  id="recentlyViewedBlock"
+  style="display:none; margin:50px auto; padding:2px, background-color:rgb(248, 252, 244)">
+
+  <h2
+  style="padding-left: 15px; text-align:center"
+  class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+>
+  Looks Like You Loved These! <br>Revisit Your Recently Viewed Picks:
+</h2>
+  <!-- Horizontal scroll container with HIDDEN scrollbar -->
+  <div style="background-color:" class="rv-horizontal-scroll-container" id="rvProductGrid">
+    <div style="background-color:" class="rv-horizontal-product-grid" id="CartRecentlyViewed">
+      <!-- Loading placeholder -->
+      <div class="rv-loading-placeholder">Loading your recently viewed products...</div>
+    </div>
+  </div>
+
+  <!-- Custom scrollbar with See All button -->
+  <div class="rv-scrollbar-row" id="rvScrollbarRow">
+    <div class="rv-custom-scrollbar-track" id="rvCustomScrollbarTrack">
+      <div class="rv-custom-scrollbar-thumb" id="rvCustomScrollbarThumb"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Loading placeholder */
+  .rv-loading-placeholder {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  /* Section fade-in */
+  #recentlyViewedBlock.rv-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #recentlyViewedBlock {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  /* Center align section */
+  .cart-recently-viewed {
+    max-width: 1400px;
+    margin: 50px auto;
+  }
+
+  /* Enhanced horizontal scroll container - HIDDEN SCROLLBAR */
+  .rv-horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .rv-horizontal-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Horizontal product grid */
+  .rv-horizontal-product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0 20px;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Mobile: 2 cards visible at a time */
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item {
+      width: calc(50vw - 32px);
+      min-width: 160px;
+      max-width: 200px;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 12px;
+      padding: 0 16px;
+    }
+  }
+
+  /* Desktop: 4 cards visible at a time */
+  @media screen and (min-width: 750px) {
+    .rv-horizontal-grid__item {
+      flex: 0 0 calc(25% - 12px);
+      width: calc(25% - 12px);
+      min-width: 300px;
+      max-width: 300px;
+    }
+
+    .rv-horizontal-product-grid {
+      gap: 16px;
+      padding: 0 20px;
+    }
+  }
+
+  /* Ensure cards maintain their aspect ratio */
+  .rv-horizontal-grid__item {
+    box-sizing: border-box;
+  }
+
+  /* Adjust card content for smaller sizes */
+  .rv-horizontal-grid__item .card__content {
+    padding: 8px 8px 12px 8px;
+  }
+
+  .rv-horizontal-grid__item .card__heading {
+    font-size: 14px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .rv-horizontal-grid__item .price {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  /* Remove extra space */
+  .rv-horizontal-grid__item .rating {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .rv-horizontal-grid__item .card__vendor {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-horizontal-grid__item .card__content {
+      padding: 6px 6px 8px 6px;
+    }
+
+    .rv-horizontal-grid__item .card__heading {
+      font-size: 13px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .rv-horizontal-grid__item .price {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+  }
+
+  /* CUSTOM SCROLLBAR WITH SEE ALL BUTTON */
+  .rv-scrollbar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 20px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rv-custom-scrollbar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .rv-custom-scrollbar-thumb {
+    height: 100%;
+    background: #404040 !important;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: background-color 0.2s ease;
+    min-width: 20px;
+    cursor: pointer;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 50px;
+  }
+
+  .rv-custom-scrollbar-thumb:hover {
+    background: #2d2d2d !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rv-scrollbar-row {
+      padding: 12px 16px;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script type="module">
+  // ✅ OPTIMIZED: Load IMMEDIATELY when section is visible, not after page load
+  (function() {
+    const API_URL = "https://recently-viewed.anveshan.farm/api/recently-viewed";
+    const API_KEY = "2c4010dffce0f7dd1ab3a429acd5d334c94ec2ee7a0e3f8d9f06c9b41afd8f6a";
+    const LIMIT = 12;
+
+    let isLoaded = false;
+
+    // ========================================
+    // 📊 GA4 EVENT TRACKING HELPER
+    // ========================================
+    function sendGA4Event(eventName, eventParams) {
+      try {
+        if (typeof gtag !== 'undefined') {
+          gtag('event', eventName, eventParams);
+        } else if (typeof dataLayer !== 'undefined') {
+          dataLayer.push({
+            event: eventName,
+            ...eventParams
+          });
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+
+    // ========================================
+    // 🎯 ATTACH GA4 EVENT LISTENERS
+    // ========================================
+    function attachGA4EventListeners() {
+      const container = document.getElementById("CartRecentlyViewed");
+      if (!container) return;
+
+      // 🛒 Track Add to Cart clicks
+      container.addEventListener('submit', function(e) {
+        const form = e.target;
+        const cardItem = form.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = cardItem.querySelector('.card__heading a')?.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const variantIdInput = form.querySelector('input[name="id"]');
+        const variantId = variantIdInput ? variantIdInput.value : '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_add_to_cart', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+
+      // 👆 Track product clicks
+      container.addEventListener('click', function(e) {
+        const link = e.target.closest('.card__media a, .card__heading a, a[href*="/products/"]');
+        if (!link) return;
+
+        const cardItem = link.closest('.rv-horizontal-grid__item, li');
+        if (!cardItem) return;
+
+        const productTitle = cardItem.querySelector('.card__heading a')?.textContent?.trim() || 'Unknown Product';
+        const productLink = link.href || '';
+        const priceElement = cardItem.querySelector('.price, .price-item');
+        const productPrice = priceElement ? priceElement.textContent.replace(/[^0-9.]/g, '') : '0';
+        const urlParams = new URLSearchParams(productLink.split('?')[1] || '');
+        const variantId = urlParams.get('variant') || '';
+        const productHandle = productLink ? productLink.split('/products/')[1]?.split('?')[0] : '';
+
+        sendGA4Event('recently_viewed_product_click', {
+          event_category: 'Recently Viewed',
+          event_label: productTitle,
+          variant_id: variantId,
+          product_name: productTitle,
+          product_handle: productHandle,
+          price: productPrice,
+          currency: 'INR',
+          value: parseFloat(productPrice) || 0,
+          source: 'recently_viewed_section'
+        });
+      });
+    }
+
+    async function loadRecentlyViewed() {
+      if (isLoaded) return;
+      isLoaded = true;
+
+      let customerId = null;
+
+      {% if customer %}
+        customerId = "{{ customer.id }}";
+      {% else %}
+        customerId = localStorage.getItem("rv_visitor_id");
+      {% endif %}
+
+      if (!customerId) return;
+
+      try {
+        const res = await fetch(`${API_URL}/${customerId}`, {
+          headers: { "x-api-key": API_KEY },
+          priority: "high",
+        });
+
+        const data = await res.json();
+
+        // ✅ CHECK IF API RETURNED EMPTY (for visitors using localStorage)
+        let products = [];
+        if (data.success && data.data?.products?.length > 0) {
+          products = data.data.products;
+          console.log('[Recently Viewed] ✅ Loaded from API:', products.length, 'products');
+        } else if (data.data?.storage === 'localStorage' || customerId.startsWith('visitor_')) {
+          // ✅ FALLBACK TO LOCALSTORAGE FOR VISITORS
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            try {
+              products = JSON.parse(stored);
+              console.log('[Recently Viewed] ✅ Loaded from localStorage:', products.length, 'products');
+            } catch (err) {
+              console.warn('[Recently Viewed] Failed to parse localStorage:', err);
+            }
+          }
+        }
+
+        if (!products.length) {
+          document.getElementById("recentlyViewedBlock").style.display = "none";
+          return;
+        }
+
+        const productHandles = products
+          .slice(0, LIMIT)
+          .map((p) => p.product_handle)
+          .filter(h => h);
+
+        if (!productHandles.length) {
+          document.getElementById("recentlyViewedBlock").style.display = "none";
+          return;
+        }
+
+        // ✅ Parallel fetch for speed
+        const productPromises = productHandles.map(async (handle) => {
+          try {
+            const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+            const response = await fetch(url, { priority: "high" });
+            return await response.text();
+          } catch (err) {
+            return "";
+          }
+        });
+
+        const productCards = await Promise.all(productPromises);
+        const container = document.getElementById("CartRecentlyViewed");
+        container.innerHTML = productCards.filter((c) => c).join("");
+
+        const block = document.getElementById("recentlyViewedBlock");
+        block.style.display = "block";
+        block.classList.add("rv-fade-in");
+
+        // ✅ Initialize scrollbar and GA4 tracking after products loaded
+        setTimeout(() => {
+          initRVScrollbar();
+          attachGA4EventListeners();
+        }, 100);
+      } catch (err) {
+        console.warn("[Recently Viewed] API Error:", err);
+
+        // ✅ FALLBACK TO LOCALSTORAGE ON ERROR
+        try {
+          const stored = localStorage.getItem('recently_viewed_products');
+          if (stored) {
+            const products = JSON.parse(stored);
+            const productHandles = products
+              .slice(0, LIMIT)
+              .map((p) => p.product_handle)
+              .filter(h => h);
+
+            if (productHandles.length > 0) {
+              console.log('[Recently Viewed] ✅ Using localStorage fallback after API error');
+
+              const productPromises = productHandles.map(async (handle) => {
+                try {
+                  const url = `/products/${handle}?section_id=recently-viewed-product-card`;
+                  const response = await fetch(url, { priority: "high" });
+                  return await response.text();
+                } catch (err) {
+                  return "";
+                }
+              });
+
+              const productCards = await Promise.all(productPromises);
+              const container = document.getElementById("CartRecentlyViewed");
+              container.innerHTML = productCards.filter((c) => c).join("");
+
+              const block = document.getElementById("recentlyViewedBlock");
+              block.style.display = "block";
+              block.classList.add("rv-fade-in");
+
+              setTimeout(() => {
+                initRVScrollbar();
+                attachGA4EventListeners();
+              }, 100);
+
+              return;
+            }
+          }
+        } catch (localErr) {
+          console.warn('[Recently Viewed] localStorage fallback failed:', localErr);
+        }
+
+        document.getElementById("recentlyViewedBlock").style.display = "none";
+      }
+    }
+
+    // ✅ INTERSECTION OBSERVER: Load when section comes into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadRecentlyViewed();
+          observer.disconnect();
+        }
+      });
+    }, {
+      rootMargin: "200px"
+    });
+
+    // Start observing when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const block = document.getElementById("recentlyViewedBlock");
+        if (block) {
+          block.style.display = "block";
+          observer.observe(block);
+        }
+      });
+    } else {
+      const block = document.getElementById("recentlyViewedBlock");
+      if (block) {
+        block.style.display = "block";
+        observer.observe(block);
+      }
+    }
+
+    // Scrollbar functionality
+    function initRVScrollbar() {
+      const productGrid = document.getElementById("rvProductGrid");
+      const scrollbarRow = document.getElementById("rvScrollbarRow");
+      const customScrollbarTrack = document.getElementById("rvCustomScrollbarTrack");
+      const customScrollbarThumb = document.getElementById("rvCustomScrollbarThumb");
+
+      if (!productGrid || !customScrollbarTrack || !customScrollbarThumb) return;
+
+      function updateCustomScrollbar() {
+        const gridScrollWidth = productGrid.scrollWidth;
+        const gridClientWidth = productGrid.clientWidth;
+
+        if (gridScrollWidth <= gridClientWidth) {
+          if (scrollbarRow) scrollbarRow.style.display = 'none';
+          return;
+        }
+
+        if (scrollbarRow) scrollbarRow.style.display = 'flex';
+
+        const trackWidth = customScrollbarTrack.clientWidth;
+        const thumbWidth = Math.max((gridClientWidth / gridScrollWidth) * trackWidth, 20);
+        const maxThumbPosition = trackWidth - thumbWidth;
+
+        customScrollbarThumb.style.width = `${thumbWidth}px`;
+
+        function updateThumbPosition() {
+          const scrollPercentage = productGrid.scrollLeft / (gridScrollWidth - gridClientWidth);
+          const thumbPosition = scrollPercentage * maxThumbPosition;
+          customScrollbarThumb.style.left = `${thumbPosition}px`;
+        }
+
+        updateThumbPosition();
+        productGrid.removeEventListener('scroll', updateThumbPosition);
+        productGrid.addEventListener('scroll', updateThumbPosition, { passive: true });
+      }
+
+      function setupCustomScrollbar() {
+        let isDragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        customScrollbarThumb.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          startScrollLeft = productGrid.scrollLeft;
+          customScrollbarThumb.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+
+          const deltaX = e.clientX - startX;
+          const trackWidth = customScrollbarTrack.clientWidth;
+          const thumbWidth = customScrollbarThumb.clientWidth;
+          const maxThumbPosition = trackWidth - thumbWidth;
+
+          const scrollRatio = deltaX / maxThumbPosition;
+          const maxScrollLeft = productGrid.scrollWidth - productGrid.clientWidth;
+          const newScrollLeft = startScrollLeft + (scrollRatio * maxScrollLeft);
+
+          productGrid.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            customScrollbarThumb.style.cursor = 'pointer';
+          }
+        });
+      }
+
+      updateCustomScrollbar();
+      setupCustomScrollbar();
+
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => updateCustomScrollbar(), 150);
+      });
+    }
+  })();
+</script>
+ {% endcomment %} {% endcomment %} {% endcomment %} {% endcomment %}

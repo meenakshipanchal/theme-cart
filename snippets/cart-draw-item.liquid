@@ -1,0 +1,427 @@
+{%- liquid
+  assign has_qty_rules = false
+  if item.variant.quantity_rule.increment > 1 or item.variant.quantity_rule.min > 1 or item.variant.quantity_rule.max != null
+    assign has_qty_rules = true
+  endif
+
+  assign has_vol_pricing = false
+  if item.variant.quantity_price_breaks.size > 0
+    assign has_vol_pricing = true
+  endif
+-%}
+
+{%- comment -%}
+  ===== MAIN CART ITEM CONTAINER =====
+  Wrapper div with unique ID for each cart item
+{%- endcomment -%}
+<div
+  style="border: 0.52px solid black; background-color: "
+  id="CartDrawer-Item-{{ item.index | plus: 1 }}"
+  class="cart-item"
+>
+  {%- comment -%}
+    ===== PRODUCT IMAGE SECTION =====
+    Left side: Product image with link to product page
+  {%- endcomment -%}
+  <div style="" class="cart-draw_media">
+    {% if item.image %}
+      <a href="{{ item.url }}" class="cart-item_link">
+        <img
+          class="cart-item__image"
+          src="{{ item.image | image_url: width: 300 }}"
+          alt="{{ item.image.alt | escape }}"
+          loading="lazy"
+          width="150"
+          height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
+        >
+      </a>
+    {% endif %}
+  </div>
+
+  {%- comment -%}
+    ===== RIGHT SIDE CONTENT SECTION =====
+    Contains all product details, pricing, and controls
+  {%- endcomment -%}
+  <div style="background-color:" class="cartdraw-item--right">
+    {%- comment -%}
+      ===== VENDOR DISPLAY (OPTIONAL) =====
+      Shows brand/vendor name if enabled in theme settings
+    {%- endcomment -%}
+    {%- if settings.show_vendor -%}
+      <p class="caption-with-letter-spacing light">{{ item.product.vendor }}</p>
+    {%- endif -%}
+
+    {%- comment -%}
+      ===== PRODUCT TITLE =====
+      Product name with link to product page
+    {%- endcomment -%}
+    <a href="{{ item.url }}" class="cart-item__name h4 break">
+      {{- item.title | escape -}}
+    </a>
+    {%- comment -%} ADD VARIANT INFO HERE {%- endcomment -%}
+    <div style="display: flex; gap: 8px; align-items: center; margin: 6px 0;">
+      {% comment %}
+        <p style="background-color: #B4EFFF; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
+          {{ item.variant.title }}
+        </p>
+      {% endcomment %}
+
+      <p style="background-color: #B4EFFF; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
+        {% if item.variant.title == blank
+          or item.variant.title == 'Default Title'
+          or item.variant.title == 'Top Choice'
+        %}
+          Top Choice
+        {% else %}
+          {{ item.variant.title }}
+        {% endif %}
+      </p>
+      {% comment %} <p style="background-color: #D1FFC5; font-family: Roboto Slab; font-weight: 400; font-size: 7.84px; line-height: 100%; letter-spacing: 0%; margin: 0; padding: 4px 8px; border-radius: 4px;">
+        {% if item.variant.available %}
+          {% if item.variant.inventory_quantity and item.variant.inventory_quantity > 0 %}
+            In Stock
+          {% endif %}
+        {% else %}
+          Out of Stock
+        {% endif %}
+      </p> {% endcomment %}
+    </div>
+    {%- comment -%}
+      ===== PRICING SECTION =====
+      Complex pricing display with discount calculations and comparisons
+    {%- endcomment -%}
+    <div style="background-color:" class="cartdraw-item-subtotal">
+      {%- comment -%} Loading spinner for price updates {%- endcomment -%}
+      {%- render 'loading-spinner' -%}
+
+      <div style="background-color:" class="cart-item__price-wrapper">
+        {%- comment -%}
+          DISCOUNT PRICING LOGIC:
+          If item has a compare_at_price different from original_price, show discount
+        {%- endcomment -%}
+        {%- if item.variant.compare_at_price != item.original_price -%}
+          {% liquid
+            comment
+              Calculate discount information:
+                - item_mrp: Total MRP (compare_at_price × quantity)
+                - discount: Percentage discount from MRP
+
+              assign item_mrp = item.variant.compare_at_price | times: item.quantity
+              assign discount = item_mrp | minus:item.final_line_price | times:100 | divided_by:item_mrp
+            endcomment
+            assign discount = item.variant.compare_at_price | minus: item.variant.price | times: 100.0 | divided_by: item.variant.compare_at_price | round
+            assign item_mrp = item.variant.compare_at_price | times: item.quantity
+          %}
+
+          {%- comment -%} Display discounted price structure {%- endcomment -%}
+          <div style="b " class="cart-item__discounted-prices">
+            {%- comment -%} Current selling price (after discount) {%- endcomment -%}
+            <strong class="cart-item__final-price product-option">
+              {{- item.final_line_price | money -}}
+            </strong>
+
+            {%- comment -%} Original price (crossed out) and discount percentage {%- endcomment -%}
+            {% if item_mrp > item.final_line_price %}
+              <s class="cart-item__old-price product-option">
+                {{- item_mrp | money -}}
+              </s>
+              <span
+                >(<b>{{ discount }}% off</b>)</span
+              >
+            {% endif %}
+          </div>
+        {%- else -%}
+          {%- comment -%} No discount - show regular price {%- endcomment -%}
+          <strong class="product-option">
+            {{ item.discounted_price | money }}
+          </strong>
+        {%- endif -%}
+
+        {%- comment -%}
+          ===== UNIT PRICING (OPTIONAL) =====
+          Shows price per unit/weight if product has unit pricing
+        {%- endcomment -%}
+        {%- if item.variant.available and item.unit_price_measurement -%}
+          <div style="background-color:" class="unit-price caption">
+            <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+            {{ item.unit_price | money }}
+            <span aria-hidden="true">/</span>
+            <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+            {%- if item.unit_price_measurement.reference_value != 1 -%}
+              {{- item.unit_price_measurement.reference_value -}}
+            {%- endif -%}
+            {{ item.unit_price_measurement.reference_unit }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%}
+      ===== BUNDLE PRODUCTS DISPLAY =====
+      Special handling for bundle/kit products that contain multiple items
+      Looks for custom properties with '_title' to display bundled items
+    {%- endcomment -%}
+    {%- if item.properties.size != 0 -%}
+      {%- for property in item.properties -%}
+        {%- if property.first contains '_title' -%}
+          <ul class="bundle-product">
+            {%- comment -%}
+              Parse bundle data: format is "item1|image1,item2|image2,..."
+              Each bundle item can have name and optional image
+            {%- endcomment -%}
+            {% assign samples = property.last | split: ',' %}
+            {% for sample in samples %}
+              {% assign sa = sample | split: '|' %}
+              <li>
+                {%- comment -%} Display bundle item image if available {%- endcomment -%}
+                {% if sa[1] %}
+                  <img
+                    src="//www.anveshan.farm/cdn/shop/{{- sa[1] -}}?width=50"
+                    alt="{{ sa[0] | escape }}"
+                    loading="lazy"
+                    width="50"
+                    height="50"
+                  >
+                {% endif %}
+                {%- comment -%} Display bundle item name {%- endcomment -%}
+                {{- sa[0] -}}
+              </li>
+            {% endfor %}
+          </ul>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {%- comment -%}
+      ===== QUANTITY CONTROLS & REMOVE BUTTON SECTION =====
+      Bottom section with quantity adjustment and remove functionality
+    {%- endcomment -%}
+    <div style="background-color:" class="cartdraw-item-with-qty">
+      {%- comment -%}
+        ===== QUANTITY POPOVER CONTAINER =====
+        Handles quantity input with optional rules and volume pricing info
+      {%- endcomment -%}
+      <quantity-popover>
+        <div class="cart-item__quantity-wrapper quantity-popover-wrapper">
+          <div class="quantity-popover-container{% if has_qty_rules or has_vol_pricing %} quantity-popover-container--hover{% endif %}">
+            {%- comment -%}
+              ===== QUANTITY INPUT CONTROLS =====
+              Minus button, quantity input field, plus button
+            {%- endcomment -%}
+            <quantity-input
+              style="border-radius: 25px; overflow: hidden; background: white; border: 1px solid #00000;"
+              class="quantity cart-quantity"
+            >
+              {%- comment -%} DECREASE QUANTITY BUTTON {%- endcomment -%}
+              <button class="quantity__button no-js-hidden" name="minus" type="button">
+                <span class="visually-hidden">
+                  {{- 'products.product.quantity.decrease' | t: product: item.product.title | escape -}}
+                </span>
+                {{- 'icon-minus.svg' | inline_asset_content -}}
+              </button>
+
+              {%- comment -%}
+                ===== QUANTITY INPUT FIELD =====
+                Main quantity input with extensive data attributes for JavaScript functionality
+              {%- endcomment -%}
+              <input
+                class="quantity__input"
+                type="number"
+                data-quantity-variant-id="{{ item.variant.id }}"
+                name="updates[]"
+                value="{{ item.quantity }}"
+                min="1"
+                {% # theme-check-disable %}
+                data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+
+                {%- comment -%}
+                  QUANTITY RESTRICTIONS:
+                  - Sample kits: Limited to 1 item max
+                  - Custom quantity limits: From variant metafields
+                  - Standard quantity rules: Min/max from variant settings
+                {%- endcomment -%}
+                {% if item.product.tags contains 'sample-kit-product' %}
+                  max="1"
+                {% endif %}
+                step="{{ item.variant.quantity_rule.increment }}"
+                {% # theme-check-enable %}
+
+                {%- comment -%} Accessibility and data attributes for JavaScript {%- endcomment -%}
+                aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                id="Drawer-quantity-{{ item.index | plus: 1 }}"
+                data-index="{{ item.index | plus: 1 }}"
+                data-qty="{{ cart.item_count }}"
+                data-price="{{ cart.total_price | minus: item.final_price | divided_by: 100 }}"
+
+                {%- comment -%} Special data attributes for different product types {%- endcomment -%}
+                {% if item.properties._type == 'winter' %}
+                  data-winter="1"
+                {% endif %}
+                {% if item.properties._title %}
+                  data-property="{{ properties }}"
+                  data-title="{{- item.properties._title -}}"
+                {% else %}
+                  data-property="0"
+                {% endif %}
+                readonly
+              >
+
+              {%- comment -%} INCREASE QUANTITY BUTTON {%- endcomment -%}
+              <button class="quantity__button no-js-hidden" name="plus" type="button">
+                <span class="visually-hidden">
+                  {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
+                </span>
+                {{- 'icon-plus.svg' | inline_asset_content -}}
+              </button>
+            </quantity-input>
+          </div>
+        </div>
+
+        {%- comment -%}
+          ===== QUANTITY RULES INFO BUTTON =====
+          Shows additional info about quantity rules or volume pricing
+        {%- endcomment -%}
+        {%- if has_qty_rules or has_vol_pricing -%}
+          <button
+            type="button"
+            class="quantity-popover__info-button quantity-popover__info-button--icon-with-label button button--tertiary"
+            aria-expanded="false"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-info.svg' | inline_asset_content -}}
+            </span>
+            <span>
+              {%- if has_vol_pricing -%}
+                {{ 'products.product.volume_pricing.note' | t }}
+              {%- elsif has_qty_rules -%}
+                {{ 'products.product.quantity.note' | t }}
+              {%- endif -%}
+            </span>
+          </button>
+        {%- endif -%}
+
+        {%- comment -%}
+          ===== QUANTITY RULES & VOLUME PRICING POPUP =====
+          Hidden popup that shows detailed quantity rules and volume pricing tiers
+        {%- endcomment -%}
+        {%- if has_vol_pricing or has_qty_rules -%}
+          <div
+            class="cart-items__info global-settings-popup quantity-popover__info"
+            tabindex="-1"
+            hidden
+          >
+            {%- comment -%} Volume pricing label {%- endcomment -%}
+            {%- if has_qty_rules == false -%}
+              <span class="volume-pricing-label caption">
+                {{- 'products.product.volume_pricing.title' | t -}}
+              </span>
+            {%- endif -%}
+
+            {%- comment -%}
+              QUANTITY RULES DISPLAY:
+              Shows minimum, maximum, and increment requirements
+            {%- endcomment -%}
+            <div class="quantity__rules caption no-js-hidden">
+              {%- if item.variant.quantity_rule.increment > 1 -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.multiples_of' | t: quantity: item.variant.quantity_rule.increment -}}
+                </span>
+              {%- endif -%}
+              {%- if item.variant.quantity_rule.min > 1 -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.minimum_of' | t: quantity: item.variant.quantity_rule.min -}}
+                </span>
+              {%- endif -%}
+              {%- if item.variant.quantity_rule.max != null -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.maximum_of' | t: quantity: item.variant.quantity_rule.max -}}
+                </span>
+              {%- endif -%}
+            </div>
+
+            {%- comment -%} Close button for popup {%- endcomment -%}
+            <button
+              class="button-close button button--tertiary"
+              type="button"
+              aria-label="{{ 'accessibility.close' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-close.svg' | inline_asset_content -}}
+              </span>
+            </button>
+
+            {%- comment -%}
+              ===== VOLUME PRICING TIERS =====
+              Shows different price points based on quantity purchased
+            {%- endcomment -%}
+            {%- if item.variant.quantity_price_breaks.size > 0 -%}
+              <volume-pricing class="parent-display">
+                <ul class="list-unstyled">
+                  {%- comment -%} Base price tier {%- endcomment -%}
+                  <li>
+                    <span>{{ item.variant.quantity_rule.min }}+</span>
+                    <span>{{ item.variant.price | money_with_currency }}/ea</span>
+                  </li>
+
+                  {%- comment -%} Volume discount tiers {%- endcomment -%}
+                  {%- for price_break in item.variant.quantity_price_breaks -%}
+                    <li>
+                      <span>
+                        {{- price_break.minimum_quantity -}}
+                        <span aria-hidden="true">+</span>
+                      </span>
+                      <span>{{ price_break.price | money_with_currency }}/ea</span>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </volume-pricing>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- comment -%}
+          ===== ERROR DISPLAY AREA =====
+          Shows quantity-related errors (out of stock, invalid quantity, etc.)
+        {%- endcomment -%}
+        <div
+          id="CartDrawer-LineItemError-{{ item.index | plus: 1 }}"
+          class="cart-item__error"
+          role="alert"
+          style="display:none;"
+        >
+          <small class="cart-item__error-text"></small>
+          <span class="svg-wrapper">
+            {{- 'icon-error.svg' | inline_asset_content -}}
+          </span>
+        </div>
+      </quantity-popover>
+
+      <cart-remove-button
+        id="CartDrawer-Remove-{{ item.index | plus: 1 }}"
+        data-index="{{ item.index | plus: 1 }}"
+        data-price="{{ cart.total_price | minus: item.line_price | divided_by: 100 }}"
+        data-product-title="{{ item.product.title | escape }}"
+        data-item-price="{{ item.final_line_price | money_without_trailing_zeros }}"
+        data-variant-title="{{ item.variant.title | escape }}"
+        data-quantity="{{ item.quantity }}"
+        {% if item.properties['_type'] == 'winter' %}data-winter='1'{% endif %}
+      >
+        <button
+          type="button"
+          class="cart-remove-btn"
+          aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}"
+          data-variant-id="{{ item.variant.id }}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </cart-remove-button>
+    </div>
+  </div>
+</div>
+<!-- Add this horizontal line after each cart item (except the last one) -->
+{% unless forloop.last %}
+  <hr style="border: none; border-top: 1px solid #E5E5E5; margin: 1rem 0;">
+{% endunless %}

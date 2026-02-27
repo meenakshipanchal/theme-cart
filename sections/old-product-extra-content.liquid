@@ -1,0 +1,259 @@
+<style>
+  .flex { display: flex; flex-wrap: wrap; }
+  div[class*="col--"] { padding: 0 5px; margin-top: 10px; }
+  div[class*="col--"] img { max-width: 100%; width: 100%; display: block; }
+  .flex.cols { margin-left: -5px; margin-right: -5px; }
+  .dark-theme { display: flex; flex-direction: column; }
+  .dark { background: #d9788c; color: #fff; padding: 10px; flex: 1; }
+  .dark h3 { color: inherit; }
+  .col--1 { flex: 0 0 100%; }
+  .col--2 { flex: 0 0 50%; }
+  .col--3 { flex: 0 0 33.33%; }
+  .slick-arrow { border-radius: 50%; height: 40px; width: 40px; border: 0; opacity: 0.9; }
+  div .slick-arrow svg { width: 22px; }
+  @media (min-width: 1001px) {
+    .slider_item.items--5 { flex: 0 0 20%; }
+  }
+  @media (min-width: 750px) {
+    div[class*="col--"] { padding: 0 10px; margin-top: 20px; }
+    .flex.cols { margin-left: -10px; margin-right: -10px; }
+    .desc-3 { flex: 0 0 33.33%; }
+    .desc-4 { flex: 0 0 25%; }
+    .desc-5 { flex: 0 0 20%; }
+  }
+  @media (max-width: 749px) {
+    .col--2:nth-child(n+2) { margin-top: 10px; }
+    .col--3:nth-child(n+3) { margin-top: 10px; }
+  }
+</style>
+{% if section.settings.slider %}
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  {{ 'old-slick.css' | asset_url | stylesheet_tag }}
+  <style>
+    .slider_wrap img { max-width: 100%; width: 100%; height: auto; border-radius: 10px 0 0 10px; }
+    .slider_wrap figure { margin: 0; }
+    .slider_item { padding: 10px; }
+    /* .slick-slider .slick-track { display: flex; } */
+    .slick-initialized .slick-slide { display: flex; height: auto; flex-direction: column; }
+    @media (min-width: 750px) { 
+      .slider_wrap { display: flex; margin: 0 -10px; }
+      .slider_item { flex: 0 0 25%; }
+      .slider_item.items--3 { flex: 0 0 33.3333% }
+    }
+    @media (min-width: 1001px) {
+      .slider_item.items--5, .items--5 { flex: 0 0 20%; max-width: 20%; }
+    .slider_item.items--6 { flex: 0 0 16.66%; max-width: 16.66%; }
+    .slider_item.items--7 { flex: 0 0 14.28%; max-width: 14.28%; }
+    }
+    @media (max-width: 749px) { 
+      .slider_wrap { margin: 0 -15px; }
+      .slider_item { width: 83.3333%; }
+      .slider_wrap:not(.slick-slider) .slider_item:not(:first-child) { display: none; }
+      .slick-list { padding-left: 5px; padding-right: 5px; }
+    }
+  </style>
+{% endif %}
+{% liquid
+  if section.settings.dark
+    assign themeClass = ' dark-theme'
+    assign darkClass = ' dark'
+  endif
+%}
+{% if block.settings.dark %}dark-theme{% endif %}
+<div class="page-width">
+  {% if section.settings.title %}
+    <div class="head">
+      <h2>{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle %}
+        <p>{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+  {% if section.settings.slider %}
+    <div class="slider_wrap {{ section.id }}">
+      {% for block in section.blocks %}
+        {% assign image = block.settings.image %}
+        <div class="slider_item items--{{ section.settings.item }} {{ themeClass }}">
+          <img srcset="{%- if image.width >= 200 -%}{{ image | image_url: width: 200 }} 200w,{%- endif -%}
+              {%- if image.width >= 360 -%}{{ image | image_url: width: 360 }} 360w,{%- endif -%}
+              {%- if image.width >= 480 -%}{{ image | image_url: width: 480 }} 480w,{%- endif -%}
+              {{ image | image_url: width: 720 }} 720w" src="{{ image | image_url: width: 100 }}"
+              sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
+              alt="{{ image.alt | escape }}" class="{{ class }}" loading="lazy">
+          <div class="bottom-content{{ darkClass }}">
+            <h3>{{ block.settings.title }}</h3>
+            {% if block.settings.description %}<p>{{ block.settings.description }}</p>{% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="content-outer flex cols">
+      {% for block in section.blocks %}
+        {% assign image = block.settings.image %}
+        <div class="block-extra-content{{ themeClass }} col--{{ section.settings.mobile_item }} desc-{{ section.settings.item }}">
+          <img srcset="{%- if image.width >= 200 -%}{{ image | image_url: width: 200 }} 200w,{%- endif -%}
+              {%- if image.width >= 360 -%}{{ image | image_url: width: 360 }} 360w,{%- endif -%}
+              {%- if image.width >= 480 -%}{{ image | image_url: width: 480 }} 480w,{%- endif -%}
+              {{ image | image_url: width: 720 }} 720w" src="{{ image | image_url: width: 100 }}"
+              sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
+              alt="{{ image.alt | escape }}" class="{{ class }}" loading="lazy">
+          <div class="bottom-content{{ darkClass }}">
+            <h3>{{ block.settings.title }}</h3>
+            {% if block.settings.description %}<p>{{ block.settings.description }}</p>{% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% if section.settings.slider %}
+  {% liquid
+    assign m_col = 1.2
+    if section.settings.mobile_item == 3
+      assign m_col = 2.2
+    endif
+  %}
+  {% if section.settings.mobile_item == 3 %}{% endif %}
+  <script src="{{ 'slick.old.js' | asset_url }}"></script>
+  <script type="text/javascript">
+      jQuery(document).ready(function(){
+        jQuery('.{{ section.id }}').slick({
+          speed: 300,
+          autoplay: false,
+          infinite: false,
+          slidesToShow: {{ section.settings.item }},
+          slidesToScroll: 1,
+          prevArrow: "<button type='button' class='slick-prev pull-left'><svg aria-hidden='true' focusable='false' role='presentation' class='icon icon-caret' viewBox='0 0 10 6'><path fill-rule='evenodd' clip-rule='evenodd' d='M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z' fill='currentColor'/></svg></button>",
+          nextArrow: "<button type='button' class='slick-next pull-right'><svg aria-hidden='true' focusable='false' role='presentation' class='icon icon-caret' viewBox='0 0 10 6'><path fill-rule='evenodd' clip-rule='evenodd' d='M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z' fill='currentColor'/></svg></button>",
+          arrows: true,
+          responsive: [
+            {
+              breakpoint: 1000,
+              settings: {
+                slidesToShow: 2.2,
+                arrows: false
+              }
+            },
+            {
+              breakpoint: 600,
+              settings: {
+                slidesToShow: {{ m_col }},
+                arrows: false
+              }
+            }
+          ]
+        });
+      });
+  </script>
+{% endif %}
+{% schema %}
+  {
+    "name": "Product Static Content",
+    "class": "product-static-content",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "text",
+        "id": "subtitle",
+        "label": "Sub Heading"
+      },
+      {
+        "type": "checkbox",
+        "id": "slider",
+        "label": "Enable Slider",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "mobile_item",
+        "min": 1,
+        "max": 3,
+        "step":  1,
+        "default": 2,
+        "label": "Per row item(s)"
+      },
+      {
+        "type": "range",
+        "id": "item",
+        "min": 3,
+        "max": 8,
+        "step":  1,
+        "default": 4,
+        "label": "Desktop Per row item(s)"
+      },
+      {
+        "type": "checkbox",
+        "id": "next",
+        "default": true,
+        "label": "Next Product Show In Mobile"
+      },
+      {
+        "type": "checkbox",
+        "id": "slideno",
+        "default": false,
+        "label": "Show Slider Number"
+      },
+      {
+        "type": "checkbox",
+        "id": "dark",
+        "default": false,
+        "label": "Dark Theme"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image-with-txt",
+        "name": "Image With Text",
+        "limit": 12,
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description"
+          }
+        ]
+      },
+      {
+        "type": "svg-with-txt",
+        "name": "Svg With Text",
+        "limit": 12,
+        "settings": [
+          {
+            "type": "textarea",
+            "id": "svg",
+            "label": "Svg Icon"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
+            "label": "Description"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      { "name": "Product Static Content" }
+    ]
+  }
+{% endschema %}

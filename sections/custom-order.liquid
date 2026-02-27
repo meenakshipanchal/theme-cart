@@ -1,0 +1,166 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="customer order section-{{ section.id }}-padding" id="orderDetails">
+  <div>
+    <h1 class="customer__title">{{ 'customer.account.title' | t }}</h1>
+    <a href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a>
+  </div>
+
+  <div>
+    <div class="order-details-left">
+      <h2>{{ 'customer.order.title' | t: name: order.name }}<span v-text="orderId"></span></h2>
+      {%- assign order_date = order.created_at | time_tag: format: 'date_at_time' -%}
+      <p>{{ 'customer.order.date_html' | t: date: order_date }}<span v-text="orderDetails.created_at"></span></p>
+
+      <table role="table" class="order-details">
+        <caption class="visually-hidden">
+          {{ 'customer.order.title' | t: name: order.name }}
+        </caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th id="ColumnProduct" scope="col" role="columnheader">{{ 'customer.order.product' | t }}</th>
+            <th id="ColumnSku" scope="col" role="columnheader">{{ 'customer.order.sku' | t }}</th>
+            <!-- <th id="ColumnPrice" scope="col" role="columnheader">{{ 'customer.order.price' | t }}</th> -->
+            <th id="ColumnQuantity" scope="col" role="columnheader">{{ 'customer.order.quantity' | t }}</th>
+            <th id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.order.total' | t }}</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          <tr v-for="item in orderDetails.items">
+            <td v-text="item.Name"></td>
+            <td v-text="item.Sku"></td>
+            <td v-text="item.Quantity"></td>
+            <td v-text="item.Price"></td>
+          </tr>
+        </tbody>
+        <tfoot role="rowgroup">
+          <tr role="row">
+            <td id="RowSubtotal" role="rowheader" scope="row" colspan="4">
+              {{ 'customer.order.subtotal' | t }}
+            </td>
+            <td headers="RowSubtotal" role="cell" data-label="{{ 'customer.order.subtotal' | t }}" v-text="orderDetails.total_order_value + orderDetails.discount">
+            </td>
+          </tr>
+          <tr role="row">
+              <td id="RowDiscount" role="rowheader" scope="row" colspan="4">Discount</td>
+              <td id="RowDiscount" role="rowheader" scope="row" colspan="4" v-text="orderDetails.discount"></td>
+          </tr>
+            <tr role="row">
+              <td id="RowShipping" role="rowheader" scope="row" colspan="4">
+                {{ 'customer.order.shipping' | t }}
+              </td>
+              <td
+                headers="RowShipping"
+                role="cell"
+                data-label="{{ 'customer.order.shipping' | t }}"
+               v-text="orderDetails.shipping_cost">
+              </td>
+            </tr>
+          <tr role="row">
+            <td id="RowTotal" role="rowheader" scope="row" colspan="3">{{ 'customer.order.total' | t }}</td>
+            <td headers="RowTotal" role="cell" colspan="2" data-label="{{ 'customer.order.total' | t }}"  v-text="orderDetails.total_order_value">
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div>
+      <div>
+        <h2>{{ 'customer.order.billing_address' | t }}</h2>
+        <p v-text="orderDetails.address.addressLine1"></p>
+      </div>
+      <div>
+        <h2>{{ 'customer.order.shipping_address' | t }}</h2>
+        <p v-text="orderDetails.address.addressLine1"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media screen and (min-width: 990px) {
+    .order-details-left {
+      flex: 0 0 75%;
+    }
+  }
+  
+</style>
+<script src="{{ 'vue.min.js' | asset_url }}" defer></script>
+<script defer>
+  let urlParams = new URLSearchParams(window.location.search);
+  let orderid = urlParams.get('order');
+
+  /* https://medium.com/@obapelumi/pagination-with-vuejs-1f505ce8d15b */
+  const url = "https://ots.anveshan.farm/api/v1/get-punched-order-detail/?order_id="+orderid;
+  new Vue({
+  el: '#orderDetails',
+  data () {
+    return {
+      orderDetails: [],
+      baseUrl: url,
+      orderId: orderid
+    }
+  },
+  mounted () {
+    this.loadOrders();
+  },
+  methods: {
+    loadOrders() {
+      fetch(this.baseUrl)
+        .then(response => response.json())
+        .then(data => {
+          this.orderDetails = data.orders; 
+          {% comment %} console.log(this.orderDetails); {% endcomment %}
+        })
+        .catch(error => {
+          console.error('Error fetching the JSON file:', error);
+        });
+    }
+  }
+})
+</script>
+{% schema %}
+{
+  "name": "t:sections.main-order.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}

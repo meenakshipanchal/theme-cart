@@ -1,0 +1,1428 @@
+<style>
+/* === General Styles === */
+.about-us-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.about-page-width {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* === Hero Banner Section === */
+.about-hero-banner {
+  height: 50vh;
+  position: relative;
+  overflow: hidden;
+  background: #2d5f4f;
+}
+
+.about-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.about-hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  width: 90%;
+  max-width: 800px;
+  z-index: 2;
+}
+
+.about-hero-subtitle {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.about-hero-title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 15px;
+  color: #fff;
+}
+
+.about-hero-description {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* === Founder's Note Section === */
+.founders-note-section {
+  background: #2d5f4f;
+  color: #fff;
+  padding: 60px 20px;
+}
+
+.founders-note-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.founders-note-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffd700;
+}
+
+.founders-note-text {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+/* === Image with Text Section === */
+.image-text-section {
+  padding: 60px 0;
+  background: #fff;
+}
+
+.image-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.image-text-wrapper.reverse {
+  flex-direction: column-reverse;
+}
+
+.image-text-image-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.image-text-image {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  display: block;
+}
+
+.image-text-content {
+  width: 100%;
+  max-width: 600px;
+}
+
+.image-text-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2d5f4f;
+}
+
+.image-text-description {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* === Values Section === */
+.values-section {
+  background: #f8f8f8;
+  padding: 60px 20px;
+}
+
+.values-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #2d5f4f;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.value-item {
+  text-align: center;
+}
+
+.value-icon-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.value-icon {
+  max-width: 50px;
+  max-height: 50px;
+  width: 100%;
+  height: auto;
+}
+
+.value-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #2d5f4f;
+}
+
+.value-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* === Stats Section === */
+.stats-section {
+  background: #2d5f4f;
+  color: #fff;
+  padding: 50px 20px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.stat-item {
+  padding: 20px;
+}
+
+.stat-number {
+  font-size: 40px;
+  font-weight: 700;
+  color: #ffd700;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.stat-label {
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* === Team/Founder Section === */
+.team-section {
+  background: #fffbe8;
+  padding: 60px 20px;
+}
+
+.team-section-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2d5f4f;
+}
+
+.team-section-subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  color: #666;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-member {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-member-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 4px solid #f0f0f0;
+}
+
+.team-member-name {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2d5f4f;
+}
+
+.team-member-role {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 15px;
+}
+
+.team-member-bio {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* === Community/Testimonials Section === */
+.community-section {
+  background: #fff;
+  padding: 60px 20px;
+}
+
+.community-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2d5f4f;
+}
+
+.community-subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  color: #666;
+}
+
+.community-benefits {
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.community-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.community-benefit-icon {
+  color: #2d5f4f;
+  margin-right: 10px;
+  font-weight: 700;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: #f8f8f8;
+  padding: 30px;
+  border-radius: 15px;
+  position: relative;
+}
+
+.testimonial-image-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.testimonial-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.testimonial-author-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2d5f4f;
+  margin-bottom: 5px;
+}
+
+.testimonial-author-title {
+  font-size: 14px;
+  color: #888;
+}
+
+.testimonial-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+  font-style: italic;
+}
+
+/* === Certifications Section === */
+.certifications-section {
+  background: #f8f8f8;
+  padding: 60px 20px;
+}
+
+.certifications-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #2d5f4f;
+}
+
+.certifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.certification-logo {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.certification-logo:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* === CTA Section === */
+.cta-section {
+  background: #2d5f4f;
+  color: #fff;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.cta-description {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-button {
+  display: inline-block;
+  background: #ffd700;
+  color: #2d5f4f;
+  padding: 15px 40px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  background: #ffed4e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.cta-product-image {
+  max-width: 600px;
+  width: 100%;
+  height: auto;
+  margin-top: 40px;
+  border-radius: 15px;
+}
+
+/* === Responsive Design === */
+@media (min-width: 768px) {
+  .about-hero-banner {
+    height: 70vh;
+  }
+
+  .about-hero-subtitle {
+    font-size: 16px;
+  }
+
+  .about-hero-title {
+    font-size: 48px;
+  }
+
+  .about-hero-description {
+    font-size: 18px;
+  }
+
+  .image-text-wrapper {
+    flex-direction: row;
+    gap: 60px;
+  }
+
+  .image-text-wrapper.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .image-text-image-container {
+    width: 45%;
+  }
+
+  .image-text-content {
+    width: 50%;
+  }
+
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-hero-banner {
+    height: 85vh;
+  }
+
+  .about-hero-title {
+    font-size: 56px;
+  }
+
+  .values-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>
+
+<!-- Hero Banner Section -->
+<section class="about-hero-banner">
+  {% if section.settings.hero_image %}
+    <img
+      class="about-hero-image"
+      src="{{ section.settings.hero_image | image_url: width: 2400 }}"
+      alt="{{ section.settings.hero_title }}"
+      loading="eager"
+    >
+  {% endif %}
+  <div class="about-hero-overlay"></div>
+  <div class="about-hero-content">
+    {% if section.settings.hero_subtitle %}
+      <p class="about-hero-subtitle">{{ section.settings.hero_subtitle }}</p>
+    {% endif %}
+    {% if section.settings.hero_title %}
+      <h1 class="about-hero-title">{{ section.settings.hero_title }}</h1>
+    {% endif %}
+    {% if section.settings.hero_description %}
+      <div class="about-hero-description">{{ section.settings.hero_description }}</div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Dynamic Blocks -->
+{% for block in section.blocks %}
+  {% case block.type %}
+
+    <!-- Founder's Note Block -->
+    {% when 'founders_note' %}
+      <section class="founders-note-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          <div class="founders-note-content">
+            {% if block.settings.founders_title %}
+              <h2 class="founders-note-title">{{ block.settings.founders_title }}</h2>
+            {% endif %}
+            {% if block.settings.founders_text %}
+              <div class="founders-note-text">{{ block.settings.founders_text }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- Image with Text Block -->
+    {% when 'image_with_text' %}
+      <section class="image-text-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          <div class="image-text-wrapper {% if block.settings.image_position == 'right' %}reverse{% endif %}">
+            <div class="image-text-image-container">
+              {% if block.settings.image %}
+                <img
+                  class="image-text-image"
+                  src="{{ block.settings.image | image_url: width: 1000 }}"
+                  alt="{{ block.settings.title }}"
+                  loading="lazy"
+                >
+              {% endif %}
+            </div>
+            <div class="image-text-content">
+              {% if block.settings.title %}
+                <h2 class="image-text-title">{{ block.settings.title }}</h2>
+              {% endif %}
+              {% if block.settings.description %}
+                <div class="image-text-description">{{ block.settings.description }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- Values Block -->
+    {% when 'values' %}
+      <section class="values-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          {% if block.settings.values_title %}
+            <h2 class="values-title">{{ block.settings.values_title }}</h2>
+          {% endif %}
+          <div class="values-grid">
+            {% if block.settings.value_1_title %}
+              <div class="value-item">
+                {% if block.settings.value_1_icon %}
+                  <div class="value-icon-container">
+                    <img class="value-icon" src="{{ block.settings.value_1_icon | image_url: width: 100 }}" alt="{{ block.settings.value_1_title }}">
+                  </div>
+                {% endif %}
+                <h3 class="value-title">{{ block.settings.value_1_title }}</h3>
+                <p class="value-description">{{ block.settings.value_1_description }}</p>
+              </div>
+            {% endif %}
+
+            {% if block.settings.value_2_title %}
+              <div class="value-item">
+                {% if block.settings.value_2_icon %}
+                  <div class="value-icon-container">
+                    <img class="value-icon" src="{{ block.settings.value_2_icon | image_url: width: 100 }}" alt="{{ block.settings.value_2_title }}">
+                  </div>
+                {% endif %}
+                <h3 class="value-title">{{ block.settings.value_2_title }}</h3>
+                <p class="value-description">{{ block.settings.value_2_description }}</p>
+              </div>
+            {% endif %}
+
+            {% if block.settings.value_3_title %}
+              <div class="value-item">
+                {% if block.settings.value_3_icon %}
+                  <div class="value-icon-container">
+                    <img class="value-icon" src="{{ block.settings.value_3_icon | image_url: width: 100 }}" alt="{{ block.settings.value_3_title }}">
+                  </div>
+                {% endif %}
+                <h3 class="value-title">{{ block.settings.value_3_title }}</h3>
+                <p class="value-description">{{ block.settings.value_3_description }}</p>
+              </div>
+            {% endif %}
+
+            {% if block.settings.value_4_title %}
+              <div class="value-item">
+                {% if block.settings.value_4_icon %}
+                  <div class="value-icon-container">
+                    <img class="value-icon" src="{{ block.settings.value_4_icon | image_url: width: 100 }}" alt="{{ block.settings.value_4_title }}">
+                  </div>
+                {% endif %}
+                <h3 class="value-title">{{ block.settings.value_4_title }}</h3>
+                <p class="value-description">{{ block.settings.value_4_description }}</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- Stats Block -->
+    {% when 'stats' %}
+      <section class="stats-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          <div class="stats-grid">
+            {% if block.settings.stat_1_number %}
+              <div class="stat-item">
+                <span class="stat-number">{{ block.settings.stat_1_number }}</span>
+                <span class="stat-label">{{ block.settings.stat_1_label }}</span>
+              </div>
+            {% endif %}
+
+            {% if block.settings.stat_2_number %}
+              <div class="stat-item">
+                <span class="stat-number">{{ block.settings.stat_2_number }}</span>
+                <span class="stat-label">{{ block.settings.stat_2_label }}</span>
+              </div>
+            {% endif %}
+
+            {% if block.settings.stat_3_number %}
+              <div class="stat-item">
+                <span class="stat-number">{{ block.settings.stat_3_number }}</span>
+                <span class="stat-label">{{ block.settings.stat_3_label }}</span>
+              </div>
+            {% endif %}
+
+            {% if block.settings.stat_4_number %}
+              <div class="stat-item">
+                <span class="stat-number">{{ block.settings.stat_4_number }}</span>
+                <span class="stat-label">{{ block.settings.stat_4_label }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- Team/Founders Block -->
+    {% when 'team' %}
+      <section class="team-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          {% if block.settings.team_title %}
+            <h2 class="team-section-title">{{ block.settings.team_title }}</h2>
+          {% endif %}
+          {% if block.settings.team_subtitle %}
+            <div class="team-section-subtitle">{{ block.settings.team_subtitle }}</div>
+          {% endif %}
+          <div class="team-grid">
+            {% if block.settings.member_1_name %}
+              <div class="team-member">
+                {% if block.settings.member_1_image %}
+                  <img class="team-member-image" src="{{ block.settings.member_1_image | image_url: width: 300 }}" alt="{{ block.settings.member_1_name }}">
+                {% endif %}
+                <h3 class="team-member-name">{{ block.settings.member_1_name }}</h3>
+                {% if block.settings.member_1_role %}
+                  <p class="team-member-role">{{ block.settings.member_1_role }}</p>
+                {% endif %}
+                {% if block.settings.member_1_bio %}
+                  <div class="team-member-bio">{{ block.settings.member_1_bio }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {% if block.settings.member_2_name %}
+              <div class="team-member">
+                {% if block.settings.member_2_image %}
+                  <img class="team-member-image" src="{{ block.settings.member_2_image | image_url: width: 300 }}" alt="{{ block.settings.member_2_name }}">
+                {% endif %}
+                <h3 class="team-member-name">{{ block.settings.member_2_name }}</h3>
+                {% if block.settings.member_2_role %}
+                  <p class="team-member-role">{{ block.settings.member_2_role }}</p>
+                {% endif %}
+                {% if block.settings.member_2_bio %}
+                  <div class="team-member-bio">{{ block.settings.member_2_bio }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {% if block.settings.member_3_name %}
+              <div class="team-member">
+                {% if block.settings.member_3_image %}
+                  <img class="team-member-image" src="{{ block.settings.member_3_image | image_url: width: 300 }}" alt="{{ block.settings.member_3_name }}">
+                {% endif %}
+                <h3 class="team-member-name">{{ block.settings.member_3_name }}</h3>
+                {% if block.settings.member_3_role %}
+                  <p class="team-member-role">{{ block.settings.member_3_role }}</p>
+                {% endif %}
+                {% if block.settings.member_3_bio %}
+                  <div class="team-member-bio">{{ block.settings.member_3_bio }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- Community Block -->
+    {% when 'community' %}
+      <section class="community-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          {% if block.settings.community_title %}
+            <h2 class="community-title">{{ block.settings.community_title }}</h2>
+          {% endif %}
+          {% if block.settings.community_subtitle %}
+            <div class="community-subtitle">{{ block.settings.community_subtitle }}</div>
+          {% endif %}
+
+          {% if block.settings.community_benefits %}
+            <div class="community-benefits">
+              {{ block.settings.community_benefits }}
+            </div>
+          {% endif %}
+
+          <div class="testimonials-grid">
+            {% if block.settings.testimonial_1_text %}
+              <div class="testimonial-card">
+                <div class="testimonial-image-container">
+                  {% if block.settings.testimonial_1_image %}
+                    <img class="testimonial-avatar" src="{{ block.settings.testimonial_1_image | image_url: width: 120 }}" alt="{{ block.settings.testimonial_1_author }}">
+                  {% endif %}
+                  <div>
+                    <p class="testimonial-author-name">{{ block.settings.testimonial_1_author }}</p>
+                    {% if block.settings.testimonial_1_title %}
+                      <p class="testimonial-author-title">{{ block.settings.testimonial_1_title }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                <p class="testimonial-text">"{{ block.settings.testimonial_1_text }}"</p>
+              </div>
+            {% endif %}
+
+            {% if block.settings.testimonial_2_text %}
+              <div class="testimonial-card">
+                <div class="testimonial-image-container">
+                  {% if block.settings.testimonial_2_image %}
+                    <img class="testimonial-avatar" src="{{ block.settings.testimonial_2_image | image_url: width: 120 }}" alt="{{ block.settings.testimonial_2_author }}">
+                  {% endif %}
+                  <div>
+                    <p class="testimonial-author-name">{{ block.settings.testimonial_2_author }}</p>
+                    {% if block.settings.testimonial_2_title %}
+                      <p class="testimonial-author-title">{{ block.settings.testimonial_2_title }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                <p class="testimonial-text">"{{ block.settings.testimonial_2_text }}"</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- Certifications Block -->
+    {% when 'certifications' %}
+      <section class="certifications-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          {% if block.settings.cert_title %}
+            <h2 class="certifications-title">{{ block.settings.cert_title }}</h2>
+          {% endif %}
+          <div class="certifications-grid">
+            {% if block.settings.cert_logo_1 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_1 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_2 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_2 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_3 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_3 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_4 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_4 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_5 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_5 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_6 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_6 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_7 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_7 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+            {% if block.settings.cert_logo_8 %}
+              <img class="certification-logo" src="{{ block.settings.cert_logo_8 | image_url: width: 200 }}" alt="Certification">
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    <!-- CTA Block -->
+    {% when 'cta' %}
+      <section class="cta-section" {{ block.shopify_attributes }}>
+        <div class="about-page-width">
+          {% if block.settings.cta_title %}
+            <h2 class="cta-title">{{ block.settings.cta_title }}</h2>
+          {% endif %}
+          {% if block.settings.cta_description %}
+            <p class="cta-description">{{ block.settings.cta_description }}</p>
+          {% endif %}
+          {% if block.settings.cta_button_text and block.settings.cta_button_link %}
+            <a href="{{ block.settings.cta_button_link }}" class="cta-button">
+              {{ block.settings.cta_button_text }}
+            </a>
+          {% endif %}
+          {% if block.settings.cta_image %}
+            <img class="cta-product-image" src="{{ block.settings.cta_image | image_url: width: 1200 }}" alt="{{ block.settings.cta_title }}">
+          {% endif %}
+        </div>
+      </section>
+
+  {% endcase %}
+{% endfor %}
+
+{% schema %}
+{
+  "name": "About Us Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Banner"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_subtitle",
+      "label": "Subtitle",
+      "default": "About Us"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Main Title",
+      "default": "India's Most Trusted Staples. From Farmers. For Families."
+    },
+    {
+      "type": "richtext",
+      "id": "hero_description",
+      "label": "Description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "founders_note",
+      "name": "Founder's Note",
+      "settings": [
+        {
+          "type": "text",
+          "id": "founders_title",
+          "label": "Title",
+          "default": "Founder's Note"
+        },
+        {
+          "type": "richtext",
+          "id": "founders_text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "image_with_text",
+      "name": "Image with Text",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The Anveshan Way"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Image Position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left"
+        }
+      ]
+    },
+    {
+      "type": "values",
+      "name": "Our Values",
+      "settings": [
+        {
+          "type": "text",
+          "id": "values_title",
+          "label": "Section Title",
+          "default": "Our Values"
+        },
+        {
+          "type": "header",
+          "content": "Value 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "value_1_icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "value_1_title",
+          "label": "Title",
+          "default": "Native Sourcing"
+        },
+        {
+          "type": "textarea",
+          "id": "value_1_description",
+          "label": "Description"
+        },
+        {
+          "type": "header",
+          "content": "Value 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "value_2_icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "value_2_title",
+          "label": "Title",
+          "default": "Best Processing"
+        },
+        {
+          "type": "textarea",
+          "id": "value_2_description",
+          "label": "Description"
+        },
+        {
+          "type": "header",
+          "content": "Value 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "value_3_icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "value_3_title",
+          "label": "Title",
+          "default": "17+ Quality Checks"
+        },
+        {
+          "type": "textarea",
+          "id": "value_3_description",
+          "label": "Description"
+        },
+        {
+          "type": "header",
+          "content": "Value 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "value_4_icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "value_4_title",
+          "label": "Title",
+          "default": "Impact We Make"
+        },
+        {
+          "type": "textarea",
+          "id": "value_4_description",
+          "label": "Description"
+        }
+      ]
+    },
+    {
+      "type": "stats",
+      "name": "Statistics",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Stat 1"
+        },
+        {
+          "type": "text",
+          "id": "stat_1_number",
+          "label": "Number",
+          "default": "20+"
+        },
+        {
+          "type": "text",
+          "id": "stat_1_label",
+          "label": "Label",
+          "default": "Products Available"
+        },
+        {
+          "type": "header",
+          "content": "Stat 2"
+        },
+        {
+          "type": "text",
+          "id": "stat_2_number",
+          "label": "Number",
+          "default": "15 lakh"
+        },
+        {
+          "type": "text",
+          "id": "stat_2_label",
+          "label": "Label",
+          "default": "Families Served"
+        },
+        {
+          "type": "header",
+          "content": "Stat 3"
+        },
+        {
+          "type": "text",
+          "id": "stat_3_number",
+          "label": "Number",
+          "default": "Available on"
+        },
+        {
+          "type": "text",
+          "id": "stat_3_label",
+          "label": "Label",
+          "default": "Major Platforms"
+        },
+        {
+          "type": "header",
+          "content": "Stat 4"
+        },
+        {
+          "type": "text",
+          "id": "stat_4_number",
+          "label": "Number",
+          "default": "Featured in"
+        },
+        {
+          "type": "text",
+          "id": "stat_4_label",
+          "label": "Label",
+          "default": "Top Media"
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "name": "Team/Founders",
+      "settings": [
+        {
+          "type": "text",
+          "id": "team_title",
+          "label": "Title",
+          "default": "The Anveshan Community"
+        },
+        {
+          "type": "richtext",
+          "id": "team_subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "header",
+          "content": "Member 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "member_1_image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "member_1_name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "member_1_role",
+          "label": "Role"
+        },
+        {
+          "type": "richtext",
+          "id": "member_1_bio",
+          "label": "Bio"
+        },
+        {
+          "type": "header",
+          "content": "Member 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "member_2_image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "member_2_name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "member_2_role",
+          "label": "Role"
+        },
+        {
+          "type": "richtext",
+          "id": "member_2_bio",
+          "label": "Bio"
+        },
+        {
+          "type": "header",
+          "content": "Member 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "member_3_image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "member_3_name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "member_3_role",
+          "label": "Role"
+        },
+        {
+          "type": "richtext",
+          "id": "member_3_bio",
+          "label": "Bio"
+        }
+      ]
+    },
+    {
+      "type": "community",
+      "name": "Community/Testimonials",
+      "settings": [
+        {
+          "type": "text",
+          "id": "community_title",
+          "label": "Title",
+          "default": "The Anveshan Community"
+        },
+        {
+          "type": "richtext",
+          "id": "community_subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "community_benefits",
+          "label": "Benefits List"
+        },
+        {
+          "type": "header",
+          "content": "Testimonial 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "testimonial_1_image",
+          "label": "Avatar"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_1_author",
+          "label": "Author Name"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_1_title",
+          "label": "Author Title"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_1_text",
+          "label": "Testimonial Text"
+        },
+        {
+          "type": "header",
+          "content": "Testimonial 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "testimonial_2_image",
+          "label": "Avatar"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_2_author",
+          "label": "Author Name"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_2_title",
+          "label": "Author Title"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_2_text",
+          "label": "Testimonial Text"
+        }
+      ]
+    },
+    {
+      "type": "certifications",
+      "name": "Certifications",
+      "settings": [
+        {
+          "type": "text",
+          "id": "cert_title",
+          "label": "Title",
+          "default": "Our Certifications"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_1",
+          "label": "Certification Logo 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_2",
+          "label": "Certification Logo 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_3",
+          "label": "Certification Logo 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_4",
+          "label": "Certification Logo 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_5",
+          "label": "Certification Logo 5"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_6",
+          "label": "Certification Logo 6"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_7",
+          "label": "Certification Logo 7"
+        },
+        {
+          "type": "image_picker",
+          "id": "cert_logo_8",
+          "label": "Certification Logo 8"
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "Call to Action",
+      "settings": [
+        {
+          "type": "text",
+          "id": "cta_title",
+          "label": "Title",
+          "default": "Join the Movement"
+        },
+        {
+          "type": "textarea",
+          "id": "cta_description",
+          "label": "Description"
+        },
+        {
+          "type": "text",
+          "id": "cta_button_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "cta_button_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "cta_image",
+          "label": "Product Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Us Page",
+      "blocks": [
+        {
+          "type": "founders_note"
+        },
+        {
+          "type": "image_with_text"
+        },
+        {
+          "type": "values"
+        },
+        {
+          "type": "stats"
+        },
+        {
+          "type": "team"
+        },
+        {
+          "type": "community"
+        },
+        {
+          "type": "certifications"
+        },
+        {
+          "type": "cta"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

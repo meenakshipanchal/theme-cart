@@ -1,0 +1,744 @@
+ 
+{% for block in section.blocks %}
+  {% if block.type == 'image_carousel' %}
+    
+    {% liquid
+      assign carousel_count = 0
+      assign carousel_images = ''
+      for i in (1..5)
+        assign image_key = 'carousel_image_' | append: i
+        assign current_image = block.settings[image_key]
+        if current_image != blank
+          assign carousel_count = carousel_count | plus: 1
+          if carousel_images == blank
+            assign carousel_images = current_image
+          else
+            assign carousel_images = carousel_images | append: ',' | append: current_image
+          endif
+        endif
+      endfor
+    %}
+    
+    <!-- FULL WIDTH CAROUSEL BLOCK -->
+    <div class="anveshan-image-carousel-block-fullwidth" {{ block.shopify_attributes }}>
+      
+      <!-- OPTIMIZED BACKGROUND CONTAINER -->
+      <div class="anveshan-carousel-bg-container-fullwidth" data-anveshan-block-id="{{ block.id }}">
+        
+        <!-- OPTIMIZED BACKGROUND IMAGE STYLES -->
+        {%- if block.settings.mobile_bg_image != blank -%}
+          {%- liquid
+            assign desktop_bg_image = block.settings.desktop_bg_image
+            if block.settings.desktop_bg_image == blank
+              assign desktop_bg_image = block.settings.mobile_bg_image
+            endif
+          -%}
+          
+          <style>
+            /* MOBILE BACKGROUND - WEBP OPTIMIZED */
+            @media screen and (max-width: 1023px) {
+              .anveshan-carousel-bg-container-fullwidth[data-anveshan-block-id="{{ block.id }}"] {
+                background-image: url('{{ block.settings.mobile_bg_image | image_url: width: 800, format: 'webp' }}');
+              }
+            }
+            
+            /* DESKTOP BACKGROUND - WEBP OPTIMIZED */
+            @media screen and (min-width: 1024px) {
+              .anveshan-carousel-bg-container-fullwidth[data-anveshan-block-id="{{ block.id }}"] {
+                background-image: url('{{ desktop_bg_image | image_url: width: 1920, format: 'webp' }}');
+              }
+            }
+          </style>
+        {%- endif -%}
+        
+        <!-- CENTERED CONTENT OVERLAY -->
+        <div  class="anveshan-carousel-bg-content-centered">
+          
+          <!-- HEADING SECTION -->
+          {% if block.settings.title != blank or block.settings.subtitle != blank %}
+            <div class="anveshan-carousel-heading-section-overlay">
+              {% if block.settings.title != blank %}
+                <h1 class="anveshan-carousel-main-title-blue">{{ block.settings.title }}</h1>
+              {% endif %}
+              {% if block.settings.subtitle != blank %}
+                <p class="anveshan-carousel-subtitle">{{ block.settings.subtitle }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+          
+          <!-- OPTIMIZED CAROUSEL CONTAINER -->
+          {% if carousel_count > 0 %}
+            <div class="anveshan-carousel-container-centered" data-anveshan-carousel-count="{{ carousel_count }}">
+              
+              <!-- RESPONSIVE CAROUSEL WRAPPER -->
+              <div class="anveshan-carousel-wrapper" id="anveshan-carousel-wrapper-{{ block.id }}">
+                
+                <!-- IMAGES CONTAINER -->
+                <div class="anveshan-carousel-images-container" id="anveshan-carousel-scroll-{{ block.id }}">
+                  {% assign image_index = 0 %}
+                  {% for i in (1..5) %}
+                    {% assign image_key = 'carousel_image_' | append: i %}
+                    {% assign current_image = block.settings[image_key] %}
+                    
+                    {% if current_image != blank %}
+                      <div class="anveshan-carousel-image-item" data-anveshan-image-index="{{ image_index }}">
+                        <img 
+                          src="{{ current_image | image_url: width: 450, format: 'webp' }}"
+                          srcset="{{ current_image | image_url: width: 300, format: 'webp' }} 300w,
+                                  {{ current_image | image_url: width: 450, format: 'webp' }} 450w,
+                                  {{ current_image | image_url: width: 600, format: 'webp' }} 600w"
+                          sizes="(max-width: 480px) 250px, (max-width: 767px) 280px, (max-width: 1023px) 350px, 280px"
+                          alt="{{ current_image.alt | default: block.settings.title }}" 
+                          loading="lazy"
+                          decoding="async"
+                          width="280"
+                          height="{{ current_image.height | times: 280 | divided_by: current_image.width | round }}"
+                        >
+                      </div>
+                      {% assign image_index = image_index | plus: 1 %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <!-- NAVIGATION DOTS - ONLY FOR MOBILE/TABLET -->
+              {% if carousel_count > 1 %}
+                <div class="anveshan-carousel-dots" id="anveshan-carousel-dots-{{ block.id }}">
+                  {% for i in (0..carousel_count) %}
+                    {% if i < carousel_count %}
+                      <span class="anveshan-carousel-dot{% if i == 0 %} anveshan-active{% endif %}" 
+                            data-anveshan-dot-index="{{ i }}" 
+                            onclick="anveshan_scrollToImage('{{ block.id }}', {{ i }})"></span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+          
+        </div>
+      </div>
+    </div>
+    
+    <!-- OPTIMIZED CAROUSEL JAVASCRIPT -->
+    <script>
+      (function() {
+        const blockId = '{{ block.id }}';
+        const scrollContainer = document.getElementById('anveshan-carousel-scroll-' + blockId);
+        const dots = document.querySelectorAll('#anveshan-carousel-dots-' + blockId + ' .anveshan-carousel-dot');
+        const wrapper = document.getElementById('anveshan-carousel-wrapper-' + blockId);
+        
+        if (scrollContainer && wrapper) {
+          // Enable hardware acceleration
+          scrollContainer.style.transform = 'translate3d(0,0,0)';
+          scrollContainer.style.willChange = 'transform';
+          
+          // Throttled scroll handler for performance
+          let scrollTimeout;
+          const handleScroll = () => {
+            if (scrollTimeout) return;
+            scrollTimeout = requestAnimationFrame(() => {
+              const scrollLeft = scrollContainer.scrollLeft;
+              const images = scrollContainer.querySelectorAll('.anveshan-carousel-image-item');
+              
+              if (images.length > 0 && dots.length > 0) {
+                let activeIndex = 0;
+                let currentPosition = 0;
+                
+                images.forEach((image, index) => {
+                  const imageWidth = image.offsetWidth + (window.innerWidth <= 767 ? 15 : 20);
+                  if (scrollLeft >= currentPosition - imageWidth/2) {
+                    activeIndex = index;
+                  }
+                  currentPosition += imageWidth;
+                });
+                
+                dots.forEach((dot, index) => {
+                  dot.classList.toggle('anveshan-active', index === activeIndex);
+                });
+              }
+              scrollTimeout = null;
+            });
+          };
+          
+          // Add scroll listener only for mobile/tablet
+          if (window.innerWidth <= 1023) {
+            scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+          }
+          
+          // Resize handler with debouncing
+          let resizeTimeout;
+          const handleResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+              if (window.innerWidth <= 1023) {
+                scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+              } else {
+                scrollContainer.removeEventListener('scroll', handleScroll);
+              }
+            }, 100);
+          };
+          
+          window.addEventListener('resize', handleResize, { passive: true });
+        }
+      })();
+    </script>
+  {% endif %}
+{% endfor %}
+
+<!-- MODULAR CSS STYLES - NAMESPACED TO PREVENT CONFLICTS -->
+<style>
+  /* ===========================================
+     PERFORMANCE OPTIMIZATIONS - SCOPED
+     =========================================== */
+  
+
+  /* ===========================================
+     CAROUSEL HEADING SECTION STYLES - STABLE
+     =========================================== */
+  
+  .anveshan-carousel-heading-section-overlay {
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+  }
+
+  /* MOBILE HEADING - REDUCED SPACING */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-heading-section-overlay {
+      margin-bottom: 15px;
+    }
+    
+    .anveshan-carousel-main-title-blue {
+      font-size: 2.2rem;
+      line-height: 1.2;
+      font-weight: bold;
+      color: #4199A8;
+      margin-bottom: 5px;
+    }
+    
+    .anveshan-carousel-subtitle {
+      font-size: 1.2rem;
+      line-height: 1.4;
+      color: #000;
+      font-weight: 400;
+      margin: 0;
+    }
+  }
+
+  /* TABLET HEADING - REDUCED SPACING */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-heading-section-overlay {
+      margin-bottom: 18px;
+    }
+    
+    .anveshan-carousel-main-title-blue {
+      font-size: 2.6rem;
+      line-height: 1.2;
+      font-weight: bold;
+      color: #4199A8;
+      margin-bottom: 5px;
+    }
+    
+    .anveshan-carousel-subtitle {
+      font-size: 1.4rem;
+      line-height: 1.4;
+      color: #000;
+      font-weight: 400;
+      margin: 0;
+    }
+  }
+
+  /* DESKTOP HEADING - REDUCED SPACING */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-heading-section-overlay {
+      margin-bottom: 20px;
+    }
+    
+    .anveshan-carousel-main-title-blue {
+      font-size: 3.2rem;
+      line-height: 1.2;
+      font-weight: bold;
+      color: #4199A8;
+      margin-bottom: 5px;
+    }
+    
+    .anveshan-carousel-subtitle {
+      font-size: 1.4rem;
+      line-height: 1.4;
+      color: #000;
+      font-weight: 400;
+      margin: 0;
+    }
+  }
+  
+  /* ===========================================
+     CAROUSEL CONTAINER STYLES - MOBILE-STABLE
+     =========================================== */
+  
+  .anveshan-image-carousel-block-fullwidth {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  /* MOBILE MARGINS - STABLE */
+  @media screen and (max-width: 767px) {
+    .anveshan-image-carousel-block-fullwidth {
+      margin-top: 40px;
+      margin-bottom: 30px;
+    }
+  }
+
+  /* TABLET MARGINS - STABLE */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-image-carousel-block-fullwidth {
+      margin-top: 50px;
+      margin-bottom: 40px;
+    }
+  }
+
+  /* DESKTOP MARGINS - STABLE */
+  @media screen and (min-width: 1024px) {
+    .anveshan-image-carousel-block-fullwidth {
+      margin-top: 80px;
+      margin-bottom: 50px;
+    }
+  }
+  
+  /* ===========================================
+     CAROUSEL BACKGROUND STYLES - REDUCED SPACING
+     =========================================== */
+  
+  .anveshan-carousel-bg-container-fullwidth {
+    position: relative;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* MOBILE BACKGROUND - REDUCED PADDING */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-bg-container-fullwidth {
+      min-height: 500px;
+      padding: 30px 0;
+    }
+  }
+
+  /* TABLET BACKGROUND - REDUCED PADDING */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-bg-container-fullwidth {
+      min-height: 550px;
+      padding: 35px 0;
+    }
+  }
+
+  /* DESKTOP BACKGROUND - REDUCED PADDING */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-bg-container-fullwidth {
+      min-height: 600px;
+      padding: 40px 0;
+    }
+  }
+
+  /* LARGE DESKTOP BACKGROUND - REDUCED PADDING */
+  @media screen and (min-width: 1440px) {
+    .anveshan-carousel-bg-container-fullwidth {
+      min-height: 650px;
+      padding: 45px 0;
+    }
+  }
+ 
+
+  .anveshan-carousel-bg-content-centered {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+  }
+  
+  .anveshan-carousel-container-centered {
+    width: 100%;
+    max-width: 1200px;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* MOBILE PADDING - STABLE */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-container-centered {
+      padding: 0 15px;
+    }
+  }
+
+  /* TABLET PADDING - STABLE */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-container-centered {
+      padding: 0 20px;
+    }
+  }
+
+  /* DESKTOP PADDING - STABLE */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-container-centered {
+      padding: 0 20px;
+    }
+  }
+  
+  .anveshan-carousel-wrapper {
+    position: relative;
+    width: 100%;
+  }
+ 
+  .anveshan-carousel-images-container {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* MOBILE - HORIZONTAL SCROLL WITH REDUCED SPACING */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-images-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+      padding-bottom: 25px; /* Reduced space for dots below */
+      gap: 15px;
+      justify-content: flex-start;
+    }
+    
+    .anveshan-carousel-images-container::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* TABLET - HORIZONTAL SCROLL WITH REDUCED SPACING */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-images-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+      padding-bottom: 28px; /* Reduced space for dots below */
+      gap: 18px;
+      justify-content: flex-start;
+    }
+    
+    .anveshan-carousel-images-container::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* DESKTOP - CENTERED LAYOUT, NO SCROLL, NO DOTS */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-images-container {
+      justify-content: center;
+      overflow: visible;
+      gap: 20px;
+      padding-bottom: 0; /* No space needed for dots */
+    }
+  }
+ 
+  .anveshan-carousel-image-item {
+    flex: 0 0 auto;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .anveshan-carousel-image-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* MOBILE - FIXED STABLE SIZING */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-image-item {
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
+      flex-shrink: 0;
+    }
+  }
+
+  /* TABLET - FIXED STABLE SIZING */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-image-item {
+      width: 350px;
+      min-width: 350px;
+      max-width: 350px;
+      flex-shrink: 0;
+    }
+  }
+
+  /* DESKTOP - FIXED STABLE SIZING */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-image-item {
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
+      flex-shrink: 0;
+    }
+    
+    .anveshan-carousel-image-item:hover {
+      transform: translateY(-8px);
+    }
+    
+    .anveshan-carousel-image-item:hover img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* LARGE DESKTOP - FIXED STABLE SIZING */
+  @media screen and (min-width: 1440px) {
+    .anveshan-carousel-image-item {
+      width: 320px;
+      min-width: 320px;
+      max-width: 320px;
+    }
+  }
+
+  /* EXTRA LARGE DESKTOP - FIXED STABLE SIZING */
+  @media screen and (min-width: 1920px) {
+    .anveshan-carousel-image-item {
+      width: 350px;
+      min-width: 350px;
+      max-width: 350px;
+    }
+  }
+ 
+  .anveshan-carousel-dots {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    z-index: 4;
+    pointer-events: auto;
+  }
+
+  /* MOBILE DOTS - BELOW CAROUSEL */
+  @media screen and (max-width: 767px) {
+    .anveshan-carousel-dots {
+      bottom: 0px; /* Positioned below the carousel */
+      gap: 8px;
+    }
+    
+    .anveshan-carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+    
+    .anveshan-carousel-dot.anveshan-active {
+      background: rgba(0, 0, 0, 0.8);
+      transform: scale(1.3);
+    }
+    
+    .anveshan-carousel-dot:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  /* TABLET DOTS - BELOW CAROUSEL */
+  @media screen and (min-width: 768px) and (max-width: 1023px) {
+    .anveshan-carousel-dots {
+      bottom: 15px; /* Positioned below the carousel */
+      gap: 10px;
+    }
+    
+    .anveshan-carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+    
+    .anveshan-carousel-dot.anveshan-active {
+      background: rgba(0, 0, 0, 0.8);
+      transform: scale(1.3);
+    }
+    
+    .anveshan-carousel-dot:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  /* DESKTOP - NO DOTS AT ALL */
+  @media screen and (min-width: 1024px) {
+    .anveshan-carousel-dots {
+      display: none !important;
+    }
+  }
+</style>
+
+<!-- MODULAR GLOBAL JAVASCRIPT - NAMESPACED -->
+<script>
+  // Namespaced function to prevent conflicts
+  function anveshan_scrollToImage(blockId, imageIndex) {
+    const scrollContainer = document.getElementById('anveshan-carousel-scroll-' + blockId);
+    const dots = document.querySelectorAll('#anveshan-carousel-dots-' + blockId + ' .anveshan-carousel-dot');
+    const images = scrollContainer.querySelectorAll('.anveshan-carousel-image-item');
+    
+    if (scrollContainer && images[imageIndex] && window.innerWidth <= 1023) {
+      let scrollPosition = 0;
+      for (let i = 0; i < imageIndex; i++) {
+        scrollPosition += images[i].offsetWidth + (window.innerWidth <= 767 ? 15 : 20);
+      }
+      
+      scrollContainer.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+      
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('anveshan-active', index === imageIndex);
+      });
+    }
+  }
+</script>
+
+<!-- SHOPIFY SECTION SCHEMA -->
+{% schema %}
+{
+  "name": "ghee Section",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "ghee from Anveshan"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature_item",
+      "name": "Feature Item",
+      "settings": [
+        {
+          "type": "metaobject",
+          "id": "metaobject_reference",
+          "label": "Feature Metaobject",
+          "metaobject_type": "feature_item",
+          "info": "Select a metaobject that contains icon, title, and description fields"
+        }
+      ]
+    },
+    {
+      "type": "image_carousel",
+      "name": "Image Carousel Block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "mobile_bg_image",
+          "label": "Mobile Background Image",
+          "info": "Background image for mobile devices"
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_bg_image",
+          "label": "Desktop Background Image",
+          "info": "Background image for desktop devices"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Main Title",
+          "default": "Only Perfect Makes The Cut"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          
+        },
+        {
+          "type": "header",
+          "content": "Carousel Images"
+        },
+        {
+          "type": "image_picker",
+          "id": "carousel_image_1",
+          "label": "Carousel Image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "carousel_image_2",
+          "label": "Carousel Image 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "carousel_image_3",
+          "label": "Carousel Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "carousel_image_4",
+          "label": "Carousel Image 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "carousel_image_5",
+          "label": "Carousel Image 5"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Why Choose Section",
+      "blocks": [
+        {
+          "type": "feature_item"
+        },
+        {
+          "type": "feature_item"
+        },
+        {
+          "type": "feature_item"
+        },
+        {
+          "type": "feature_item"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

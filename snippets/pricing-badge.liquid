@@ -1,0 +1,417 @@
+{% comment %}
+  ╔═══════════════════════════════════════════════════════════════════════════════╗
+  ║                        UNIFIED PRICING SYSTEM                                  ║
+  ║                                                                                ║
+  ║  ONE FILE for both PDP and PLP                                                ║
+  ║  - Logic: SAME for both                                                        ║
+  ║  - Styles: DIFFERENT based on context                                          ║
+  ║     • PDP = .discount-badge (green badge with shine animation)                 ║
+  ║     • PLP = .best-price (simple green text)                                   ║
+  ║                                                                                ║
+  ║  Usage:                                                                        ║
+  ║    PDP: {% render 'pricing-badge', product: product %}                        ║
+  ║    PLP: {% render 'pricing-badge', card_product: card_product %}              ║
+  ╚═══════════════════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   CONFIGURATION - Change these values to control entire site
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% comment %}
+  ╔═══════════════════════════════════════════════════════════════════════════════╗
+  ║  PRICE CALCULATION LOGIC                                                       ║
+  ╠═══════════════════════════════════════════════════════════════════════════════╣
+  ║                                                                                ║
+  ║  "Best Price ₹X with coupon" ka X kaise calculate hota hai:                   ║
+  ║  ┌────────────────────────────────────────────────────────────────────────┐   ║
+  ║  │  Step 1: Product price se 15% minus karo                               │   ║
+  ║  │  Step 2: Jo bacha usse 2% aur minus karo                               │   ║
+  ║  │                                                                        │   ║
+  ║  │  Example: Price = ₹1000                                                │   ║
+  ║  │    → Step 1: ₹1000 - 15% = ₹1000 - ₹150 = ₹850                        │   ║
+  ║  │    → Step 2: ₹850 - 2% = ₹850 - ₹17 = ₹833                            │   ║
+  ║  │    → Final Best Price = ₹833                                           │   ║
+  ║  └────────────────────────────────────────────────────────────────────────┘   ║
+  ║                                                                                ║
+  ║  "Save ₹X" ka X kaise calculate hota hai (Combos ke liye):                    ║
+  ║  ┌────────────────────────────────────────────────────────────────────────┐   ║
+  ║  │  X = Compare at Price - Current Price                                  │   ║
+  ║  │                                                                        │   ║
+  ║  │  Example: Compare at = ₹2000, Current = ₹1500                         │   ║
+  ║  │    → Save = ₹2000 - ₹1500 = ₹500                                      │   ║
+  ║  │    → "Save ₹500 – no additional discounts"                            │   ║
+  ║  └────────────────────────────────────────────────────────────────────────┘   ║
+  ║                                                                                ║
+  ╚═══════════════════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+{% assign DISCOUNT_PERCENT = 15 %}                 {% comment %} Main coupon discount % (Step 1) {% endcomment %}
+{% assign EXTRA_PREPAID_PERCENT = 2 %}             {% comment %} Extra prepaid discount % (Step 2) {% endcomment %}
+{% assign ENABLE_ANIMATIONS = true %}              {% comment %} PDP animations on/off {% endcomment %}
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   SALE SETTINGS
+
+   SALE_ACTIVE = true  → Sale mode ON (SALE_COMBO_SHOW & SALE_NON_COMBO_SHOW use hoga)
+   SALE_ACTIVE = false → Normal mode (SHOW_COMBO_LINE & SHOW_BEST_PRICE_LINE use hoga)
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+{% assign SALE_ACTIVE = false %}
+{% assign SALE_TEXT = "Diwali Sale is Live Sitewide | Use code: DW30" %}
+
+{% comment %}
+  ╔═══════════════════════════════════════════════════════════════════════════════╗
+  ║  SALE MODE - Kya dikhega jab SALE_ACTIVE = true                               ║
+  ╠═══════════════════════════════════════════════════════════════════════════════╣
+  ║                                                                               ║
+  ║  SALE_COMBO_SHOW (Combo products jaise Ghee+Oil combo):                       ║
+  ║  ┌─────────────┬──────────────────────────────────────────────────────────┐   ║
+  ║  │ "save"      │ → "Save ₹500 – no additional discounts"                  │   ║
+  ║  │ "best_price"│ → "Best Price ₹850 with coupon"                          │   ║
+  ║  │ "sale_text" │ → "Diwali Sale is Live Sitewide | Use code: DW30"        │   ║
+  ║  │ "none"      │ → Kuch nahi dikhega                                      │   ║
+  ║  └─────────────┴──────────────────────────────────────────────────────────┘   ║
+  ║                                                                               ║
+  ║  SALE_NON_COMBO_SHOW (Single products jaise Ghee 500ml):                      ║
+  ║  ┌─────────────┬──────────────────────────────────────────────────────────┐   ║
+  ║  │ "best_price"│ → "Best Price ₹850 with coupon"                          │   ║
+  ║  │ "sale_text" │ → "Diwali Sale is Live Sitewide | Use code: DW30"        │   ║
+  ║  │ "none"      │ → Kuch nahi dikhega                                      │   ║
+  ║  └─────────────┴──────────────────────────────────────────────────────────┘   ║
+  ║                                                                               ║
+  ╠═══════════════════════════════════════════════════════════════════════════════╣
+  ║  EXAMPLES - Copy paste karo jo chahiye:                                       ║
+  ║                                                                               ║
+  ║  1. Sale + Combos pe Best Price, Baaki sab hide:                              ║
+  ║     SALE_ACTIVE = true                                                        ║
+  ║     SALE_COMBO_SHOW = "best_price"                                            ║
+  ║     SALE_NON_COMBO_SHOW = "none"                                              ║
+  ║     RESULT: Combo → "Best Price ₹850 with coupon"                             ║
+  ║             Non-combo → Nothing                                               ║
+  ║                                                                               ║
+  ║  2. Sale + Sab pe Best Price dikhao:                                          ║
+  ║     SALE_ACTIVE = true                                                        ║
+  ║     SALE_COMBO_SHOW = "best_price"                                            ║
+  ║     SALE_NON_COMBO_SHOW = "best_price"                                        ║
+  ║     RESULT: Combo → "Best Price ₹850 with coupon"                             ║
+  ║             Non-combo → "Best Price ₹850 with coupon"                         ║
+  ║                                                                               ║
+  ║  3. Sale + Combos pe Save line, Baaki hide:                                   ║
+  ║     SALE_ACTIVE = true                                                        ║
+  ║     SALE_COMBO_SHOW = "save"                                                  ║
+  ║     SALE_NON_COMBO_SHOW = "none"                                              ║
+  ║     RESULT: Combo → "Save ₹500 – no additional discounts"                     ║
+  ║             Non-combo → Nothing                                               ║
+  ║                                                                               ║
+  ║  4. Diwali Sale banner sab pe:                                                ║
+  ║     SALE_ACTIVE = true                                                        ║
+  ║     SALE_COMBO_SHOW = "sale_text"                                             ║
+  ║     SALE_NON_COMBO_SHOW = "sale_text"                                         ║
+  ║     RESULT: Combo → "Diwali Sale is Live Sitewide | Use code: DW30"           ║
+  ║             Non-combo → "Diwali Sale is Live Sitewide | Use code: DW30"       ║
+  ║                                                                               ║
+  ╚═══════════════════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+{% assign SALE_COMBO_SHOW = "save" %}
+{% assign SALE_NON_COMBO_SHOW = "best_price" %}
+
+{% comment %} NORMAL MODE (when SALE_ACTIVE = false) {% endcomment %}
+{% assign SHOW_COMBO_LINE = true %}                {% comment %} Show Save line for combos {% endcomment %}
+{% assign SHOW_BEST_PRICE_LINE = true %}           {% comment %} Show Best Price line for non-combos {% endcomment %}
+
+{% comment %} EXCLUSIONS {% endcomment %}
+{% assign EXCLUDED_COLLECTIONS = "deal-of-the-day" %}
+{% assign COMBO_KEYWORDS = "combo,duo,trio,mixes,&,and,pack,set,oils" %}
+{% assign COMBO_COLLECTION = "a2-desi-ghee-wood-press-oil-combo-packs" %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   DETECT CONTEXT: PDP vs PLP
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% assign _is_pdp = false %}
+{% assign _current_product = nil %}
+{% assign _product_title = "" %}
+{% assign _parent_product = nil %}
+
+{% comment %} If card_product is passed, it's always PLP context (cards, recently viewed, etc.) {% endcomment %}
+{% if card_product %}
+  {% comment %} PLP Context {% endcomment %}
+  {% assign _current_product = card_product %}
+  {% if card_product.product %}
+    {% assign _product_title = card_product.product.title %}
+    {% assign _parent_product = card_product.product %}
+  {% else %}
+    {% assign _product_title = card_product.title %}
+    {% assign _parent_product = card_product %}
+  {% endif %}
+  {% assign _is_pdp = false %}
+{% elsif product %}
+  {% comment %} PDP Context (main product page only) {% endcomment %}
+  {% assign _current_product = product.selected_or_first_available_variant %}
+  {% assign _product_title = product.title %}
+  {% assign _parent_product = product %}
+  {% assign _is_pdp = true %}
+{% endif %}
+
+
+{% if _current_product %}
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   CHECK EXCLUSIONS
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% comment %} Flash Sale Tag Check {% endcomment %}
+{% assign _has_flash_sale_tag = false %}
+{% if _parent_product %}
+  {% assign _tag_string = _parent_product.tags | join: ',' | downcase %}
+  {% assign _meta_tag1 = _parent_product.metafields.custom.tag | downcase %}
+  {% assign _meta_tag2 = _parent_product.metafields.custom.tag2 | downcase %}
+  {% if _tag_string contains 'flash sale' or _meta_tag1 contains 'flash sale' or _meta_tag2 contains 'flash sale' %}
+    {% assign _has_flash_sale_tag = true %}
+  {% endif %}
+{% endif %}
+
+{% comment %} Collection Exclusion Check {% endcomment %}
+{% assign _should_show = true %}
+{% assign _excluded_arr = EXCLUDED_COLLECTIONS | split: "," %}
+{% for exc in _excluded_arr %}
+  {% assign _exc_stripped = exc | strip %}
+  {% if collection.handle == _exc_stripped %}
+    {% assign _should_show = false %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if _has_flash_sale_tag %}
+  {% assign _should_show = false %}
+{% endif %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   DETECT COMBO PRODUCT
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% assign _is_combo = false %}
+{% if collection.handle == COMBO_COLLECTION %}
+  {% assign _is_combo = true %}
+{% else %}
+  {% assign _title_lower = _product_title | downcase %}
+  {% assign _keywords_arr = COMBO_KEYWORDS | split: "," %}
+  {% for kw in _keywords_arr %}
+    {% assign _kw_stripped = kw | strip %}
+    {% if _title_lower contains _kw_stripped %}
+      {% assign _is_combo = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   CALCULATE PRICES
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% assign _price = _current_product.price | default: 0 %}
+{% assign _compare_price = _current_product.compare_at_price | default: 0 %}
+
+{% comment %} Best Price: price - 15% - 2% of remaining {% endcomment %}
+{% assign _base_discount = _price | times: DISCOUNT_PERCENT | divided_by: 100.0 %}
+{% assign _price_after_base = _price | minus: _base_discount %}
+{% assign _extra_discount = _price_after_base | times: EXTRA_PREPAID_PERCENT | divided_by: 100.0 %}
+{% assign _final_price = _price_after_base | minus: _extra_discount %}
+
+{% comment %} Combo Savings {% endcomment %}
+{% assign _combo_savings = _compare_price | minus: _price %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   DETERMINE WHAT TO SHOW
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% assign _show_type = "none" %}
+
+{% if _should_show %}
+  {% if SALE_ACTIVE %}
+    {% comment %} ══════ SALE MODE ══════ {% endcomment %}
+    {% if _is_combo %}
+      {% comment %} COMBO during sale - 4 options {% endcomment %}
+      {% if SALE_COMBO_SHOW == "save" and _combo_savings > 0 %}
+        {% assign _show_type = "save" %}
+      {% elsif SALE_COMBO_SHOW == "best_price" %}
+        {% assign _show_type = "best_price" %}
+      {% elsif SALE_COMBO_SHOW == "sale_text" %}
+        {% assign _show_type = "sale_text" %}
+      {% else %}
+        {% assign _show_type = "none" %}
+      {% endif %}
+    {% else %}
+      {% comment %} NON-COMBO during sale - 3 options {% endcomment %}
+      {% if SALE_NON_COMBO_SHOW == "best_price" %}
+        {% assign _show_type = "best_price" %}
+      {% elsif SALE_NON_COMBO_SHOW == "sale_text" %}
+        {% assign _show_type = "sale_text" %}
+      {% else %}
+        {% assign _show_type = "none" %}
+      {% endif %}
+    {% endif %}
+  {% else %}
+    {% comment %} ══════ NORMAL MODE ══════ {% endcomment %}
+    {% if _is_combo %}
+      {% if SHOW_COMBO_LINE and _combo_savings > 0 %}
+        {% assign _show_type = "save" %}
+      {% endif %}
+    {% else %}
+      {% if SHOW_BEST_PRICE_LINE %}
+        {% assign _show_type = "best_price" %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   RENDER - Different styles for PDP vs PLP
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% if _show_type != "none" %}
+
+  {% if _is_pdp %}
+    {% comment %} ══════ PDP STYLES (Animated Badge) ══════ {% endcomment %}
+    {% if _show_type == "best_price" %}
+      {% if ENABLE_ANIMATIONS %}
+        <div class="discount-badge default" style="margin-top:8px">
+          <span class="discount-text">Best Price <span class="price-amount">{{ _final_price | money }}</span></span>
+          <span class="coupon-text">with coupon</span>
+        </div>
+      {% else %}
+        <div class="simple-discount">Best Price {{ _final_price | money }} with coupon</div>
+      {% endif %}
+    {% elsif _show_type == "save" %}
+      {% if ENABLE_ANIMATIONS %}
+        <div class="discount-badge combo" style="margin-top:8px">
+          <span class="discount-text">Save {{ _combo_savings | money }} – no additional discounts</span>
+        </div>
+      {% else %}
+        <div class="simple-discount">Save {{ _combo_savings | money }} – no additional discounts</div>
+      {% endif %}
+    {% elsif _show_type == "sale_text" %}
+      {% if ENABLE_ANIMATIONS %}
+        <div class="discount-badge special" style="margin-top:8px">
+          <span class="discount-text">{{ SALE_TEXT }}</span>
+        </div>
+      {% else %}
+        <div class="simple-discount">{{ SALE_TEXT }}</div>
+      {% endif %}
+    {% endif %}
+
+  {% else %}
+    {% comment %} ══════ PLP STYLES (Simple Text) ══════ {% endcomment %}
+    {% if _show_type == "best_price" %}
+      <div class="best-price" style="margin-top:0">
+        <i style="font-weight: 600;color: #137b6c;font-style: normal;">
+          Best Price {{ _final_price | money }}
+        </i>
+        with coupon
+      </div>
+    {% elsif _show_type == "save" %}
+      <div class="best-price" style="margin-top:0">
+        <i style="font-weight: 600;color: #137b6c;font-style: normal;">
+          Save {{ _combo_savings | money }}
+        </i>
+        – no other discounts
+      </div>
+    {% elsif _show_type == "sale_text" %}
+      <div class="best-price" style="margin-top:0">
+        <i style="font-weight: 600;color: #137b6c;font-style: normal;">
+          {{ SALE_TEXT }}
+        </i>
+      </div>
+    {% endif %}
+  {% endif %}
+
+{% endif %}
+
+{% endif %}
+
+
+{% comment %} ═══════════════════════════════════════════════════════════════════
+   PDP STYLES (Only rendered once, for PDP pages)
+═══════════════════════════════════════════════════════════════════════════════ {% endcomment %}
+
+{% if _is_pdp and ENABLE_ANIMATIONS %}
+<style>
+  .discount-badge {
+    background: #235A49;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    max-width: 100%;
+    box-shadow: 0 2px 4px rgba(35, 74, 89, 0.3);
+    transition: all 0.3s ease;
+  }
+  .discount-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(35, 74, 89, 0.4);
+  }
+  .discount-text {
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .price-amount {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .coupon-text {
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 13px;
+  }
+  .discount-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), rgba(255,255,255,0.4), rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.15), transparent);
+    animation: shine 2.5s infinite;
+    z-index: 1;
+  }
+  @keyframes shine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+  .discount-badge.special { background: rgb(210, 142, 26); }
+  .discount-badge.combo { background: #2d5a47; }
+  .discount-badge * { position: relative; z-index: 2; }
+  @media (max-width: 768px) {
+    .discount-badge { padding: 6px 10px; font-size: 13px; }
+    .price-amount { font-size: 14px; }
+    .coupon-text { font-size: 12px; }
+  }
+</style>
+{% elsif _is_pdp %}
+<style>
+  .simple-discount {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #333;
+    display: inline-block;
+    font-weight: 600;
+  }
+  @media (max-width: 768px) {
+    .simple-discount { font-size: 12px; padding: 6px 10px; }
+  }
+</style>
+{% endif %}

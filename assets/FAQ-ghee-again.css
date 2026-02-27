@@ -1,0 +1,193 @@
+/* FAQ ACCORDION STYLING - INCREASED WIDTH */
+.custom-faq-accordion {
+  width: 100%;
+  max-width: 1100px; /* INCREASED FROM 800px */
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: transparent;
+}
+.custom-faq-accordion h2 {
+  color: #00584b;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0 0 5px 0; /* Reduced from 25px to 5px */
+  text-align: center;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; */
+}
+.faq-container {
+  margin: 0; /* Remove any top margin */
+  padding: 0; /* Remove any padding */
+}
+.faq-item {
+  border: 1px solid #e5e7eb;
+  margin: 0 0 8px 0; /* Reduced from 12px to 8px */
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: box-shadow 0.2s ease;
+}
+/* Remove spacing from first FAQ item */
+.faq-item:first-child {
+  margin-top: 0 !important;
+}
+.faq-item:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px; /* ADDED INTERNAL VERTICAL PADDING */
+  cursor: pointer;
+  background-color: #ffffff;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.faq-question:hover {
+  background-color: #f9fafb;
+}
+.faq-question.active {
+  background-color: #00584b;
+  color: white;
+}
+.faq-question-text {
+  flex: 1;
+  margin-right: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.faq-question-text::before {
+  content: "Q. ";
+  font-weight: 600;
+  color: #00584b;
+}
+.faq-question.active .faq-question-text::before {
+  color: white;
+}
+.faq-arrow {
+  font-size: 14px;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+  color: #6b7280;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+.faq-question.active .faq-arrow {
+  transform: rotate(180deg);
+  color: white;
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+}
+.faq-answer.active {
+  max-height: 400px;
+}
+.faq-answer-text {
+  padding: 18px 20px; /* ADDED INTERNAL VERTICAL PADDING */
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.faq-answer-text::before {
+  content: "A. ";
+  font-weight: 600;
+  color: #00584b;
+}
+/* MOBILE FAQ STYLING */
+@media screen and (max-width: 749px) {
+  .custom-faq-accordion {
+    padding: 0 15px;
+    margin: 0 auto;
+    max-width: 95%;
+  }
+  
+  .custom-faq-accordion h2 {
+    font-size: 1.5rem;
+    margin: 0 0 3px 0; /* Reduced from 20px to 3px */
+  }
+  
+  .faq-question {
+    padding: 14px 16px; /* MOBILE INTERNAL VERTICAL PADDING */
+    font-size: 14px;
+  }
+  
+  .faq-question-text {
+    margin-right: 12px;
+  }
+  
+  .faq-arrow {
+    font-size: 12px;
+  }
+  
+  .faq-answer-text {
+    padding: 16px 16px; /* MOBILE INTERNAL VERTICAL PADDING */
+    font-size: 13px;
+  }
+}
+/* DESKTOP FAQ STYLING */
+@media screen and (min-width: 750px) {
+  .custom-faq-accordion {
+    padding: 0 30px;
+    margin: 0 auto;
+    max-width: 1200px; /* INCREASED FROM 900px */
+  }
+  
+  .custom-faq-accordion h2 {
+    font-size: 2rem;
+    margin: 0 0 5px 0; /* Reduced from 30px to 5px */
+  }
+  
+  .faq-question {
+    padding: 18px 24px; /* DESKTOP INTERNAL VERTICAL PADDING */
+    font-size: 16px;
+  }
+  
+  .faq-answer-text {
+    padding: 20px 24px; /* DESKTOP INTERNAL VERTICAL PADDING */
+    font-size: 15px;
+  }
+}
+/* LARGE DESKTOP FAQ STYLING */
+@media screen and (min-width: 1200px) {
+  .custom-faq-accordion {
+    max-width: 1300px; /* EVEN WIDER FOR LARGE SCREENS */
+  }
+  
+  .faq-question {
+    padding: 20px 28px; /* LARGE DESKTOP INTERNAL VERTICAL PADDING */
+  }
+  
+  .faq-answer-text {
+    padding: 22px 28px; /* LARGE DESKTOP INTERNAL VERTICAL PADDING */
+  }
+}
+/* Update existing accordion__content for FAQs to avoid conflicts */
+.accordion__content.richtext.rte {
+  padding: 0; /* Remove excessive padding */
+}
+/* Ensure FAQ accordion icons don't overlap */
+.faq-answer-text::before {
+  content: "A. ";
+  font-weight: 600;
+  color: #00584b;
+  display: inline;
+}
+/* Keep existing FAQ styling intact */
+.custom-faq-accordion {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: transparent;
+}

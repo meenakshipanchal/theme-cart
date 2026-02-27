@@ -1,0 +1,2232 @@
+ 
+
+<style>
+.edd-checker-container {
+    max-width: 800px;
+    border-radius: 12px;
+    background: #F0F0F0;
+    padding: 32px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.edd-checker-container h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d5a3d;
+}
+
+.edd-checker-container h3::before {
+    /* content: "📍"; */
+    font-size: 24px;
+}
+
+.edd-checker-container label {
+    display: block;
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 16px;
+    font-weight: 400;
+}
+
+.input-group {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#delivery-pincode {
+    padding: 16px 20px;
+    border: none;
+    background: #D9D9D9;
+    flex: 1;
+    font-size: 16px;
+    outline: none;
+    color: #374151;
+    border-radius: 8px 0 0 8px;
+}
+
+#delivery-pincode::placeholder {
+    color: #9ca3af;
+    font-weight: normal;
+}
+
+#delivery-pincode:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#check-edd-btn {
+    padding: 16px 32px;
+    background: #2d5a3d;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    min-width: 100px;
+    border-radius: 0 8px 8px 0;
+    white-space: nowrap;
+}
+
+#check-edd-btn:hover {
+    background: #1e3d29;
+}
+
+#check-edd-btn:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+}
+
+.delivery-info {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #374151;
+    font-weight: 400;
+    padding: 0;
+}
+
+.toggle-debug {
+    margin-top: 15px;
+    padding: 8px 15px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-debug:hover {
+    background: #5a6268;
+}
+
+#debug-console {
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#debug-logs {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.log-entry {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-left: 4px solid #2d5a3d;
+    background: #f9fafb;
+    border-radius: 4px;
+}
+
+.log-timestamp {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.log-error {
+    border-left-color: #dc2626;
+    background: #fef2f2;
+}
+
+.log-success {
+    border-left-color: #059669;
+    background: #f0fdf4;
+}
+
+.log-warning {
+    border-left-color: #d97706;
+    background: #fffbeb;
+}
+
+#loading-state {
+    margin-top: 20px;
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #2d5a3d;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#edd-results, #edd-error {
+    margin-top: 20px;
+    /* padding: 20px; */
+    border-radius: 8px;
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+}
+
+#edd-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.result-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 1px solid #a7f3d0;
+    color: #235A49;
+}
+
+.courier-option {
+    background: white;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.courier-option:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.courier-recommended {
+    border-color: #059669;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.15);
+}
+
+.recommended-badge {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: #059669;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .edd-checker-container {
+        padding: 20px;
+        margin: 10px;
+        border-radius: 8px;
+    }
+    
+    .edd-checker-container h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    
+    .edd-checker-container label {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    
+    .input-group {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    #delivery-pincode {
+        padding: 14px 16px;
+        font-size: 16px;
+        flex: 1;
+        border-radius: 8px 0 0 8px;
+        background: #D9D9D9;
+        border: none;
+        outline: none;
+        color: #374151;
+    }
+    
+    #check-edd-btn {
+        padding: 14px 16px; /* Reduced horizontal padding for better text centering */
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 0 8px 8px 0;
+        background: #2d5a3d;
+        color: white;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        min-width: 80px; /* Slightly reduced min-width for better fit */
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Ensure text is centered */
+    }
+    
+    #check-edd-btn:hover {
+        background: #1e3d29;
+    }
+    
+    #check-edd-btn:disabled {
+        background: #6b7280;
+        cursor: not-allowed;
+    }
+    
+    .courier-option {
+        flex-direction: column;
+        text-align: left;
+        gap: 10px;
+        padding: 16px;
+    }
+    
+    .recommended-badge {
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    #edd-results, #edd-error {
+        margin-top: 16px;
+    }
+    
+    #loading-state {
+        padding: 20px;
+        margin-top: 16px;
+    }
+    
+    .delivery-info {
+        font-size: 14px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .edd-checker-container {
+        padding: 16px;
+        margin: 8px;
+    }
+    
+    .edd-checker-container h3 {
+        font-size: 16px;
+    }
+    
+    #delivery-pincode {
+        padding: 12px 14px;
+        font-size: 16px;
+    }
+    
+    #check-edd-btn {
+        padding: 12px 14px; /* Further reduced padding for smaller screens */
+        font-size: 13px;
+        min-width: 70px; /* Reduced min-width for compact fit */
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Ensure text is centered */
+    }
+}
+</style>
+
+<div class="edd-checker-container">
+    <h3>{{- 'location.svg' | inline_asset_content -}} Delivery Date</h3>
+    
+    <div class="pincode-input-section">
+        <label for="delivery-pincode">Enter Pin code to check <strong>delivery date</strong> for <span id="product-title-display">Product</span>:</label>
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="delivery-pincode" 
+                placeholder="Enter 6-digit pincode (e.g., 121008)"
+                maxlength="6"
+                pattern="[0-9]{6}"
+            >
+            <button id="check-edd-btn">Check</button>
+        </div>
+    </div>
+    
+    <input type="hidden" id="product-id" value="{{ product.id }}">
+    <input type="hidden" id="product-title" value="{{ product.title | escape }}">
+    <input type="hidden" id="product-weight" value="{% if product.metafields.custom.weight %}{{ product.metafields.custom.weight | divided_by: 1000.0 }}{% else %}0.5{% endif %}">
+    <input type="hidden" id="product-price" value="{{ product.price | divided_by: 100.0 }}">
+    <input type="hidden" id="product-sku" value="{{ product.variants.first.sku | default: 'UNKNOWN_SKU' }}">
+    <input type="hidden" id="product-vendor" value="{{ product.vendor | escape }}">
+    <input type="hidden" id="product-type" value="{{ product.type | escape }}">
+    
+    <!-- <button class="toggle-debug" onclick="toggleDebug()">Show Debug Logs</button> -->
+    
+    <div id="debug-console" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>🔍 Debug Log:</strong>
+            <button onclick="clearDebugLogs()" style="padding: 2px 8px; font-size: 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                Clear Logs
+            </button>
+        </div>
+        <div id="debug-logs"></div>
+    </div>
+    
+    <div id="loading-state" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p style="margin: 0;">Checking delivery options...</p>
+    </div>
+    
+    <div id="edd-results" style="display: none;">
+        <div id="delivery-info"></div>
+    </div>
+    
+    <div id="edd-error" style="display: none;">
+        <h4>❌ Error</h4>
+        <p id="error-message"></p>
+    </div>
+</div>
+
+<script>
+    const warehouses = {
+        'Anveshan Farm Technologies Manesar': {
+            pincode: '122050',
+            region: '122',
+            state: 'Haryana'
+        },
+        'Emiza Bangalore': {
+            pincode: '562123',
+            region: '562',
+            state: 'Karnataka'
+        },
+        'Emiza Bhiwandi': {
+            pincode: '421302',
+            region: '421',
+            state: 'Maharashtra'
+        },
+        'Emiza Kolkata': {
+            pincode: '711302',
+            region: '711',
+            state: 'West Bengal'
+        },
+        'Prozo-GGN': {
+            pincode: '122413',
+            region: '122',
+            state: 'Haryana'
+        }
+    };
+
+    const SHIPROCKET_CONFIG = {
+        email: 'kunalprajapati@anveshan.farm',
+        password: '2Yy6lL%VqQklFh3@'
+    };
+
+    let authToken = null;
+    let tokenExpiry = null;
+
+    function debugLog(message, data = null, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `${timestamp} ${message}`;
+        
+        console.log(logMessage, data || '');
+        
+        const debugLogs = document.getElementById('debug-logs');
+        if (debugLogs) {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : type === 'warning' ? 'log-warning' : ''}`;
+            
+            let logContent = `<span class="log-timestamp">${timestamp}</span> ${message}`;
+            
+            if (data) {
+                logContent += `\n📄 Data: ${JSON.stringify(data, null, 2)}`;
+            }
+            
+            logEntry.innerHTML = `<pre style="margin: 0; white-space: pre-wrap; word-break: break-word;">${logContent}</pre>`;
+            debugLogs.appendChild(logEntry);
+            debugLogs.scrollTop = debugLogs.scrollHeight;
+        }
+    }
+
+    function toggleDebug() {
+        const debugConsole = document.getElementById('debug-console');
+        const toggleBtn = event.target;
+        
+        if (debugConsole.style.display === 'none') {
+            debugConsole.style.display = 'block';
+            toggleBtn.textContent = 'Hide Debug Logs';
+        } else {
+            debugConsole.style.display = 'none';
+            toggleBtn.textContent = 'Show Debug Logs';
+        }
+    }
+
+    function clearDebugLogs() {
+        const debugLogs = document.getElementById('debug-logs');
+        if (debugLogs) {
+            debugLogs.innerHTML = '';
+        }
+    }
+
+    function validatePincode(pincode) {
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+        return pincodeRegex.test(pincode);
+    }
+
+    async function validatePincodeAPI(pincode) {
+        debugLog('🔍 Validating pincode with API...', { pincode });
+        
+        try {
+            const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+            const data = await response.json();
+            
+            debugLog('📍 Pincode validation response:', data);
+            
+            if (data && data[0] && data[0].Status === "Success") {
+                const result = {
+                    valid: true,
+                    district: data[0].PostOffice[0].District,
+                    state: data[0].PostOffice[0].State,
+                    area: data[0].PostOffice[0].Name,
+                    division: data[0].PostOffice[0].Division,
+                    region: data[0].PostOffice[0].Region
+                };
+                debugLog('✅ Pincode validation successful:', result, 'success');
+                return result;
+            }
+            
+            debugLog('❌ Pincode validation failed - Invalid pincode', null, 'error');
+            return { valid: false };
+        } catch (error) {
+            debugLog('⚠️ Pincode validation API error, using basic validation:', error.message, 'warning');
+            return { valid: validatePincode(pincode) };
+        }
+    }
+
+    function findNearestWarehouse(userPincode) {
+        debugLog('🏪 Finding nearest warehouse...', { userPincode });
+        
+        const userRegion = userPincode.substring(0, 3);
+        let nearestWarehouse = null;
+        let minDistance = Infinity;
+        
+        for (const [warehouseName, warehouseData] of Object.entries(warehouses)) {
+            if (warehouseData.region === userRegion) {
+                nearestWarehouse = {
+                    name: warehouseName,
+                    ...warehouseData
+                };
+                debugLog('🎯 Exact region match found:', nearestWarehouse, 'success');
+                return nearestWarehouse;
+            }
+        }
+        
+        for (const [warehouseName, warehouseData] of Object.entries(warehouses)) {
+            const distance = Math.abs(parseInt(userRegion) - parseInt(warehouseData.region));
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestWarehouse = {
+                    name: warehouseName,
+                    ...warehouseData,
+                    distance: distance
+                };
+            }
+        }
+        
+        debugLog('📍 Nearest warehouse found:', nearestWarehouse, 'success');
+        return nearestWarehouse;
+    }
+
+    function getCurrentProductDetails() {
+        const productData = {
+            id: document.getElementById('product-id').value,
+            weight: parseFloat(document.getElementById('product-weight').value) || 0.5,
+            price: parseFloat(document.getElementById('product-price').value) || 500,
+            title: document.getElementById('product-title').value || 'Unknown Product',
+            sku: document.getElementById('product-sku').value || 'UNKNOWN_SKU',
+            vendor: document.getElementById('product-vendor').value || 'Anveshan',
+            product_type: document.getElementById('product-type').value || 'Unknown Type'
+        };
+        
+        debugLog('📦 Current product details:', productData);
+        return productData;
+    }
+
+    async function getShiprocketToken() {
+        if (authToken && tokenExpiry && Date.now() < tokenExpiry) {
+            debugLog('🔑 Using cached authentication token');
+            return authToken;
+        }
+        
+        debugLog('🔐 Requesting new authentication token...', {
+            email: SHIPROCKET_CONFIG.email,
+            password: '***HIDDEN***'
+        });
+        
+        try {
+            const response = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: SHIPROCKET_CONFIG.email,
+                    password: SHIPROCKET_CONFIG.password
+                })
+            });
+            
+            const data = await response.json();
+            
+            debugLog('🔐 Authentication response:', {
+                status: response.status,
+                ok: response.ok,
+                data: data
+            });
+            
+            if (!response.ok) {
+                debugLog('❌ Authentication failed:', {
+                    status: response.status,
+                    message: data.message || 'Unknown error'
+                }, 'error');
+                throw new Error(`Authentication failed: ${data.message || 'Invalid credentials'}`);
+            }
+            
+            if (data.token) {
+                authToken = data.token;
+                tokenExpiry = Date.now() + (23 * 60 * 60 * 1000);
+                
+                debugLog('✅ Authentication successful!', {
+                    token: `${authToken.substring(0, 20)}...`,
+                    expires: new Date(tokenExpiry).toLocaleString()
+                }, 'success');
+                
+                return authToken;
+            }
+            
+            throw new Error('No token received from authentication');
+        } catch (error) {
+            debugLog('❌ Error getting Shiprocket token:', error.message, 'error');
+            throw error;
+        }
+    }
+
+    async function checkServiceability(pickupPincode, deliveryPincode, weight, price) {
+        debugLog('🚚 Checking serviceability with Shiprocket API...', {
+            pickupPincode,
+            deliveryPincode,
+            weight,
+            price
+        });
+        
+        const token = await getShiprocketToken();
+        
+        const params = new URLSearchParams({
+            pickup_postcode: pickupPincode,
+            delivery_postcode: deliveryPincode,
+            weight: weight,
+            cod: 0,
+            declared_value: price
+        });
+        
+        const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?${params.toString()}`;
+        
+        debugLog('📤 Serviceability request URL:', { url, params: Object.fromEntries(params) });
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            debugLog('📥 Serviceability response status:', {
+                status: response.status,
+                ok: response.ok,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries())
+            });
+            
+            const data = await response.json();
+            debugLog('📦 Serviceability response data:', data);
+            
+            if (!response.ok) {
+                debugLog('❌ Shiprocket API error:', {
+                    status: response.status,
+                    error: data
+                }, 'error');
+                throw new Error(`Shiprocket API error: ${response.status} - ${data.message || response.statusText}`);
+            }
+            
+            debugLog('✅ Serviceability data received successfully!', data, 'success');
+            return data;
+            
+        } catch (error) {
+            debugLog('❌ Error checking serviceability:', error.message, 'error');
+            throw error;
+        }
+    }
+
+    function calculateDeliveryTimeRange(couriers) {
+        debugLog('📊 Calculating delivery time range...', { courierCount: couriers.length });
+        
+        if (!couriers || couriers.length === 0) {
+            debugLog('❌ No couriers data available', null, 'error');
+            return null;
+        }
+        
+        let minDays = Infinity;
+        let maxDays = -Infinity;
+        
+        couriers.forEach((courier, index) => {
+            const deliveryDays = parseInt(courier.estimated_delivery_days || courier.etd_days || courier.etd || 999);
+            
+            debugLog(`📦 Courier ${index + 1}: ${courier.courier_name || 'Unknown'} - ${deliveryDays} days`);
+            
+            if (deliveryDays !== 999 && !isNaN(deliveryDays)) {
+                minDays = Math.min(minDays, deliveryDays);
+                maxDays = Math.max(maxDays, deliveryDays);
+            }
+        });
+        
+        if (minDays === Infinity || maxDays === -Infinity) {
+            debugLog('⚠️ No valid delivery days found', null, 'warning');
+            return null;
+        }
+        
+        const range = {
+            minDays: minDays,
+            maxDays: maxDays,
+            rangeText: minDays === maxDays ? `${minDays} day${minDays !== 1 ? 's' : ''}` : `${minDays}-${maxDays} days`
+        };
+        
+        debugLog('✅ Delivery time range calculated:', range, 'success');
+        return range;
+    }
+
+    async function checkDeliveryTime() {
+        const userPincode = document.getElementById('delivery-pincode').value.trim();
+        const checkButton = document.getElementById('check-edd-btn');
+        
+        debugLog('🚀 Starting delivery time check...', { userPincode });
+        
+        checkButton.disabled = true;
+        checkButton.textContent = 'Checking...';
+        hideAllSections();
+        
+        if (!validatePincode(userPincode)) {
+            debugLog('❌ Invalid pincode format', null, 'error');
+            showError('Please enter a valid 6-digit pincode');
+            resetButtonState();
+            return;
+        }
+        
+        document.getElementById('loading-state').style.display = 'block';
+        
+        try {
+            debugLog('📍 Step 1: Validating pincode...');
+            const pincodeValidation = await validatePincodeAPI(userPincode);
+            if (!pincodeValidation.valid) {
+                debugLog('❌ Pincode validation failed', null, 'error');
+                showError('This pincode does not exist. Please enter a valid pincode.');
+                return;
+            }
+            
+            debugLog('🏪 Step 2: Finding nearest warehouse...');
+            const nearestWarehouse = findNearestWarehouse(userPincode);
+            
+            if (!nearestWarehouse) {
+                debugLog('❌ No warehouse found', null, 'error');
+                showError('Delivery not available to this location');
+                return;
+            }
+            
+            debugLog('📦 Step 3: Getting product details...');
+            const currentProduct = getCurrentProductDetails();
+            
+            debugLog('🚚 Step 4: Checking serviceability with Shiprocket...');
+            const serviceabilityData = await checkServiceability(
+                nearestWarehouse.pincode,
+                userPincode,
+                currentProduct.weight,
+                currentProduct.price
+            );
+            
+            debugLog('📋 Step 5: Displaying results...');
+            displayDeliveryResults(serviceabilityData, nearestWarehouse, userPincode, pincodeValidation);
+            
+            debugLog('✅ Delivery check completed successfully!', null, 'success');
+            
+        } catch (error) {
+            debugLog('❌ Error in delivery check:', error.message, 'error');
+            console.error('Error checking delivery time:', error);
+            showError(`Unable to check delivery options: ${error.message}`);
+        } finally {
+            document.getElementById('loading-state').style.display = 'none';
+            resetButtonState();
+        }
+    }
+
+    function displayDeliveryResults(apiResponse, warehouse, userPincode, pincodeInfo) {
+        debugLog('📋 Displaying delivery results...', { apiResponse, warehouse, userPincode, pincodeInfo });
+        
+        const resultsDiv = document.getElementById('delivery-info');
+        
+        if (!apiResponse) {
+            debugLog('❌ No API response received', null, 'error');
+            showError('No delivery information received from API');
+            return;
+        }
+        
+        let couriers = [];
+        
+        if (apiResponse.data && apiResponse.data.available_courier_companies) {
+            couriers = apiResponse.data.available_courier_companies;
+        } else if (apiResponse.available_courier_companies) {
+            couriers = apiResponse.available_courier_companies;
+        } else if (Array.isArray(apiResponse)) {
+            couriers = apiResponse;
+        } else if (apiResponse.data && Array.isArray(apiResponse.data)) {
+            couriers = apiResponse.data;
+        }
+        
+        debugLog('📦 Processing couriers data:', { courierCount: couriers.length, couriers });
+        
+        if (couriers.length === 0) {
+            debugLog('❌ No couriers available', null, 'error');
+            showError('No delivery options available for this pincode');
+            return;
+        }
+        
+        couriers.sort((a, b) => {
+            const aDays = parseInt(a.estimated_delivery_days || a.etd_days || a.etd || 999);
+            const bDays = parseInt(b.estimated_delivery_days || b.etd_days || b.etd || 999);
+            return aDays - bDays;
+        });
+        
+        const deliveryRange = calculateDeliveryTimeRange(couriers);
+        const estimatedDeliveryText = deliveryRange ? 
+            `Estimated Delivery Time: ${deliveryRange.rangeText}` : 
+            'Estimated Delivery Time: Contact for details';
+            
+        const locationInfo = pincodeInfo?.area && pincodeInfo?.district 
+            ? `${pincodeInfo.area}, ${pincodeInfo.district}, ${pincodeInfo.state}`
+            : userPincode;
+        
+        let resultsHTML = `
+           
+                
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold; color: #235A49;">${estimatedDeliveryText}</p>
+                
+                
+        `;
+         // <div class="result-success">
+         //        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+         //            <div style="background: #28a745; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+         //                ✓
+         //            </div>
+         //            <h4 style="color: #28a745; margin: 0;">🚚 Delivery Available</h4>
+         //        </div>
+                
+         //        <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+         //            <p style="margin: 5px 0;"><strong>📍 Delivery to:</strong> ${locationInfo}</p>
+         //            <p style="margin: 5px 0;"><strong>🏭 Shipping from:</strong> ${warehouse.name}</p>
+         //            <p style="margin: 5px 0; font-size: 12px; color: #666;">📮 Warehouse: ${warehouse.pincode}, ${warehouse.state}</p>
+         //        </div>
+      // <h5 style="margin-bottom: 15px; color: #333;">🚛 Available Delivery Options:</h5>
+        // couriers.forEach((courier, index) => {
+        //     const deliveryDays = courier.estimated_delivery_days || courier.etd_days || courier.etd || 'N/A';
+        //     const courierName = courier.courier_name || courier.name || courier.courier_company_id || 'Standard Delivery';
+        //     const rate = courier.rate || courier.freight_charge || courier.total_charge || 'Contact for pricing';
+        //     const etd = courier.etd || courier.pickup_performance || '';
+        //     const isRecommended = index === 0;
+        //     const rating = courier.rating || (Math.random() * 1 + 4).toFixed(1);
+            
+        //     debugLog(`📦 Processing courier ${index + 1}:`, {
+        //         name: courierName,
+        //         days: deliveryDays,
+        //         rate: rate,
+        //         etd: etd
+        //     });
+            
+        //     resultsHTML += `
+        //         <div class="courier-option ${isRecommended ? 'courier-recommended' : ''}">
+        //             ${isRecommended ? '<div class="recommended-badge">⭐ RECOMMENDED</div>' : ''}
+                    
+        //             <div style="flex: 1;">
+        //                 <div style="display: flex; align-items: center; gap: 8px;">
+        //                     <strong style="color: #333;">🚚 ${courierName}</strong>
+        //                 </div>
+        //                 <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+        //                     ${etd ? `<span style="font-size: 12px; color: #666;">📅 Expected: ${etd}</span>` : ''}
+        //                     <span style="font-size: 12px; color: #666;">⭐ Rating: ${rating}/5</span>
+        //                 </div>
+        //             </div>
+                    
+        //             <div style="text-align: right;">
+        //                 <div style="font-weight: bold; color: #28a745; font-size: 18px;">
+        //                     ⏱️ ${deliveryDays} ${deliveryDays == 1 ? 'day' : 'days'}
+        //                 </div>
+        //                 <div style="font-size: 14px; color: #333; font-weight: 500;">
+        //                     💰 ₹${rate}
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     `;
+        // });
+        
+        resultsHTML += `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa4; border-radius: 4px; padding: 10px; margin-top: 15px;">
+                    <div style="font-size: 12px; color: #856404;">
+                        <strong>Note:</strong> Delivery times are estimated and may vary due to weather conditions, public holidays, or operational factors.
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        resultsDiv.innerHTML = resultsHTML;
+        document.getElementById('edd-results').style.display = 'block';
+        
+        debugLog('✅ Results displayed successfully', null, 'success');
+    }
+
+    function hideAllSections() {
+        document.getElementById('edd-results').style.display = 'none';
+        document.getElementById('edd-error').style.display = 'none';
+        document.getElementById('loading-state').style.display = 'none';
+    }
+
+    function showError(message) {
+        debugLog('❌ Showing error:', message, 'error');
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('edd-error').style.display = 'block';
+    }
+
+    function resetButtonState() {
+        const checkButton = document.getElementById('check-edd-btn');
+        checkButton.disabled = false;
+        checkButton.textContent = 'Check';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        debugLog('🎉 EDD Checker initialized - Dynamic Product Version', null, 'success');
+        
+        const pincodeInput = document.getElementById('delivery-pincode');
+        const checkButton = document.getElementById('check-edd-btn');
+        const productTitleDisplay = document.getElementById('product-title-display');
+        
+        if (productTitleDisplay && document.getElementById('product-title').value) {
+            productTitleDisplay.textContent = document.getElementById('product-title').value;
+        }
+        
+        if (pincodeInput) {
+            pincodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkDeliveryTime();
+                }
+            });
+            
+            pincodeInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 6) {
+                    this.value = this.value.slice(0, 6);
+                }
+            });
+        }
+
+        if (checkButton) {
+            checkButton.addEventListener('click', checkDeliveryTime);
+        }
+
+        pincodeInput.value = '121008';
+    });
+</script> 
+
+
+{% comment %} 
+ 
+<style>
+        .edd-checker-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            border-radius: 8px;
+            background: white;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            border: 1px solid #e5e7eb;
+            box-sizing: border-box;
+        }
+
+        .edd-checker-container h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d5a3d;
+        }
+
+        .edd-checker-container h3::before {
+            font-size: 20px;
+        }
+
+        .edd-checker-container label {
+            display: block;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        #delivery-pincode {
+            padding: 8px 10px;
+            border: 1px solid #235A49;
+            background: #f9fafb;
+            flex: 1;
+            font-size: 14px;
+            outline: none;
+            color: #374151;
+            border-radius: 6px 0 0 6px;
+            border-right: none;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        #delivery-pincode::placeholder {
+            color: #9ca3af;
+            font-weight: normal;
+        }
+
+        #delivery-pincode:focus {
+            outline: none;
+            box-shadow: none;
+            border-color: #235A49;
+        }
+
+        #check-edd-btn {
+            padding: 8px 16px;
+            background: #2d5a3d;
+            color: white;
+            border: 1px solid #235A49;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            border-radius: 0 6px 6px 0;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        #check-edd-btn:hover {
+            background: #1e3d29;
+        }
+
+        #check-edd-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .delivery-info {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 400;
+            padding: 0;
+        }
+
+        .premium-delivery-section {
+            background: #2d5a3d;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .premium-delivery-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .premium-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .premium-option {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .premium-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .premium-option.available {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .premium-option-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: white;
+        }
+
+        .premium-option-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .toggle-debug {
+            margin-top: 12px;
+            padding: 4px 8px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-debug:hover {
+            background: #5a6268;
+        }
+
+        #debug-console {
+            margin-top: 16px;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        #debug-logs {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 4px 6px;
+            border-left: 3px solid #2d5a3d;
+            background: #f9fafb;
+            border-radius: 3px;
+        }
+
+        .log-timestamp {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+        .log-error {
+            border-left-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .log-success {
+            border-left-color: #059669;
+            background: #f0fdf4;
+        }
+
+        .log-warning {
+            border-left-color: #d97706;
+            background: #fffbeb;
+        }
+
+        #loading-state {
+            margin-top: 16px;
+            text-align: center;
+            padding: 16px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #2d5a3d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #edd-results, #edd-error {
+            margin-top: 16px;
+            border-radius: 6px;
+        }
+
+        #edd-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 10px;
+        }
+
+        .result-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 1px solid #a7f3d0;
+            color: #235A49;
+        }
+
+        .courier-option {
+            background: white;
+            padding: 10px;
+            margin: 12px 0;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .courier-option:hover {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .courier-recommended {
+            border-color: #059669;
+            box-shadow: 0 3px 12px rgba(5, 150, 105, 0.15);
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -8px;
+            left: 16px;
+            background: #059669;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Tablet Responsive - 1024px and below */
+        @media (max-width: 1024px) {
+            .edd-checker-container {
+                max-width: 95%;
+                padding: 14px;
+                margin: 8px auto;
+            }
+            
+            .edd-checker-container h3 {
+                font-size: 17px;
+            }
+        }
+
+        /* Mobile Large - 768px and below */
+        @media (max-width: 768px) {
+            .edd-checker-container {
+                padding: 12px;
+                margin: 6px auto;
+                max-width: 98%;
+                border-radius: 6px;
+            }
+            
+            .edd-checker-container h3 {
+                font-size: 16px;
+                margin-bottom: 10px;
+                gap: 6px;
+            }
+            
+            .edd-checker-container label {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .input-group {
+                margin-bottom: 14px;
+            }
+            
+            #delivery-pincode {
+                padding: 7px 8px;
+                font-size: 14px;
+            }
+            
+            #check-edd-btn {
+                padding: 7px 12px;
+                font-size: 13px;
+            }
+            
+            .premium-options {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            
+            .premium-delivery-section {
+                padding: 10px;
+            }
+            
+            .premium-delivery-title {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+            
+            .courier-option {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .recommended-badge {
+                top: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .delivery-info {
+                font-size: 13px;
+            }
+        }
+
+        /* Mobile Medium - 480px and below */
+        @media (max-width: 480px) {
+            .edd-checker-container {
+                padding: 10px;
+                margin: 4px auto;
+                max-width: 99%;
+            }
+            
+            .edd-checker-container h3 {
+                font-size: 15px;
+                gap: 5px;
+            }
+            
+            .edd-checker-container label {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            #delivery-pincode {
+                padding: 6px 7px;
+                font-size: 13px;
+            }
+            
+            #check-edd-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .premium-delivery-section {
+                padding: 8px;
+            }
+            
+            .premium-delivery-title {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .premium-option {
+                padding: 6px;
+            }
+            
+            .premium-option-title {
+                font-size: 11px;
+            }
+            
+            .premium-option-time {
+                font-size: 10px;
+            }
+            
+            .courier-option {
+                padding: 7px;
+                margin: 10px 0;
+            }
+            
+            .delivery-info {
+                font-size: 12px;
+            }
+            
+            #loading-state {
+                padding: 12px;
+            }
+        }
+
+        /* Mobile Small - 360px and below */
+        @media (max-width: 360px) {
+            .edd-checker-container {
+                padding: 8px;
+                margin: 2px auto;
+                border-radius: 4px;
+                max-width: 100%;
+            }
+            
+            .edd-checker-container h3 {
+                font-size: 14px;
+                gap: 4px;
+            }
+            
+            .edd-checker-container label {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .input-group {
+                border-radius: 4px;
+                margin-bottom: 12px;
+            }
+            
+            #delivery-pincode {
+                padding: 5px 6px;
+                font-size: 12px;
+                border-radius: 4px 0 0 4px;
+            }
+            
+            #check-edd-btn {
+                padding: 5px 8px;
+                font-size: 11px;
+                border-radius: 0 4px 4px 0;
+            }
+            
+            .premium-delivery-section {
+                padding: 6px;
+                border-radius: 4px;
+            }
+            
+            .premium-delivery-title {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .premium-option {
+                padding: 5px;
+                border-radius: 3px;
+            }
+            
+            .premium-option-title {
+                font-size: 10px;
+            }
+            
+            .premium-option-time {
+                font-size: 9px;
+            }
+            
+            .courier-option {
+                padding: 6px;
+                margin: 8px 0;
+                border-radius: 4px;
+            }
+            
+            .recommended-badge {
+                padding: 2px 8px;
+                font-size: 10px;
+                border-radius: 12px;
+            }
+            
+            .delivery-info {
+                font-size: 11px;
+            }
+            
+            #loading-state {
+                padding: 10px;
+            }
+            
+            .loading-spinner {
+                width: 16px;
+                height: 16px;
+                margin-right: 6px;
+            }
+        }
+
+        /* Extra Small - 320px and below */
+        @media (max-width: 320px) {
+            .edd-checker-container {
+                padding: 6px;
+                margin: 1px auto;
+            }
+            
+            .edd-checker-container h3 {
+                font-size: 13px;
+            }
+            
+            .edd-checker-container label {
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+            
+            #delivery-pincode {
+                padding: 4px 5px;
+                font-size: 11px;
+            }
+            
+            #check-edd-btn {
+                padding: 4px 6px;
+                font-size: 10px;
+            }
+            
+            .premium-delivery-section {
+                padding: 5px;
+            }
+            
+            .courier-option {
+                padding: 5px;
+                margin: 6px 0;
+            }
+            
+            .delivery-info {
+                font-size: 10px;
+            }
+        }
+
+        /* Ultra wide screens */
+        @media (min-width: 1200px) {
+            .edd-checker-container {
+                max-width: 600px;
+            }
+        }
+    </style>
+ 
+    <div class="edd-checker-container">
+        <h3>{{- 'location.svg' | inline_asset_content -}}Delivery Date</h3>
+        
+        <div class="pincode-input-section">
+            <label for="delivery-pincode">Enter Pin code to check <strong>delivery date</strong>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="delivery-pincode" 
+                    placeholder="Enter 6-digit pincode (e.g., 121008)"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                >
+                <button id="check-edd-btn">Check</button>
+            </div>
+        </div>
+        
+        <!-- Hidden inputs for product data -->
+        <input type="hidden" id="product-id" value="12345">
+        <input type="hidden" id="product-title" value="Sample Product">
+        <input type="hidden" id="product-weight" value="0.5">
+        <input type="hidden" id="product-price" value="500">
+        <input type="hidden" id="product-sku" value="SKU123">
+        <input type="hidden" id="product-vendor" value="Anveshan">
+        <input type="hidden" id="product-type" value="Food">
+        
+        <!-- Debug button commented out as in original -->
+        <!-- <button class="toggle-debug" onclick="toggleDebug()">Show Debug Logs</button> -->
+        
+        <div id="debug-console" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong>🔍 Debug Log:</strong>
+                <button onclick="clearDebugLogs()" style="padding: 2px 8px; font-size: 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                    Clear Logs
+                </button>
+            </div>
+            <div id="debug-logs"></div>
+        </div>
+        
+        <div id="loading-state" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p style="margin: 0;">Checking delivery options...</p>
+        </div>
+        
+        <div id="edd-results" style="display: none;">
+            <div id="delivery-info"></div>
+        </div>
+        
+        <div id="edd-error" style="display: none;">
+            <h4>❌ Error</h4>
+            <p id="error-message"></p>
+        </div>
+    </div>
+
+    <script>
+        const warehouses = {
+            'Anveshan Farm Technologies Manesar': {
+                pincode: '122050',
+                region: '122',
+                state: 'Haryana'
+            },
+            'Emiza Bangalore': {
+                pincode: '562123',
+                region: '562',
+                state: 'Karnataka'
+            },
+            'Emiza Bhiwandi': {
+                pincode: '421302',
+                region: '421',
+                state: 'Maharashtra'
+            },
+            'Emiza Kolkata': {
+                pincode: '711302',
+                region: '711',
+                state: 'West Bengal'
+            },
+            'Prozo-GGN': {
+                pincode: '122413',
+                region: '122',
+                state: 'Haryana'
+            }
+        };
+
+        const deliveryServiceability = {
+            SDD: {
+                '201301': { city: 'Gautam Buddha Nagar', state: 'Uttar Pradesh' },
+                '560035': { city: 'Bangalore', state: 'Karnataka' },
+                '410209': { city: 'Kamothe', state: 'Maharashtra' },
+                '400709': { city: 'Thane', state: 'Maharashtra' },
+                '400097': { city: 'Mumbai', state: 'Maharashtra' },
+                '110024': { city: 'South Delhi', state: 'Delhi' },
+                '110018': { city: 'West Delhi', state: 'Delhi' },
+                '201010': { city: 'Ghaziabad', state: 'Uttar Pradesh' },
+                '122002': { city: 'Gurgaon', state: 'Haryana' },
+                '110049': { city: 'South Delhi', state: 'Delhi' },
+                '110021': { city: 'South West Delhi', state: 'Delhi' },
+                '201307': { city: 'Gautam Buddha Nagar', state: 'Uttar Pradesh' },
+                '122001': { city: 'Gurgaon', state: 'Haryana' },
+                '122007': { city: 'Gurgaon', state: 'Haryana' },
+                '110067': { city: 'South West Delhi', state: 'Delhi' },
+                '560041': { city: 'Bangalore', state: 'Karnataka' },
+                '560025': { city: 'Bangalore', state: 'Karnataka' },
+                '560030': { city: 'Bangalore', state: 'Karnataka' },
+                '560072': { city: 'Bangalore', state: 'Karnataka' },
+                '560102': { city: 'Bangalore', state: 'Karnataka' },
+                '560070': { city: 'Bangalore', state: 'Karnataka' },
+                '560082': { city: 'Bangalore Rural', state: 'Karnataka' },
+                '400067': { city: 'Mumbai', state: 'Maharashtra' },
+                '401107': { city: 'Thane', state: 'Maharashtra' },
+                '400091': { city: 'Mumbai', state: 'Maharashtra' },
+                '421505': { city: 'Thane', state: 'Maharashtra' },
+                '700130': { city: 'North 24 Parganas', state: 'West Bengal' },
+                '121007': { city: 'Faridabad', state: 'Haryana' },
+                '560049': { city: 'Bangalore', state: 'Karnataka' },
+                '560094': { city: 'Bangalore', state: 'Karnataka' },
+                '110015': { city: 'West Delhi', state: 'Delhi' },
+                '700111': { city: 'North 24 Parganas', state: 'West Bengal' },
+                '712302': { city: 'Hooghly', state: 'West Bengal' },
+                '700104': { city: 'South 24 Parganas', state: 'West Bengal' },
+                '122006': { city: 'Gurgaon', state: 'Haryana' },
+                '122018': { city: 'Gurgaon', state: 'Haryana' },
+                '110088': { city: 'North West Delhi', state: 'Delhi' },
+                '302017': { city: 'Jaipur', state: 'Rajasthan' },
+                '110042': { city: 'North West Delhi', state: 'Delhi' }
+            },
+            NDD: {
+                '201303': { city: 'Gautam Buddha Nagar', state: 'Uttar Pradesh' },
+                '122002': { city: 'Gurgaon', state: 'Haryana' },
+                '121006': { city: 'Faridabad', state: 'Haryana' },
+                '201301': { city: 'Gautam Buddha Nagar', state: 'Uttar Pradesh' },
+                '201306': { city: 'Gautam Buddha Nagar', state: 'Uttar Pradesh' },
+                '110016': { city: 'South West Delhi', state: 'Delhi' },
+                '201010': { city: 'Ghaziabad', state: 'Uttar Pradesh' },
+                '110078': { city: 'South West Delhi', state: 'Delhi' },
+                '110092': { city: 'East Delhi', state: 'Delhi' },
+                '576101': { city: 'Udupi', state: 'Karnataka' },
+                '560016': { city: 'Bangalore', state: 'Karnataka' },
+                '560037': { city: 'Bangalore', state: 'Karnataka' },
+                '500037': { city: 'Hyderabad', state: 'Telangana' },
+                '143001': { city: 'Amritsar', state: 'Punjab' },
+                '110091': { city: 'East Delhi', state: 'Delhi' },
+                '110075': { city: 'South West Delhi', state: 'Delhi' },
+                '110035': { city: 'North West Delhi', state: 'Delhi' },
+                '122001': { city: 'Gurgaon', state: 'Haryana' },
+                '201301': { city: 'Noida', state: 'Uttar Pradesh' },
+                '757002': { city: 'Mayurbhanj', state: 'Odisha' },
+                '721514': { city: 'West Midnapore', state: 'West Bengal' },
+                '700154': { city: 'South 24 Parganas', state: 'West Bengal' },
+                '826005': { city: 'Dhanbad', state: 'Jharkhand' },
+                '713213': { city: 'Bardhaman', state: 'West Bengal' },
+                '711106': { city: 'Howrah', state: 'West Bengal' },
+                '110041': { city: 'West Delhi', state: 'Delhi' },
+                '110027': { city: 'West Delhi', state: 'Delhi' },
+                '110018': { city: 'West Delhi', state: 'Delhi' },
+                '110019': { city: 'Delhi', state: 'Delhi' },
+                '201002': { city: 'Ghaziabad', state: 'Uttar Pradesh' },
+                '124001': { city: 'Rohtak', state: 'Haryana' },
+                '313324': { city: 'Rajsamand', state: 'Rajasthan' },
+                '324002': { city: 'Kota', state: 'Rajasthan' },
+                '110007': { city: 'North Delhi', state: 'Delhi' },
+                '110074': { city: 'South West Delhi', state: 'Delhi' },
+                '148023': { city: 'Sangrur', state: 'Punjab' },
+                '122004': { city: 'Gurgaon', state: 'Haryana' },
+                '110064': { city: 'South West Delhi', state: 'Delhi' }
+            }
+        };
+
+        const SHIPROCKET_CONFIG = {
+            email: 'kunalprajapati@anveshan.farm',
+            password: '2Yy6lL%VqQklFh3@'
+        };
+
+        let authToken = null;
+        let tokenExpiry = null;
+
+        function debugLog(message, data = null, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `${timestamp} ${message}`;
+            
+            console.log(logMessage, data || '');
+            
+            const debugLogs = document.getElementById('debug-logs');
+            if (debugLogs) {
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : type === 'warning' ? 'log-warning' : ''}`;
+                
+                let logContent = `<span class="log-timestamp">${timestamp}</span> ${message}`;
+                
+                if (data) {
+                    logContent += `\n📄 Data: ${JSON.stringify(data, null, 2)}`;
+                }
+                
+                logEntry.innerHTML = `<pre style="margin: 0; white-space: pre-wrap; word-break: break-word;">${logContent}</pre>`;
+                debugLogs.appendChild(logEntry);
+                debugLogs.scrollTop = debugLogs.scrollHeight;
+            }
+        }
+
+        function toggleDebug() {
+            const debugConsole = document.getElementById('debug-console');
+            const toggleBtn = event.target;
+            
+            if (debugConsole.style.display === 'none') {
+                debugConsole.style.display = 'block';
+                toggleBtn.textContent = 'Hide Debug Logs';
+            } else {
+                debugConsole.style.display = 'none';
+                toggleBtn.textContent = 'Show Debug Logs';
+            }
+        }
+
+        function clearDebugLogs() {
+            const debugLogs = document.getElementById('debug-logs');
+            if (debugLogs) {
+                debugLogs.innerHTML = '';
+            }
+        }
+
+        function validatePincode(pincode) {
+            const pincodeRegex = /^[1-9][0-9]{5}$/;
+            return pincodeRegex.test(pincode);
+        }
+
+        async function validatePincodeAPI(pincode) {
+            debugLog('🔍 Validating pincode with API...', { pincode });
+            
+            try {
+                const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+                const data = await response.json();
+                
+                debugLog('📍 Pincode validation response:', data);
+                
+                if (data && data[0] && data[0].Status === "Success") {
+                    const result = {
+                        valid: true,
+                        district: data[0].PostOffice[0].District,
+                        state: data[0].PostOffice[0].State,
+                        area: data[0].PostOffice[0].Name,
+                        division: data[0].PostOffice[0].Division,
+                        region: data[0].PostOffice[0].Region
+                    };
+                    debugLog('✅ Pincode validation successful:', result, 'success');
+                    return result;
+                }
+                
+                debugLog('❌ Pincode validation failed - Invalid pincode', null, 'error');
+                return { valid: false };
+            } catch (error) {
+                debugLog('⚠️ Pincode validation API error, using basic validation:', error.message, 'warning');
+                return { valid: validatePincode(pincode) };
+            }
+        }
+
+        function checkPremiumDeliveryEligibility(pincode) {
+            debugLog('🏆 Checking premium delivery eligibility...', { pincode });
+            
+            const sddEligible = !!deliveryServiceability.SDD[pincode];
+            const nddEligible = !!deliveryServiceability.NDD[pincode];
+            
+            const result = {
+                sddEligible,
+                nddEligible,
+                sddLocation: sddEligible ? deliveryServiceability.SDD[pincode] : null,
+                nddLocation: nddEligible ? deliveryServiceability.NDD[pincode] : null
+            };
+            
+            debugLog('🏆 Premium delivery eligibility result:', result, 'success');
+            return result;
+        }
+
+        function findNearestWarehouse(userPincode) {
+            debugLog('🏪 Finding nearest warehouse...', { userPincode });
+            
+            const userRegion = userPincode.substring(0, 3);
+            let nearestWarehouse = null;
+            let minDistance = Infinity;
+            
+            for (const [warehouseName, warehouseData] of Object.entries(warehouses)) {
+                if (warehouseData.region === userRegion) {
+                    nearestWarehouse = {
+                        name: warehouseName,
+                        ...warehouseData
+                    };
+                    debugLog('🎯 Exact region match found:', nearestWarehouse, 'success');
+                    return nearestWarehouse;
+                }
+            }
+            
+            for (const [warehouseName, warehouseData] of Object.entries(warehouses)) {
+                const distance = Math.abs(parseInt(userRegion) - parseInt(warehouseData.region));
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestWarehouse = {
+                        name: warehouseName,
+                        ...warehouseData,
+                        distance: distance
+                    };
+                }
+            }
+            
+            debugLog('📍 Nearest warehouse found:', nearestWarehouse, 'success');
+            return nearestWarehouse;
+        }
+
+        function getCurrentProductDetails() {
+            const productData = {
+                id: document.getElementById('product-id').value,
+                weight: parseFloat(document.getElementById('product-weight').value) || 0.5,
+                price: parseFloat(document.getElementById('product-price').value) || 500,
+                title: document.getElementById('product-title').value || 'Unknown Product',
+                sku: document.getElementById('product-sku').value || 'UNKNOWN_SKU',
+                vendor: document.getElementById('product-vendor').value || 'Anveshan',
+                product_type: document.getElementById('product-type').value || 'Unknown Type'
+            };
+            
+            debugLog('📦 Current product details:', productData);
+            return productData;
+        }
+
+        async function getShiprocketToken() {
+            if (authToken && tokenExpiry && Date.now() < tokenExpiry) {
+                debugLog('🔑 Using cached authentication token');
+                return authToken;
+            }
+            
+            debugLog('🔐 Requesting new authentication token...', {
+                email: SHIPROCKET_CONFIG.email,
+                password: '***HIDDEN***'
+            });
+            
+            try {
+                const response = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: SHIPROCKET_CONFIG.email,
+                        password: SHIPROCKET_CONFIG.password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                debugLog('🔐 Authentication response:', {
+                    status: response.status,
+                    ok: response.ok,
+                    data: data
+                });
+                
+                if (!response.ok) {
+                    debugLog('❌ Authentication failed:', {
+                        status: response.status,
+                        message: data.message || 'Unknown error'
+                    }, 'error');
+                    throw new Error(`Authentication failed: ${data.message || 'Invalid credentials'}`);
+                }
+                
+                if (data.token) {
+                    authToken = data.token;
+                    tokenExpiry = Date.now() + (23 * 60 * 60 * 1000);
+                    
+                    debugLog('✅ Authentication successful!', {
+                        token: `${authToken.substring(0, 20)}...`,
+                        expires: new Date(tokenExpiry).toLocaleString()
+                    }, 'success');
+                    
+                    return authToken;
+                }
+                
+                throw new Error('No token received from authentication');
+            } catch (error) {
+                debugLog('❌ Error getting Shiprocket token:', error.message, 'error');
+                throw error;
+            }
+        }
+
+        async function checkServiceability(pickupPincode, deliveryPincode, weight, price) {
+            debugLog('🚚 Checking serviceability with Shiprocket API...', {
+                pickupPincode,
+                deliveryPincode,
+                weight,
+                price
+            });
+            
+            const token = await getShiprocketToken();
+            
+            const params = new URLSearchParams({
+                pickup_postcode: pickupPincode,
+                delivery_postcode: deliveryPincode,
+                weight: weight,
+                cod: 0,
+                declared_value: price
+            });
+            
+            const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?${params.toString()}`;
+            
+            debugLog('📤 Serviceability request URL:', { url, params: Object.fromEntries(params) });
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                debugLog('📥 Serviceability response status:', {
+                    status: response.status,
+                    ok: response.ok,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+                
+                const data = await response.json();
+                debugLog('📦 Serviceability response data:', data);
+                
+                if (!response.ok) {
+                    debugLog('❌ Shiprocket API error:', {
+                        status: response.status,
+                        error: data
+                    }, 'error');
+                    throw new Error(`Shiprocket API error: ${response.status} - ${data.message || response.statusText}`);
+                }
+                
+                debugLog('✅ Serviceability data received successfully!', data, 'success');
+                return data;
+                
+            } catch (error) {
+                debugLog('❌ Error checking serviceability:', error.message, 'error');
+                throw error;
+            }
+        }
+
+        function calculateDeliveryTimeRange(couriers) {
+            debugLog('📊 Calculating delivery time range...', { courierCount: couriers.length });
+            
+            if (!couriers || couriers.length === 0) {
+                debugLog('❌ No couriers data available', null, 'error');
+                return null;
+            }
+            
+            let minDays = Infinity;
+            let maxDays = -Infinity;
+            
+            couriers.forEach((courier, index) => {
+                const deliveryDays = parseInt(courier.estimated_delivery_days || courier.etd_days || courier.etd || 999);
+                
+                debugLog(`📦 Courier ${index + 1}: ${courier.courier_name || 'Unknown'} - ${deliveryDays} days`);
+                
+                if (deliveryDays !== 999 && !isNaN(deliveryDays)) {
+                    minDays = Math.min(minDays, deliveryDays);
+                    maxDays = Math.max(maxDays, deliveryDays);
+                }
+            });
+            
+            if (minDays === Infinity || maxDays === -Infinity) {
+                debugLog('⚠️ No valid delivery days found', null, 'warning');
+                return null;
+            }
+            
+            const range = {
+                minDays: minDays,
+                maxDays: maxDays,
+                rangeText: minDays === maxDays ? `${minDays} day${minDays !== 1 ? 's' : ''}` : `${minDays}-${maxDays} days`
+            };
+            
+            debugLog('✅ Delivery time range calculated:', range, 'success');
+            return range;
+        }
+
+        async function checkDeliveryTime() {
+            const userPincode = document.getElementById('delivery-pincode').value.trim();
+            const checkButton = document.getElementById('check-edd-btn');
+            
+            debugLog('🚀 Starting delivery time check...', { userPincode });
+            
+            checkButton.disabled = true;
+            checkButton.textContent = 'Checking...';
+            hideAllSections();
+            
+            if (!validatePincode(userPincode)) {
+                debugLog('❌ Invalid pincode format', null, 'error');
+                showError('Please enter a valid 6-digit pincode');
+                resetButtonState();
+                return;
+            }
+            
+            document.getElementById('loading-state').style.display = 'block';
+            
+            try {
+                debugLog('📍 Step 1: Validating pincode...');
+                const pincodeValidation = await validatePincodeAPI(userPincode);
+                if (!pincodeValidation.valid) {
+                    debugLog('❌ Pincode validation failed', null, 'error');
+                    showError('This pincode does not exist. Please enter a valid pincode.');
+                    return;
+                }
+                
+                debugLog('🏆 Step 2: Checking premium delivery eligibility...');
+                const premiumEligibility = checkPremiumDeliveryEligibility(userPincode);
+                
+                debugLog('🏪 Step 3: Finding nearest warehouse...');
+                const nearestWarehouse = findNearestWarehouse(userPincode);
+                
+                if (!nearestWarehouse) {
+                    debugLog('❌ No warehouse found', null, 'error');
+                    showError('Delivery not available to this location');
+                    return;
+                }
+                
+                debugLog('📦 Step 4: Getting product details...');
+                const currentProduct = getCurrentProductDetails();
+                
+                debugLog('🚚 Step 5: Checking serviceability with Shiprocket...');
+                const serviceabilityData = await checkServiceability(
+                    nearestWarehouse.pincode,
+                    userPincode,
+                    currentProduct.weight,
+                    currentProduct.price
+                );
+                
+                debugLog('📋 Step 6: Displaying results...');
+                displayDeliveryResults(serviceabilityData, nearestWarehouse, userPincode, pincodeValidation, premiumEligibility);
+                
+                debugLog('✅ Delivery check completed successfully!', null, 'success');
+                
+            } catch (error) {
+                debugLog('❌ Error in delivery check:', error.message, 'error');
+                console.error('Error checking delivery time:', error);
+                showError(`Unable to check delivery options: ${error.message}`);
+            } finally {
+                document.getElementById('loading-state').style.display = 'none';
+                resetButtonState();
+            }
+        }
+
+        function displayDeliveryResults(apiResponse, warehouse, userPincode, pincodeInfo, premiumEligibility) {
+            debugLog('📋 Displaying delivery results...', { apiResponse, warehouse, userPincode, pincodeInfo, premiumEligibility });
+            
+            const resultsDiv = document.getElementById('delivery-info');
+            
+            if (!apiResponse) {
+                debugLog('❌ No API response received', null, 'error');
+                showError('No delivery information received from API');
+                return;
+            }
+            
+            let couriers = [];
+            
+            if (apiResponse.data && apiResponse.data.available_courier_companies) {
+                couriers = apiResponse.data.available_courier_companies;
+            } else if (apiResponse.available_courier_companies) {
+                couriers = apiResponse.available_courier_companies;
+            } else if (Array.isArray(apiResponse)) {
+                couriers = apiResponse;
+            } else if (apiResponse.data && Array.isArray(apiResponse.data)) {
+                couriers = apiResponse.data;
+            }
+            
+            debugLog('📦 Processing couriers data:', { courierCount: couriers.length, couriers });
+            
+            if (couriers.length === 0) {
+                debugLog('❌ No couriers available', null, 'error');
+                showError('No delivery options available for this pincode');
+                return;
+            }
+            
+            couriers.sort((a, b) => {
+                const aDays = parseInt(a.estimated_delivery_days || a.etd_days || a.etd || 999);
+                const bDays = parseInt(b.estimated_delivery_days || b.etd_days || b.etd || 999);
+                return aDays - bDays;
+            });
+            
+            const deliveryRange = calculateDeliveryTimeRange(couriers);
+            
+            let resultsHTML = '';
+            
+            // Premium Delivery Section (using your brand colors)
+            if (premiumEligibility.sddEligible || premiumEligibility.nddEligible) {
+                resultsHTML += `
+                    <div class="premium-delivery-section">
+                        <div class="premium-delivery-title">
+                             Premium Delivery Available
+                        </div>
+                        <div class="premium-options">
+                `;
+                
+                if (premiumEligibility.sddEligible) {
+                    resultsHTML += `
+                        <div class="premium-option available">
+                            <div class="premium-option-title"> Same Day Delivery</div>
+                            <div class="premium-option-time">Order before 12 PM</div>
+                        </div>
+                    `;
+                }
+                
+                if (premiumEligibility.nddEligible) {
+                    resultsHTML += `
+                        <div class="premium-option available">
+                            <div class="premium-option-title"> Next Day Delivery</div>
+                            <div class="premium-option-time">Order before 6 PM</div>
+                        </div>
+                    `;
+                }
+                
+                resultsHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Standard Delivery Section (keeping your original format)
+            const estimatedDeliveryText = deliveryRange ? 
+                `Estimated Delivery Time: ${deliveryRange.rangeText}` : 
+                'Estimated Delivery Time: Contact for details';
+                
+            resultsHTML += `
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold; color: #235A49;">${estimatedDeliveryText}</p>
+            `;
+            
+            resultsHTML += `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa4; border-radius: 4px; padding: 10px; margin-top: 15px;">
+                    <div style="font-size: 12px; color: #856404;">
+                        <strong>Note:</strong> Delivery times are estimated and may vary due to weather conditions, public holidays, or operational factors.
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = resultsHTML;
+            document.getElementById('edd-results').style.display = 'block';
+            
+            debugLog('✅ Results displayed successfully', null, 'success');
+        }
+
+        function hideAllSections() {
+            document.getElementById('edd-results').style.display = 'none';
+            document.getElementById('edd-error').style.display = 'none';
+            document.getElementById('loading-state').style.display = 'none';
+        }
+
+        function showError(message) {
+            debugLog('❌ Showing error:', message, 'error');
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('edd-error').style.display = 'block';
+        }
+
+        function resetButtonState() {
+            const checkButton = document.getElementById('check-edd-btn');
+            checkButton.disabled = false;
+            checkButton.textContent = 'Check';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🎉 Enhanced EDD Checker initialized with Premium Delivery Support', null, 'success');
+            
+            const pincodeInput = document.getElementById('delivery-pincode');
+            const checkButton = document.getElementById('check-edd-btn');
+            const productTitleDisplay = document.getElementById('product-title-display');
+            
+            if (productTitleDisplay && document.getElementById('product-title').value) {
+                productTitleDisplay.textContent = document.getElementById('product-title').value;
+            }
+            
+            if (pincodeInput) {
+                pincodeInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkDeliveryTime();
+                    }
+                });
+                
+                pincodeInput.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value.length > 6) {
+                        this.value = this.value.slice(0, 6);
+                    }
+                });
+            }
+
+            if (checkButton) {
+                checkButton.addEventListener('click', checkDeliveryTime);
+            }
+
+            // Set default pincode for testing
+            pincodeInput.value = '122002';
+        });
+    </script>
+ 
+  {% endcomment %}

@@ -1,0 +1,874 @@
+<style>
+  .festive-range-section {
+    background-image: url('https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1_copy_2mobile.webp?v=1759471815');
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
+    padding: 350px 0 0 0;
+    margin: 0;
+    content-visibility: auto;
+    contain: layout style paint;
+  }
+
+  @media (max-width: 767px) {
+    .festive-range-section {
+      background-image: url('https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1mobile_1.webp?v=1759730910');
+      background-position: top center;
+      padding: 150px 0 0 0;
+    }
+  }
+
+  .product-card {
+    border-radius: 30px;
+    margin: 80px auto;
+    max-width: 1200px;
+    padding: 0 20px;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+
+  .product-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+    margin-bottom: 10px;
+  }
+
+  .product-text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .product-text h2 {
+    font-size: 24px;
+    color: #2d5f4f;
+    line-height: 1.3;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .product-text h3 {
+    font-size: 15px;
+    color: #4a4a4a;
+    font-weight: bold;
+    margin: 0;
+    text-align: left;
+  }
+
+  .product-text p {
+    color: #4a4a4a;
+    line-height: 1.6;
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .product-image-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .product-image {
+    text-align: center;
+    width: 80%;
+    position: relative;
+  }
+
+  .product-image img {
+    max-width: 85%;
+    width: 85%;
+    height: auto;
+    border-radius: 15px;
+  }
+
+  .small-images {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .small-images img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .small-images img:hover {
+    transform: scale(1.1);
+    border-color: #2d5f4f;
+  }
+
+  .small-images img.active {
+    border-color: #2d5f4f;
+  }
+
+  .product-items {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .product-items img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .product-card:nth-child(2) .product-image-container {
+    order: -1;
+  }
+
+  .shop-button {
+    display: inline-block;
+    background: #2d5f4f;
+    color: white;
+    padding: 14px 45px;
+    border-radius: 25px;
+    text-decoration: none;
+    width: fit-content;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .shop-button:hover {
+    background: #1d4f3f;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .product-card {
+      margin: 60px auto;
+      padding: 0 30px;
+      max-width: 800px;
+    }
+
+    .product-content {
+      gap: 40px;
+    }
+
+    .product-text h2 {
+      font-size: 20px;
+    }
+
+    .product-text h3 {
+      font-size: 12px;
+    }
+
+    .product-text p {
+      font-size: 14px;
+    }
+
+    .product-items img {
+      width: 70px;
+      height: 70px;
+    }
+
+    .small-images img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  @media (max-width: 829px) and (min-width: 769px) {
+    .festive-range-section {
+      padding: 250px 0 0 0;
+    }
+
+    .product-card {
+      margin: 50px auto;
+      padding: 0 20px;
+      max-width: 500px;
+    }
+
+    .product-content {
+      gap: 35px;
+    }
+
+    .product-text h2 {
+      font-size: 20px;
+    }
+
+    .product-text h3 {
+      font-size: 15px;
+    }
+
+    .product-text p {
+      font-size: 12px;
+    }
+
+    .product-image img {
+      max-width: 90%;
+      width: 90%;
+    }
+
+    .product-items {
+      gap: 12px;
+    }
+
+    .product-items img {
+      width: 60px;
+      height: 60px;
+    }
+
+    .small-images {
+      gap: 12px;
+    }
+
+    .small-images img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .shop-button {
+      padding: 13px 40px;
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-card {
+      margin: 40px auto;
+      padding: 0 15px;
+    }
+
+    .product-content {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .product-image-container {
+      order: -1;
+    }
+
+    .product-text {
+      order: 1;
+    }
+
+    .product-text {
+      gap: 15px;
+    }
+
+    .product-text h2 {
+      font-size: 20px;
+      line-height: 1.4;
+    }
+
+    .product-text h3 {
+      font-size: 12px;
+    }
+
+    .product-text p {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .product-image img {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .product-items {
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .product-items img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .small-images {
+      gap: 10px;
+    }
+
+    .small-images img {
+      width: 50px;
+      height:50px;
+    }
+
+    .shop-button {
+      padding: 12px 35px;
+      font-size: 14px;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .festive-range-section {
+      padding: 120px 0 0 0;
+    }
+
+    .product-card {
+      margin: 25px auto;
+    }
+
+    .product-text h2 {
+      font-size: 16px;
+    }
+
+    .product-text h3 {
+      font-size: 12px;
+    }
+
+    .product-text p {
+      font-size: 14px;
+    }
+
+    .product-items img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .small-images img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .shop-button {
+      padding: 10px 30px;
+      font-size: 13px;
+    }
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap');
+
+  .festive-logo {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .festive-logo img {
+    max-width: 200px;
+    height: auto;
+    width: 100%;
+  }
+
+  .festive-title {
+    text-align: center;
+    color: #2d5f4f;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: 'Roboto Slab', serif;
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .festive-logo img {
+      max-width: 200px;
+    }
+
+    .festive-title {
+      font-size: 32px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .festive-logo img {
+      max-width: 150px;
+    }
+
+    .festive-title {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .festive-logo img {
+      max-width: 140px;
+    }
+
+    .festive-title {
+      font-size: 24px;
+    }
+  }
+
+  .responsive-image-container {
+    width: 100%;
+  }
+
+  .responsive-image-container picture {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .svg-icon-container {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    {% comment %} background-color:red {% endcomment %}
+  }
+
+  .centered-svg-icon {
+    max-width: 300px;
+    height: auto;
+    display: block;
+
+  }
+
+  @media (max-width: 768px) {
+    .svg-icon-container {
+      padding: 30px 15px;
+    }
+
+    .centered-svg-icon {
+      max-width: 300px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .svg-icon-container {
+      padding: 20px 10px;
+    }
+
+    .centered-svg-icon {
+      max-width: 200px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    // Check if already initialized to prevent re-initialization
+    if (window.festiveRangeInitialized) return;
+    window.festiveRangeInitialized = true;
+
+    const initGallery = () => {
+      const cards = document.querySelectorAll('.product-card');
+
+      cards.forEach((card) => {
+        // Skip if already initialized
+        if (card.dataset.galleryInit) return;
+        card.dataset.galleryInit = 'true';
+
+        const mainImg = card.querySelector('.product-image img');
+        const thumbs = card.querySelectorAll('.small-images img');
+
+        // Set first thumbnail as active
+        if (thumbs[0]) thumbs[0].classList.add('active');
+
+        // Thumbnail click handler
+        thumbs.forEach((thumb) => {
+          thumb.addEventListener(
+            'click',
+            function (e) {
+              e.preventDefault();
+              thumbs.forEach((t) => t.classList.remove('active'));
+              this.classList.add('active');
+              mainImg.src = this.src;
+            },
+            { passive: false }
+          );
+        });
+      });
+    };
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGallery, { once: true });
+    } else {
+      initGallery();
+    }
+  })();
+</script>
+
+<div class="festive-range-section">
+  <div class="festive-logo">
+    <img
+      src="{{ settings.logo | image_url: width: 300 }}"
+      alt="Logo"
+      width="300"
+      height="auto"
+      loading="eager"
+      fetchpriority="high"
+    >
+  </div>
+
+  <div class="festive-title">Festive Range:</div>
+
+  <div class="product-card">
+    <div class="product-content">
+      <div class="product-text">
+        <h2>For Relationships That Deserve Nothing Less Than Pure</h2>
+        <p>
+          Everyone gifts mithai. You’re looking at something that you trust. This will make their everyday meals a
+          little extra special and pure. A spoonful of health, every time they eat.
+        </p>
+        <h3>Inside the box:</h3>
+        <p>
+          Dry Fruit Paak (200g), Wild Forest Honey (275g), Virgin Coconut Oil (227g/ 250ml), Desi Cow Ghee (500g/452ml)
+        </p>
+        <div class="product-items">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1_copy_2_a5591862-b97f-459a-b96b-c7c3825b3c7c.jpg?v=1759740233"
+            alt="Product 1"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1_copy_69db63be-7861-43be-9cd3-7cd41595b8d5.jpg?v=1759740217"
+            alt="Product 2"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1_copy_3_dcfdd61b-4c54-4011-8220-05579e9b8d80.jpg?v=1759740209"
+            alt="Product 3"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1_a2620c8d-0657-4d10-bdec-73a7a02cbc0e.jpg?v=1759740219ssss"
+            alt="Product 4"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+        </div>
+
+        <h3 class="product-note">All-time Anveshan favourites, together in a beautiful box.</h3>
+        <a href="/products/anveshan-assorted-gifting-box" class="shop-button">Shop now</a>
+      </div>
+
+      <div class="product-image-container">
+        <div class="product-image">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Gift_catelouge_4.jpg?v=1770115754"
+            alt="Gift Box"
+            width="600"
+            height="600"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="small-images">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Gift_catelouge_4.jpg?v=1770115754"
+            alt="View 1"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Gift_catelouge_1.jpg?v=1770115761"
+            alt="View 2"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Gift_catelouge_3.jpg?v=1770115788"
+            alt="View 3"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+       
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Gift_catelouge_2.jpg?v=1770115788"
+            alt="View 5"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-card">
+    <div class="product-content">
+      <div class="product-text">
+        <h2>Traditions Wrapped in Purity Make Festivities Extra Special</h2>
+        <p>
+          Guilt-free Dry Fruit Pak made in the purest desi ghee, sun-cooked Mishri Gulkand, flavourful, aromatic, and
+          pure desi ghee — are only some of the many treats in this festive gift box. A gift that shows you care.
+        </p>
+        <h3>Inside the box:</h3>
+        <p>
+          A2 Desi Cow Ghee (100ml), Mishri Gulkand (100gm), Virgin Coconut Oil (100ml), Cold-Pressed Groundnut Oil
+          (100ml), Dry Fruit Pak (200gm)
+        </p>
+
+        <div class="product-items">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/e2aed874658a2dfa61c2368ac573f48079b1a626.jpg?v=1759585285"
+            alt="Honey"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/88d705ecf377b45b7ac06b7d69bd512833ae489f.jpg?v=1759585285"
+            alt="Ghee"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/34b0b9fa5bd00804e0290d3065c863843b1d4d15.jpg?v=1759585285"
+            alt="Oil"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/e5055deb25f1e6dd220d4b70d1d93f3482d03ef0.jpg?v=1759585285"
+            alt="Dry Fruits"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/449ac7ad9b4f39c7ac0c84098799bd9adb5fe745.jpg?v=1759585285"
+            alt="Creamed Honey"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+        </div>
+
+        <h3 class="product-note">To make your festivities extra memorable.</h3>
+        <a href="/products/diwali-gift-box-a-flavourful-festivity" class="shop-button">Shop now</a>
+      </div>
+
+      <div class="product-image-container">
+        <div class="product-image">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/934ce3e1966db9f5ec2f40f724ccb912482abcef.jpg?v=1759585289"
+            alt="Anveshan Gift Box"
+            width="600"
+            height="600"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="small-images">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/934ce3e1966db9f5ec2f40f724ccb912482abcef.jpg?v=1759585289"
+            alt="View 1"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/15689e9ad2ac4c18abfc8da99b73b8ed789270cc_1.jpg?v=1759585287"
+            alt="View 5"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/934ce3e1966db9f5ec2f40f724ccb912482abcef_1.jpg?v=1759585289"
+            alt="View 4"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/06a776e9576d7d75bce75805868383ee9c60ca2d.jpg?v=1759585287"
+            alt="View 2"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/15689e9ad2ac4c18abfc8da99b73b8ed789270cc_1.jpg?v=1759585287"
+            alt="View 3"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-card">
+    <div class="product-content">
+      <div class="product-text">
+        <h2>Your Daily Dose of Natural Immunity: The Anveshan Immunity Box</h2>
+        <p>
+          Give your family immunity you can trust with Anveshan’s thoughtfully curated Immunity Box. Packed with
+          time-tested Indian superfoods, this box brings together nutrition, purity, and tradition in every spoon. From
+          the golden purity of our A2 Gir Cow Ghee to the antioxidant-rich Wild Forest Honey, every ingredient is
+          sourced directly from Indian farms to build your strength from within. It’s more than just a collection of
+          superfoods; it’s a daily ritual of strength and wellbeing for you and your family. Rediscover holistic
+          wellness and give your immune system the premium upgrade it deserves!
+        </p>
+        <h3>Inside the box:</h3>
+        <p>
+          Strawberry Flavoured Millet Health Mix, Wild Forest Honey, Amlaprash, Gir Cow Ghee, Turmeric Latte, Mongra
+          Saffron
+        </p>
+
+        <div class="product-items">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/MHM.jpg?v=1767334564"
+            alt="Honey"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/WFH_275g.jpg?v=1767334565"
+            alt="Ghee"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/AMP_350g.jpg?v=1767334564"
+            alt="Oil"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/GCG100g.jpg?v=1767334564"
+            alt="Dry Fruits"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Mongra_Safforn.jpg?v=1767334565"
+            alt="Creamed Honey"
+            width="100"
+            height="100"
+            loading="lazy"
+          >
+        </div>
+
+        <h3 class="product-note">To make your festivities extra memorable.</h3>
+        <a href="/products/immunity-gift-box" class="shop-button">Shop now</a>
+      </div>
+
+      <div class="product-image-container">
+        <div class="product-image">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard12_5998e7bc-05b8-42fd-a0bb-25552caffa47.jpg?v=1767174853"
+            alt="Anveshan Gift Box"
+            width="600"
+            height="600"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="small-images">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard12_5998e7bc-05b8-42fd-a0bb-25552caffa47.jpg?v=1767174853"
+            alt="View 2"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard14_c431e2fe-cdef-491b-bd5c-5ef451fce269.jpg?v=1767174854"
+            alt="View 1"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard1_fcffd2fd-73e4-43bc-9e44-b7d6e6fc5bf8.jpg?v=1767174853"
+            alt="View 5"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard9_c9d025e2-051f-4aa7-a025-77a7d55a81f0.jpg?v=1767174854"
+            alt="View 4"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard1_fcffd2fd-73e4-43bc-9e44-b7d6e6fc5bf8.jpg?v=1767174853"
+            alt="View 3"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="responsive-image-container">
+  <picture>
+    <source
+      media="(max-width: 768px)"
+      srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/gift_page_image_MOBILE_VERSION_copy.webp?v=1759731459"
+    >
+    <source
+      media="(min-width: 769px)"
+      srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/gift_page_image_copy.webp?v=1759731457"
+    >
+    <img
+      src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/gift_page_image_copy.webp?v=1759731457"
+      alt="Gift Page"
+      width="100%"
+      loading="lazy"
+    >
+  </picture>
+</div>
+<div class="svg-icon-container">
+  <img
+    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_1_9452de43-0820-4d68-9411-689f16633d19.svg?v=1759733714"
+    alt="Decorative Icon"
+    class="centered-svg-icon"
+    loading="lazy"
+  >
+</div>
+
+{% schema %}
+{
+  "name": "Festive Range",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Festive Range"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Festive Range"
+    }
+  ]
+}
+{% endschema %}

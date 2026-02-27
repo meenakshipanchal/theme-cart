@@ -1,0 +1,103 @@
+{% liquid
+  assign contents = metaobject.browser_contents.value
+  assign elements = contents.element.value
+%}
+<div class="page-width-desktop custom-content prod-video" style="order:1">
+  <div class="content-width prod-video-content">
+    <div>
+      <h4>{{- metaobject.title.value -}}</h4>
+      <div class="desk-only">
+        <p>{{ contents.content.value }}</p>
+        <ul>
+          {% for element in elements %}
+            <li>
+              {{ element.media.value | image_url: width: 80 | image_tag: loading: 'lazy', style: 'height: auto' -}}
+              {{- element.title.value }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% liquid
+      assign video_id = metaobject.youtube_video_link.value | split: '=' | last
+      assign image = metaobject.thumbnail.value
+    %}
+    <noscript>
+      <div
+        class="video-section__media"
+        {% if image != blank %}
+          style="padding-bottom: {{ 1 | divided_by: image.aspect_ratio | times: 100 }}%;"
+        {% endif %}
+      >
+        <a
+          href="{{ urls }}"
+          class="video-section__poster media media--transparent media--landscape{% if image == blank %} video-section__placeholder{% endif %}"
+        >
+          {%- if image != blank -%}
+            <img
+              srcset="
+                {%- if image.width >= 375 -%}{{ image | image_url: width: 375 }} 375w,{%- endif -%}
+                {%- if image.width >= 750 -%}{{ image | image_url: width: 750 }} 750w,{%- endif -%}
+                {%- if image.width >= 1100 -%}{{ image | image_url: width: 1100 }} 1100w,{%- endif -%}
+                {%- if image.width >= 1500 -%}{{ image | image_url: width: 1500 }} 1500w,{%- endif -%}
+                {{ image | image_url }} {{ image.width }}w
+              "
+              src="{{ image | image_url: width: 1920 }}"
+              sizes="{% if section.settings.full_width %}100vw{% else %}(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 }}px, (min-width: 750px) calc(100vw - 10rem), 100vw{% endif %}"
+              alt="{{ 'sections.video.load_video' | t: description: section.settings.description | escape }}"
+              loading="lazy"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            >
+          {%- else -%}
+            {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+          {%- endif -%}
+        </a>
+      </div>
+    </noscript>
+    <deferred-media
+      class="video-section__media deferred-media no-js-hidden gradient global-media-settings{% if section.settings.full_width %} global-media-settings--full-width{% endif %}"
+      data-media-id="{{ video_id }}"
+      {% if image != blank %}
+        style="padding-bottom: {{ 1 | divided_by: image.aspect_ratio | times: 100 }}%;"
+      {% endif %}
+    >
+      <button
+        id="Deferred-Poster-Modal-{{ video_id }}"
+        class="video-section__poster media deferred-media__poster media--landscape"
+        type="button"
+      >
+        {%- if image != blank -%}
+          <img
+            srcset="
+              {%- if image.width >= 375 -%}{{ image | image_url: width: 375 }} 375w,{%- endif -%}
+              {%- if image.width >= 750 -%}{{ image | image_url: width: 750 }} 750w,{%- endif -%}
+              {%- if image.width >= 1100 -%}{{ image | image_url: width: 1100 }} 1100w,{%- endif -%}
+              {%- if image.width >= 1600 -%}{{ image | image_url: width: 1600 }} 1600w,{%- endif -%}
+            "
+            src="{{ image | image_url: width: 750 }}"
+            sizes="{% if section.settings.full_width %}100vw{% else %}(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 }}px, (min-width: 750px) calc(100vw - 10rem), 100vw{% endif %}"
+            alt="{{ 'sections.video.load_video' | t: description: section.settings.description | escape }}"
+            loading="lazy"
+            width="{{ image.width }}"
+            height="{{ image.height }}"
+          >
+        {%- else -%}
+          {{ 'collection-2' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+        {%- endif -%}
+        <span class="deferred-media__poster-button motion-reduce">
+          {{- 'icon-play.svg' | inline_asset_content -}}
+        </span>
+      </button>
+      <template>
+        <iframe
+          src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&enablejsapi=1"
+          class="js-youtube"
+          allow="autoplay;muted; encrypted-media"
+          allowfullscreen
+          title="{{ section.settings.description | escape }}"
+        ></iframe>
+      </template>
+    </deferred-media>
+  </div>
+</div>

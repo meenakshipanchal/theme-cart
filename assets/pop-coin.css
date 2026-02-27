@@ -1,0 +1,51 @@
+body.popcoinShow .drawer.active {
+  z-index: 900000000!important;
+}
+
+body.popcoinShow div.pop-star {
+  z-index: 9000000000!important;
+}
+
+
+body.popcoinShow div.pop-star#POPStar, body.popcoinShow div.pop-star1#POPStar,body.popcoinShow div.pop-star#POPStar div.popclub-modal {
+  z-index: 9000000000!important;
+}
+
+.pop-star #pop-club-quick-buy3 span {
+  font-family: var(--font-heading-family) !important;
+}
+
+#shopify-block-3172998000497177565 {
+  height: 0!important;
+}
+
+body.popcoinShow {
+  
+}
+
+#popAtcWrapper {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    position: absolute;
+    top: -3rem;
+    width: 100%;
+    background: #fff;
+    margin: auto;
+    display: flex!important;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+}
+
+.pop-star.pop__product button#pop-club-quick-buy3 {
+  display: none!important;
+}
+
+@media (max-width: 767px) {
+  .pop-club-listing p {
+    font-size: 14px;
+    justify-content: start!important;
+    padding: 0 .85rem!important;
+  }
+}

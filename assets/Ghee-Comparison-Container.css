@@ -1,0 +1,179 @@
+/* Ghee Comparison Container */
+
+
+
+.ghee-comparison-gallery .images-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 15px;
+  padding: 15px;
+  width: 96%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.ghee-comparison-gallery .product-image-item {
+  flex: 0 0 auto;
+  width: 300px;
+  height: 400px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.ghee-comparison-gallery .product-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Hide scrollbar but keep functionality */
+.ghee-comparison-gallery .images-container::-webkit-scrollbar {
+  display: none;
+}
+
+.ghee-comparison-gallery .images-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Tablet and Desktop Adjustments */
+@media screen and (min-width: 600px) {
+  .ghee-comparison-gallery .product-image-item {
+    width: 350px;
+    height: 450px;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .ghee-comparison-gallery .images-container {
+    width: 80%;
+    max-width: 1100px;
+    margin: 20px auto;
+  }
+
+  .ghee-comparison-gallery .product-image-item {
+    width: 400px;
+    height: 500px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .ghee-comparison-gallery .images-container {
+    width: 75%;
+    max-width: 1200px;
+    margin: 30px auto;
+  }
+
+  .ghee-comparison-gallery .product-image-item {
+    width: 450px;
+    height: 550px;
+  }
+}
+.ghee-comparison-container {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Mobile Vertical Stack - Only visible on mobile */
+.mobile-vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* Desktop Horizontal Row - Hidden on mobile */
+.desktop-horizontal-row {
+  display: none;
+}
+
+/* Desktop styles - 768px and above */
+@media screen and (min-width: 768px) {
+  .mobile-vertical-stack {
+    display: none;
+  }
+  
+  .desktop-horizontal-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .horizontal-image-item {
+    flex: 1;
+    max-width: calc(33.333% - 15px);
+    min-width: 250px;
+  }
+  
+  .horizontal-image-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    transition: transform 0.3s ease;
+  }
+  
+  .horizontal-image-item img:hover {
+    transform: translateY(-5px);
+  }
+}
+
+/* Large desktop - 1024px and above */
+@media screen and (min-width: 1024px) {
+  .ghee-comparison-container {
+    padding: 30px;
+  }
+  
+  .desktop-horizontal-row {
+    gap: 30px;
+    padding: 0 30px;
+  }
+  
+  .horizontal-image-item {
+    max-width: calc(33.333% - 20px);
+  }
+}
+
+/* Mobile specific adjustments */
+@media screen and (max-width: 480px) {
+  .ghee-comparison-container {
+    padding: 15px;
+  }
+  
+  .mobile-vertical-stack {
+    gap: 15px;
+    padding: 0 15px;
+  }
+  
+  .horizontal-image-item {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .horizontal-image-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+  }
+}

@@ -1,0 +1,67 @@
+{% comment %}
+  Renders cart notification
+
+  Accepts:
+  - color_scheme: {String} sets the color scheme of the notification (optional)
+  - desktop_menu_type: {String} passes the desktop menu type which allows us to use the right css class (optional)
+
+  Usage:
+  {% render 'cart-notification' %}
+{% endcomment %}
+<style>.cart-notification{visibility:hidden;}</style>
+<cart-notification>
+  <div class="cart-notification-wrapper{% if desktop_menu_type != 'drawer' %} page-width{% endif %}">
+    <div
+      id="cart-notification"
+      class="cart-notification focus-inset{% if color_scheme %} color-{{ color_scheme }} gradient{% endif %}"
+      aria-modal="true"
+      aria-label="{{ 'general.cart.item_added' | t }}"
+      role="dialog"
+      tabindex="-1"
+    >
+      <div class="cart-notification__header">
+        <h2 class="cart-notification__heading caption-large text-body">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+          {{ 'general.cart.item_added' | t }}
+        </h2>
+        <button
+          type="button"
+          class="cart-notification__close modal__close-button link link--text focus-inset"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+      <div id="cart-notification-product" class="cart-notification-product"></div>
+      <div class="cart-notification__links">
+        <a
+          href="{{ routes.cart_url }}"
+          id="cart-notification-button"
+          class="button button--secondary flex-half"
+        >
+          {{- 'general.cart.view_empty_cart' | t -}}
+        </a>
+        <div class="shiprocket-headless flex-half" data-type="mini-cart">
+            <button type="button" class="sr-headless-checkout" onclick="shiprocketCheckoutEvents.buyCart(event)" style="opacity: 1;background: #FFD57A!important;color:#235A49;text-transform: capitalize;font-weight: 700;font-size: 14px;border-radius: 5px;height: 36px; min-height: 20px;line-height: 1 !important;">
+              <div class="sr-d-flex flex-center"><div class="sr-d-flex full-width flex-center">
+                <span class="sr-checkout-visible2" style="display: inline-block;">Checkout</span>
+                <div class="loader5" style="display: none;"></div></div></div></button>
+          </div>
+        {% comment %}
+        <form action="{{ routes.cart_url }}" method="post" id="cart-notification-form">
+          <button id="cart-notification-form" class="button button--primary button--full-width" name="checkout">
+            {{ 'sections.cart.checkout' | t }}
+          </button>
+        </form> {% endcomment %}
+        <button type="button" class="link button-label flex-full">{{ 'general.continue_shopping' | t }}</button>
+      </div>
+    </div>
+  </div>
+</cart-notification>
+{% style %}
+  .cart-notification {
+    display: none;
+  }
+{% endstyle %}

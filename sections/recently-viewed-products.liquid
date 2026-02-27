@@ -1,0 +1,575 @@
+
+<div id="recently-viewed-wrapper" class="recently-viewed-section" style="display: none;">
+  <div class="">
+    <h2 class="recently-viewed-heading">You were checking these out earlier.</h2>
+    <h2 class="recently-viewed-subheading">Don't miss out; Complete your purchase Now.</h2>
+    <div class="rv-slider-container">
+    <div class="x-padding-responsive">
+      <ul
+        id="rv-product-grid"
+        class="rv-horizontal-scroll"
+        role="list"
+      >
+        <!-- Cards will be loaded here -->
+      </ul>
+ 
+    </div>
+    </div>
+  </div>
+</div>
+<style>
+  .x-padding-responsive {
+    padding: 0 15px; /* Mobile default */
+  }
+  @media (min-width: 768px) {
+    .x-padding-responsive {
+      padding: 0 25px; /* Tablet */
+    }
+  }
+  @media (min-width: 1024px) {
+    .x-padding-responsive {
+      padding: 0 60px; /* Laptop */
+    }
+  }
+  
+  .recently-viewed-section {
+    padding: 0px 0;
+    overflow: hidden;
+  }
+
+  .recently-viewed-heading {
+    font-weight: 600;
+    text-align: center;
+    color: #235a49;
+    font-size: 2.9rem;
+    margin-bottom: 8px;
+  }
+
+  .recently-viewed-subheading {
+    text-align: center;
+    color: #235a49;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    margin-top: 0;
+  }
+
+  /* Desktop: 6 cards visible */
+  @media (min-width: 1025px) {
+    .recently-viewed-heading {
+      font-size: 2.9rem;
+      margin-bottom: 8px;
+    }
+    .recently-viewed-subheading {
+      font-size: 1.9rem;
+      margin-top: 0;
+    }
+  }
+
+  /* Tablet: 3 cards visible */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .recently-viewed-heading {
+      font-size: 1.9rem;
+      margin-bottom: 6px;
+    }
+    .recently-viewed-subheading {
+      font-size: 1.6rem;
+      margin-top: 0;
+    }
+  }
+
+  /* Mobile: EXACTLY 2 cards visible */
+  @media (max-width: 768px) {
+    .recently-viewed-heading {
+      font-size: 1.9rem;
+      margin-bottom: 5px;
+    }
+    .recently-viewed-subheading {
+      font-size: 1.5rem;
+      margin-top: 0;
+    }
+  }
+
+  .rv-slider-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .rv-horizontal-scroll {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 10px 0 20px 0;
+    margin: 0;
+    list-style: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+  }
+
+  .rv-horizontal-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .rv-horizontal-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .rv-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  .rv-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* =============================================
+     MOBILE: 2 cards - FIXED 190px width
+     ============================================= */
+  @media screen and (max-width: 767px) {
+    .rv-horizontal-scroll {
+      gap: 12px;
+    }
+    .rv-horizontal-scroll .grid__item {
+      flex: 0 0 190px !important;
+      width: 190px !important;
+      min-width: 190px !important;
+      max-width: 190px !important;
+      scroll-snap-align: start;
+      margin: 0 !important;
+    }
+  }
+
+  /* =============================================
+     TABLET: 4 cards - FIXED 180px width
+     ============================================= */
+  @media screen and (min-width: 768px) and (max-width: 1024px) {
+    .rv-horizontal-scroll {
+      gap: 1rem;
+    }
+    .rv-horizontal-scroll .grid__item {
+      flex: 0 0 180px !important;
+      width: 180px !important;
+      min-width: 180px !important;
+      max-width: 180px !important;
+      scroll-snap-align: start;
+      margin: 0 !important;
+    }
+  }
+
+  /* =============================================
+     DESKTOP: 5 cards - FIXED 240px width
+     ============================================= */
+  @media screen and (min-width: 1025px) {
+    .rv-horizontal-scroll {
+      gap: 1.5rem;
+    }
+    .rv-horizontal-scroll .grid__item {
+      flex: 0 0 240px !important;
+      width: 240px !important;
+      min-width: 240px !important;
+      max-width: 240px !important;
+      scroll-snap-align: start;
+      margin: 0 !important;
+    }
+  }
+
+  .recently-viewed-section .slider-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .recently-viewed-section .slider-button {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+  }
+
+  .recently-viewed-section .slider-button:hover:not(:disabled) {
+    background: #f5f5f5;
+    border-color: #999;
+  }
+
+  .recently-viewed-section .slider-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .recently-viewed-section .slider-counter {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  @media screen and (max-width: 768px) {
+    .recently-viewed-section .slider-buttons {
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .recently-viewed-section .slider-button {
+      width: 36px;
+      height: 36px;
+    }
+
+    .recently-viewed-section .slider-button svg {
+      width: 8px;
+      height: 12px;
+    }
+
+    .recently-viewed-section .slider-counter {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+<script>
+(function() {
+  'use strict';
+
+  // =============================================
+  // 🎯 MAIN RENDER FUNCTION (VARIANT-AWARE)
+  // =============================================
+  async function renderRecentlyViewed() {
+    const wrapper = document.getElementById('recently-viewed-wrapper');
+    const grid = document.getElementById('rv-product-grid');
+    const recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+
+    {% comment %} console.log('📦 Recently viewed data:', recent); {% endcomment %}
+    {% comment %} console.log('📊 Total products in storage:', recent.length); {% endcomment %}
+
+    // Filter out current product/variant
+    {% if product %}
+    const currentProductId = '{{ product.id }}';
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentVariantId = urlParams.get('variant');
+
+    const filtered = recent.filter(p => {
+      // If viewing a specific variant, exclude that variant
+      if (currentVariantId && p.variant_id === currentVariantId) {
+        return false;
+      }
+      // If no variant specified, exclude the entire product
+      if (!currentVariantId && p.product_id === currentProductId) {
+        return false;
+      }
+      return true;
+    });
+
+    {% comment %} console.log('✅ After filtering current product/variant:', filtered.length); {% endcomment %}
+    {% else %}
+    const filtered = recent;
+    {% endif %}
+
+    if (filtered.length === 0) {
+      {% comment %} console.log('❌ No recently viewed products found'); {% endcomment %}
+      wrapper.style.display = 'none';
+      return;
+    }
+
+    // Get max products to show
+    const maxProducts = Math.min({{ section.settings.products_to_show | default: 20 }}, 20);
+    const productsToShow = filtered.slice(0, maxProducts);
+
+    {% comment %} console.log('🎯 Products to display:', productsToShow.length); {% endcomment %}
+
+    // Show wrapper with loading
+    wrapper.style.display = 'block';
+    grid.innerHTML = '<li style="padding: 60px 40px; text-align: center; min-width: 300px; color: #999;">⏳ Loading products...</li>';
+
+    try {
+      await displayProducts(productsToShow, grid);
+
+      const totalCards = grid.children.length;
+      {% comment %} console.log('✅ Total cards rendered:', totalCards); {% endcomment %}
+
+      // Update counter
+      const totalCounter = document.querySelector('.recently-viewed-section .slider-counter--total');
+      if (totalCounter) {
+        totalCounter.textContent = totalCards;
+      }
+
+      initializeSlider();
+      attachEventTracking();
+
+    } catch (error) {
+      {% comment %} console.error('❌ Error loading recently viewed:', error); {% endcomment %}
+      grid.innerHTML = '<li style="padding: 60px 40px; text-align: center; min-width: 300px; color: #999;">Error loading products</li>';
+    }
+  }
+
+  // =============================================
+  // 🎨 DISPLAY PRODUCTS (VARIANT-AWARE)
+  // =============================================
+  async function displayProducts(products, grid) {
+    grid.innerHTML = '';
+
+    {% comment %} console.log('🚀 Starting to display', products.length, 'products'); {% endcomment %}
+
+    // Fetch products in batches
+    const batchSize = 5;
+    const allCards = [];
+
+    for (let i = 0; i < products.length; i += batchSize) {
+      const batch = products.slice(i, i + batchSize);
+      {% comment %} console.log(`📥 Processing batch ${Math.floor(i/batchSize) + 1}:`, batch.map(p => p.product_handle)); {% endcomment %}
+
+      const batchPromises = batch.map(item => fetchProductCard(item));
+      const batchResults = await Promise.all(batchPromises);
+
+      allCards.push(...batchResults.filter(card => card !== null));
+    }
+
+    {% comment %} console.log('✅ Successfully fetched', allCards.length, 'out of', products.length, 'products'); {% endcomment %}
+
+    if (allCards.length === 0) {
+      grid.innerHTML = '<li style="padding: 60px 40px; text-align: center; min-width: 300px; color: #999;">No products available</li>';
+      return;
+    }
+
+    // Append all cards
+    allCards.forEach(cardHTML => {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cardHTML.trim();
+      const cardElement = tempDiv.querySelector('li.grid__item');
+      if (cardElement) {
+        grid.appendChild(cardElement);
+      }
+    });
+
+    // Re-initialize Shopify features
+    if (window.Shopify && window.Shopify.PaymentButton) {
+      window.Shopify.PaymentButton.init();
+    }
+  }
+
+  // =============================================
+  // 📡 FETCH SINGLE PRODUCT CARD (VARIANT-AWARE)
+  // =============================================
+  async function fetchProductCard(item) {
+    try {
+      const handle = item.product_handle;
+      {% comment %} console.log('⬇️  Fetching:', handle, item.variant_id ? `(variant: ${item.variant_id})` : ''); {% endcomment %}
+
+      // Fetch product with variant parameter if available
+      let url = `/products/${handle}?view=rv-card`;
+      if (item.variant_id) {
+        url += `&variant=${item.variant_id}`;
+      }
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        {% comment %} console.warn(`⚠️  Failed to fetch ${handle}: ${response.status}`); {% endcomment %}
+        return null;
+      }
+
+      const html = await response.text();
+      {% comment %} console.log('✅ Success:', handle); {% endcomment %}
+
+      return html;
+
+    } catch (err) {
+      {% comment %} console.error(`❌ Error fetching ${item.product_handle}:`, err); {% endcomment %}
+      return null;
+    }
+  }
+
+  // =============================================
+  // 🎮 SLIDER CONTROLS
+  // =============================================
+  function initializeSlider() {
+    const grid = document.getElementById('rv-product-grid');
+    const prevButton = document.querySelector('.recently-viewed-section .slider-button--prev');
+    const nextButton = document.querySelector('.recently-viewed-section .slider-button--next');
+    const currentCounter = document.querySelector('.recently-viewed-section .slider-counter--current');
+
+    if (!grid || !prevButton || !nextButton) {
+      {% comment %} console.warn('Slider elements not found'); {% endcomment %}
+      return;
+    }
+
+    function getVisibleCards() {
+      const width = window.innerWidth;
+      if (width <= 768) return 2; // Mobile: 2 cards
+      if (width <= 1024) return 3; // Tablet: 3 cards
+      return 6; // Desktop: 6 cards
+    }
+
+    function getScrollAmount() {
+      const containerWidth = grid.clientWidth;
+      const visibleCards = getVisibleCards();
+      return containerWidth / visibleCards;
+    }
+
+    let scrollAmount = getScrollAmount();
+
+    prevButton.addEventListener('click', () => {
+      scrollAmount = getScrollAmount();
+      grid.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+
+    nextButton.addEventListener('click', () => {
+      scrollAmount = getScrollAmount();
+      grid.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+
+    function updateSlider() {
+      const scrollLeft = grid.scrollLeft;
+      const maxScroll = grid.scrollWidth - grid.clientWidth;
+
+      // Calculate current position
+      const currentScroll = getScrollAmount();
+      const currentPosition = Math.round(scrollLeft / currentScroll) + 1;
+
+      if (currentCounter) {
+        currentCounter.textContent = currentPosition;
+      }
+
+      prevButton.disabled = scrollLeft <= 5;
+      nextButton.disabled = scrollLeft >= maxScroll - 5;
+    }
+
+    grid.addEventListener('scroll', updateSlider);
+
+    window.addEventListener('resize', () => {
+      scrollAmount = getScrollAmount();
+      updateSlider();
+    });
+
+    updateSlider();
+  }
+
+  // =============================================
+  // 📊 GA4 EVENT TRACKING
+  // =============================================
+  function pushGA4Event(eventName, eventParams = {}) {
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, eventParams);
+      {% comment %} console.log('📊 GA4:', eventName, eventParams); {% endcomment %}
+    } else if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: eventName, ...eventParams });
+      {% comment %} console.log('📊 DataLayer:', eventName, eventParams); {% endcomment %}
+    }
+  }
+
+  function attachEventTracking() {
+    const grid = document.getElementById('rv-product-grid');
+
+    // Product Click Tracking
+    grid.addEventListener('click', (e) => {
+      const productLink = e.target.closest('a.card-wrapper, a[href*="/products/"]');
+
+      if (productLink && !e.target.closest('button, form')) {
+        const productCard = productLink.closest('li.grid__item');
+        const productTitle = productCard?.querySelector('.card__heading')?.textContent?.trim() || 'Unknown';
+        const productHandle = productLink.getAttribute('href')?.split('/products/')[1]?.split('?')[0] || '';
+
+        pushGA4Event('recently_viewed_product_click', {
+          product_name: productTitle,
+          product_handle: productHandle,
+          section: 'Recently Viewed Products'
+        });
+      }
+    });
+
+    // Add to Cart Tracking
+    grid.addEventListener('submit', (e) => {
+      const form = e.target.closest('form[action*="/cart/add"]');
+
+      if (form) {
+        const productCard = form.closest('li.grid__item');
+        const productTitle = productCard?.querySelector('.card__heading')?.textContent?.trim() || 'Unknown';
+        const variantId = form.querySelector('input[name="id"]')?.value || '';
+
+        pushGA4Event('recently_viewed_add_to_cart', {
+          product_name: productTitle,
+          variant_id: variantId,
+          section: 'Recently Viewed Products'
+        });
+      }
+    });
+
+    // Buy Now Tracking
+    grid.addEventListener('click', (e) => {
+      const buyNowButton = e.target.closest('.shopify-payment-button__button, button[name="checkout"]');
+
+      if (buyNowButton) {
+        const productCard = buyNowButton.closest('li.grid__item');
+        const productTitle = productCard?.querySelector('.card__heading')?.textContent?.trim() || 'Unknown';
+        const form = buyNowButton.closest('form');
+        const variantId = form?.querySelector('input[name="id"]')?.value || '';
+
+        pushGA4Event('recently_viewed_buy_now', {
+          product_name: productTitle,
+          variant_id: variantId,
+          section: 'Recently Viewed Products'
+        });
+      }
+    });
+  }
+
+  // =============================================
+  // 🚀 INITIALIZE
+  // =============================================
+
+  // Make function globally available for refresh
+  window.updateRecentlyViewed = renderRecentlyViewed;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderRecentlyViewed);
+  } else {
+    renderRecentlyViewed();
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Recently Viewed Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "You were checking these out earlier."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading",
+      "default": "Customers often come back to complete their purchase"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Number of products to show",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 12
+    }
+  ]
+}
+{% endschema %}

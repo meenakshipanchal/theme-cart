@@ -1,0 +1,59 @@
+<style>
+  .product-tabs { position: sticky; top: 45px; background: #FFF8F1; z-index: 9; margin: 0; }
+  .info-tab { display: flex; list-style: none; padding: 15px 12px 7px; margin: 0 0 -0.75rem; }
+  .info-tab li:not(:first-child) { margin-left: 5px; }
+  .info-tab span { display: block; padding: 0.8rem 1.35rem; border-radius: 0.3rem; border: #ddd solid 1px; font-weight: 600; line-height: 1; font-size: 1.45rem; }
+  .tabs.active span { border-color: #00584b; color: #fff; background-color: #00584b; }
+</style>
+<ul class="info-tab">
+  {% for block in section.blocks %}
+    <li class="tabs" data-target="{{- block.settings.id -}}"><span>{{- block.settings.title -}}</span></li>
+  {% endfor %}
+  </ul>
+  <script>
+    // JavaScript to handle the click event and scroll to the section
+    document.querySelectorAll('.tabs').forEach(tab => {
+    tab.addEventListener('click', function () {
+      // Remove 'active' class from all tabs
+      document.querySelectorAll('.tabs').forEach(t => t.classList.remove('active'));
+
+      // Add 'active' class to the clicked tab
+      this.classList.add('active');
+
+      // Scroll to the target section
+      const targetId = this.getAttribute('data-target');
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        const targetPosition = targetElement.offsetTop - 85;
+
+        // Smoothly scroll to the calculated position
+        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+      }
+    });
+  });
+  </script>
+{% schema %}
+  {
+    "name": "Product Tabs",
+    "class": "product-tabs",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "tabs",
+        "name": "Tabs",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "text",
+            "id": "id",
+            "label": "Tab ID"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

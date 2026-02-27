@@ -1,0 +1,467 @@
+/* STYLING FOR USES INSIDE RICH TEXT ACCORDION */
+
+/* TARGET PARAGRAPHS OR LIST ITEMS INSIDE ACCORDION CONTENT */
+.accordion__content.richtext.rte p,
+.accordion__content.richtext.rte li,
+.accordion__content.richtext.rte div {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px 20px; /* ADDED INTERNAL PADDING */
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.accordion__content.richtext.rte p:hover,
+.accordion__content.richtext.rte li:hover,
+.accordion__content.richtext.rte div:hover {
+  /* box-shadow: 0 4px 6px rgba(0,0,0,0.1); */
+  transform: translateY(-2px);
+  /* border-color: #00584b; */
+}
+
+/* ADD ICON BEFORE EACH USE */
+.accordion__content.richtext.rte p::before,
+.accordion__content.richtext.rte li::before,
+.accordion__content.richtext.rte div::before {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #00584b;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* STYLE THE TEXT CONTENT */
+.accordion__content.richtext.rte p,
+.accordion__content.richtext.rte li,
+.accordion__content.richtext.rte div {
+  color: #374151;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+/* REMOVE DEFAULT LIST STYLING */
+.accordion__content.richtext.rte ul,
+.accordion__content.richtext.rte ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* SPECIAL STYLING FOR STRONG/BOLD TEXT INSIDE */
+.accordion__content.richtext.rte p strong,
+.accordion__content.richtext.rte li strong,
+.accordion__content.richtext.rte div strong {
+  color: #00584b;
+  font-weight: 600;
+}
+
+/* ANIMATION FOR USES WHEN ACCORDION OPENS */
+.accordion__content.richtext.rte p {
+  opacity: 0;
+  animation: fadeInUse 0.6s ease forwards;
+}
+
+.accordion__content.richtext.rte p:nth-child(1) { animation-delay: 0.1s; }
+.accordion__content.richtext.rte p:nth-child(2) { animation-delay: 0.2s; }
+.accordion__content.richtext.rte p:nth-child(3) { animation-delay: 0.3s; }
+.accordion__content.richtext.rte p:nth-child(4) { animation-delay: 0.4s; }
+.accordion__content.richtext.rte p:nth-child(5) { animation-delay: 0.5s; }
+.accordion__content.richtext.rte p:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUse {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* MOBILE RESPONSIVE */
+@media screen and (max-width: 749px) {
+  .accordion__content.richtext.rte p,
+  .accordion__content.richtext.rte li,
+  .accordion__content.richtext.rte div {
+    padding: 14px 16px; /* MOBILE INTERNAL PADDING */
+    font-size: 14px;
+    margin: 0 0 10px 0;
+  }
+  
+  .accordion__content.richtext.rte p::before,
+  .accordion__content.richtext.rte li::before,
+  .accordion__content.richtext.rte div::before {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+}
+
+/* TABLET */
+@media screen and (min-width: 750px) and (max-width: 1199px) {
+  .accordion__content.richtext.rte p,
+  .accordion__content.richtext.rte li,
+  .accordion__content.richtext.rte div {
+    padding: 16px 20px; /* TABLET INTERNAL PADDING */
+    font-size: 15px;
+  }
+}
+
+/* DESKTOP */
+@media screen and (min-width: 1200px) {
+  .accordion__content.richtext.rte p,
+  .accordion__content.richtext.rte li,
+  .accordion__content.richtext.rte div {
+    padding: 18px 24px; /* DESKTOP INTERNAL PADDING */
+    font-size: 16px;
+  }
+  
+  .accordion__content.richtext.rte p::before,
+  .accordion__content.richtext.rte li::before,
+  .accordion__content.richtext.rte div::before {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+}
+
+/* CENTER ACCORDION HEADINGS */
+.product__accordion .summary__title {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product__accordion .accordion__title {
+  text-align: center;
+  margin: 0 auto;
+  flex: 1;
+}
+
+/* ENSURE SUMMARY CONTENT IS CENTERED */
+.product__accordion summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 16px 20px; /* ADDED INTERNAL PADDING */
+}
+
+/* CENTER THE CARET ICON */
+.product__accordion summary svg {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* RESPONSIVE CENTERING */
+@media screen and (max-width: 749px) {
+  .product__accordion .summary__title {
+    text-align: center;
+  }
+  
+  .product__accordion .accordion__title {
+    text-align: center;
+    font-size: 16px;
+  }
+  
+  .product__accordion summary {
+    padding: 14px 16px; /* MOBILE INTERNAL PADDING */
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .product__accordion .summary__title {
+    text-align: center;
+  }
+  
+  .product__accordion .accordion__title {
+    text-align: center;
+    font-size: 18px;
+  }
+  
+  .product__accordion summary {
+    padding: 18px 24px; /* DESKTOP INTERNAL PADDING */
+  }
+}
+
+/* STYLING FOR USES SECTION (NON-ACCORDION) */
+.uses-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 88, 75, 0.1);
+}
+
+.uses-title {
+  color: #00584b;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 20px 0;
+}
+
+.uses-content.richtext.rte {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.6;
+  padding: 0;
+}
+
+/* Style individual paragraphs or list items in Uses */
+.uses-content.richtext.rte p,
+.uses-content.richtext.rte li,
+.uses-content.richtext.rte div {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 16px; /* ADDED INTERNAL PADDING */
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Remove icon to prevent overlap */
+.uses-content.richtext.rte p::before,
+.uses-content.richtext.rte li::before,
+.uses-content.richtext.rte div::before {
+  content: none;
+}
+
+/* Style strong/bold text */
+.uses-content.richtext.rte p strong,
+.uses-content.richtext.rte li strong,
+.uses-content.richtext.rte div strong {
+  color: #00584b;
+  font-weight: 600;
+}
+
+/* Remove default list styling */
+.uses-content.richtext.rte ul,
+.uses-content.richtext.rte ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Animation for content */
+.uses-content.richtext.rte p {
+  opacity: 0;
+  animation: fadeInUse 0.6s ease forwards;
+}
+
+.uses-content.richtext.rte p:nth-child(1) { animation-delay: 0.1s; }
+.uses-content.richtext.rte p:nth-child(2) { animation-delay: 0.2s; }
+.uses-content.richtext.rte p:nth-child(3) { animation-delay: 0.3s; }
+.uses-content.richtext.rte p:nth-child(4) { animation-delay: 0.4s; }
+.uses-content.richtext.rte p:nth-child(5) { animation-delay: 0.5s; }
+.uses-content.richtext.rte p:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUse {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 749px) {
+  .uses-container {
+    max-width: 95%;
+    padding: 0 15px;
+  }
+  
+  .uses-title {
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+  }
+  
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 14px;
+    padding: 10px 14px; /* MOBILE INTERNAL PADDING */
+    margin: 0 0 10px 0;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 750px) and (max-width: 1199px) {
+  .uses-container {
+    max-width: 1000px;
+    padding: 0 20px;
+  }
+  
+  .uses-title {
+    font-size: 1.8rem;
+  }
+  
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 15px;
+    padding: 12px 16px; /* TABLET INTERNAL PADDING */
+  }
+}
+
+/* Desktop */
+@media screen and (min-width: 1200px) {
+  .uses-container {
+    max-width: 1300px;
+    padding: 0 30px;
+  }
+  
+  .uses-title {
+    font-size: 2rem;
+  }
+  
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 16px;
+    padding: 14px 18px; /* DESKTOP INTERNAL PADDING */
+  }
+}
+
+/* STYLING FOR NON-FAQ USES SECTION */
+.page-width.product__accordion.accordion.quick-add-hidden.uses-section {
+  background-color: transparent;
+  border: none;
+  max-width: 1200px;
+  padding: 0;
+}
+
+.uses-content.richtext.rte {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+/* CRITICAL: Remove spacing from the first element right after the title */
+.uses-content.richtext.rte > *:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Remove default paragraph spacing in Uses section */
+.page-width.uses-section .uses-content.richtext.rte p {
+  margin-top: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Remove spacing from all direct children */
+.page-width.uses-section .uses-content.richtext.rte > * {
+  margin-top: 0 !important;
+}
+
+/* STYLING FOR EACH PARAGRAPH/LINE WITH BORDERS AND INTERNAL PADDING */
+.uses-content.richtext.rte p,
+.uses-content.richtext.rte li,
+.uses-content.richtext.rte div {
+  margin: 0 0 12px 0;
+  padding: 16px 20px; /* ADDED INTERNAL PADDING */
+  /* border: 1px solid #e5e7eb;
+  border-radius: 10px; */
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  position: relative;
+  font-size: 15px;
+  color: #374151;
+  line-height: 1.1;
+}
+
+/* STYLE STRONG/BOLD TEXT */
+.uses-content.richtext.rte p strong,
+.uses-content.richtext.rte li strong,
+.uses-content.richtext.rte div strong {
+  color: #00584b;
+  font-weight: 600;
+}
+
+/* REMOVE DEFAULT LIST STYLING */
+.uses-content.richtext.rte ul,
+.uses-content.richtext.rte ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ANIMATION FOR CONTENT */
+.uses-content.richtext.rte p {
+  opacity: 0;
+  animation: fadeInUse 0.6s ease forwards;
+}
+
+.uses-content.richtext.rte p:nth-child(1) { animation-delay: 0.1s; }
+.uses-content.richtext.rte p:nth-child(2) { animation-delay: 0.2s; }
+.uses-content.richtext.rte p:nth-child(3) { animation-delay: 0.3s; }
+.uses-content.richtext.rte p:nth-child(4) { animation-delay: 0.4s; }
+.uses-content.richtext.rte p:nth-child(5) { animation-delay: 0.5s; }
+.uses-content.richtext.rte p:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUse {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* MOBILE RESPONSIVE */
+@media screen and (max-width: 749px) {
+  .page-width.product__accordion.accordion.quick-add-hidden.uses-section {
+    margin: 0 auto;
+    padding: 0;
+  }
+  
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 14px;
+    padding: 14px 16px; /* MOBILE INTERNAL PADDING */
+    margin: 0 0 6px 0;
+    border-width: 1px;
+  }
+}
+
+/* TABLET */
+@media screen and (min-width: 750px) and (max-width: 1199px) {
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 15px;
+    padding: 16px 18px; /* TABLET INTERNAL PADDING */
+  }
+}
+
+/* DESKTOP */
+@media screen and (min-width: 1200px) {
+  .page-width.product__accordion.accordion.quick-add-hidden.uses-section {
+    max-width: 1300px;
+  }
+  
+  .uses-content.richtext.rte p,
+  .uses-content.richtext.rte li,
+  .uses-content.richtext.rte div {
+    font-size: 16px;
+    padding: 18px 24px; /* DESKTOP INTERNAL PADDING */
+    border-width: 1px;
+  }
+}

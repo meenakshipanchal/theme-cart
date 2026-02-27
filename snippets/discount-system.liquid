@@ -1,0 +1,368 @@
+
+{% assign BASE_DISCOUNT_PERCENT = 15 %}            <!-- Main discount % -->
+{% assign EXTRA_DISCOUNT_PERCENT = 2 %}            <!-- Extra discount % -->
+{% assign DISCOUNT_TEXT = "Best Price" %}          <!-- Main text -->
+{% assign COUPON_TEXT = "with coupon" %}           <!-- Coupon text -->
+{% assign ENABLE_ANIMATIONS = true %}              <!-- Animations on/off -->
+{% assign DIWALI_SALE_ACTIVE = false %}              <!-- B3P2 Sale flag -->
+
+{% comment %} Check for B3P2 sale - if active, show only B3P2 message {% endcomment %}
+{% if DIWALI_SALE_ACTIVE %}
+  {% if ENABLE_ANIMATIONS %}
+    <div class="discount-badge special" style="margin-top:8px">
+      <span class="discount-text">Diwali Sale is Live Sitewide | Use code: DW30</span>
+    </div>
+  {% else %}
+    <div class="simple-discount">Diwali Sale is Live Sitewide | Use code: DW30</div>
+  {% endif %}
+{% else %}
+  {% comment %} Detect if PDP or PLP {% endcomment %}
+  {% if product %}
+    {% assign current_product = product.selected_or_first_available_variant %}
+    {% assign product_title = product.title %}
+    {% assign is_pdp = true %}
+  {% else %}
+    {% assign current_product = card_product %}
+    {% assign product_title = card_product.title %}
+    {% assign is_pdp = false %}
+  {% endif %}
+
+  {% comment %} Check exclusions {% endcomment %}
+  {% assign should_show = true %}
+  {% if collection.handle == 'deal-of-the-day' %}
+    {% assign should_show = false %}
+  {% endif %}
+
+  {% comment %} Check for combo {% endcomment %}
+  {% assign is_combo = false %}
+  {% if collection.handle == 'a2-desi-ghee-wood-press-oil-combo-packs' %}
+    {% assign is_combo = true %}
+  {% else %}
+    {% assign title_lower = product_title | downcase %}
+    {% if title_lower contains 'combo'
+      or title_lower contains 'and'
+      or title_lower contains '&'
+      or title_lower contains 'duo'
+      or title_lower contains 'trio'
+      or title_lower contains 'mixes'
+      or title_lower contains 'pack'
+      or title_lower contains 'set'
+      or title_lower contains 'oils'
+    %}
+      {% assign is_combo = true %}
+    {% endif %}
+  {% endif %}
+
+  {% if should_show %}
+    {% if is_combo %}
+      {% liquid
+        assign compare_price = current_product.compare_at_price | default: 0
+        assign current_price = current_product.price
+        assign savings = compare_price | minus: current_price
+      %}
+      {% if savings > 0 %}
+        {% if ENABLE_ANIMATIONS %}
+          <div class="discount-badge combo" style="margin-top:8px">
+            <span class="discount-text">Save {{ savings | money }} – no additional discounts</span>
+          </div>
+        {% else %}
+          <div class="simple-discount">Save {{ savings | money }} – no additional discounts</div>
+        {% endif %}
+      {% endif %}
+    {% else %}
+      {% liquid
+        assign _price = current_product.price
+        assign base_discount = _price | times: BASE_DISCOUNT_PERCENT | divided_by: 100
+        assign price_after_base = _price | minus: base_discount
+        assign extra_discount = price_after_base | times: EXTRA_DISCOUNT_PERCENT | divided_by: 100
+        assign final_price = price_after_base | minus: extra_discount
+      %}
+      {% if ENABLE_ANIMATIONS %}
+        <div class="discount-badge default" style="margin-top:8px">
+          <span class="discount-text">{{ DISCOUNT_TEXT }} <span class="price-amount">{{ final_price | money }}</span></span>
+          <span class="coupon-text">{{ COUPON_TEXT }}</span>
+        </div>
+      {% else %}
+        <div class="simple-discount">{{ DISCOUNT_TEXT }} {{ final_price | money }} {{ COUPON_TEXT }}</div>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% comment %} 
+  ============= STYLING =============
+{% endcomment %}
+{% if ENABLE_ANIMATIONS %}
+<style>
+  .discount-badge {
+    background: #235A49;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    max-width: 100%;
+    box-shadow: 0 2px 4px rgba(35, 74, 89, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .discount-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(35, 74, 89, 0.4);
+  }
+
+  .discount-text {
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  .price-amount {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .coupon-text {
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 13px;
+  }
+
+  .discount-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), rgba(255,255,255,0.4), rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.15), transparent);
+    animation: shine 2.5s infinite;
+    z-index: 1;
+  }
+
+  @keyframes shine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  .discount-badge.special {
+    background:rgb(210, 142, 26);
+  }
+
+  .discount-badge.combo {
+    background: #2d5a47;
+  }
+
+  .discount-badge * {
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .discount-badge {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .price-amount { font-size: 14px; }
+    .coupon-text { font-size: 12px; }
+  }
+</style>
+{% else %}
+<style>
+  .simple-discount {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #333;
+    display: inline-block;
+    font-weight: 600;
+  }
+  @media (max-width: 768px) {
+    .simple-discount { font-size: 12px; padding: 6px 10px; }
+  }
+</style>
+{% endif %}
+
+{% comment %} {% assign BASE_DISCOUNT_PERCENT = 15 %}            <!-- Main discount % -->
+{% assign EXTRA_DISCOUNT_PERCENT = 2 %}            <!-- Extra discount % -->
+{% assign DISCOUNT_TEXT = "Best Price" %}          <!-- Main text -->
+{% assign COUPON_TEXT = "with coupon" %}           <!-- Coupon text -->
+{% assign ENABLE_ANIMATIONS = true %}              <!-- Animations on/off -->
+
+{% comment %} Detect if PDP or PLP {% endcomment %}
+{% if product %}
+  {% assign current_product = product.selected_or_first_available_variant %}
+  {% assign product_title = product.title %}
+  {% assign is_pdp = true %}
+{% else %}
+  {% assign current_product = card_product %}
+  {% assign product_title = card_product.title %}
+  {% assign is_pdp = false %}
+{% endif %}
+
+{% comment %} Check exclusions {% endcomment %}
+{% assign should_show = true %}
+{% if collection.handle == 'deal-of-the-day' %}
+  {% assign should_show = false %}
+{% endif %}
+
+{% comment %} Check for combo {% endcomment %}
+{% assign is_combo = false %}
+{% if collection.handle == 'a2-desi-ghee-wood-press-oil-combo-packs' %}
+  {% assign is_combo = true %}
+{% else %}
+  {% assign title_lower = product_title | downcase %}
+  {% if title_lower contains 'combo'
+    or title_lower contains 'and'
+    or title_lower contains '&'
+    or title_lower contains 'duo'
+    or title_lower contains 'trio'
+    or title_lower contains 'mixes'
+    or title_lower contains 'pack'
+    or title_lower contains 'set'
+    or title_lower contains 'oils'
+  %}
+    {% assign is_combo = true %}
+  {% endif %}
+{% endif %}
+
+{% if should_show %}
+  {% if is_combo %}
+    {% liquid
+      assign compare_price = current_product.compare_at_price | default: 0
+      assign current_price = current_product.price
+      assign savings = compare_price | minus: current_price
+    %}
+    {% if savings > 0 %}
+      {% if ENABLE_ANIMATIONS %}
+        <div class="discount-badge combo" style="margin-top:8px">
+          <span class="discount-text">Save {{ savings | money }} – no additional discounts</span>
+        </div>
+      {% else %}
+        <div class="simple-discount">Save {{ savings | money }} – no additional discounts</div>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    {% liquid
+      assign _price = current_product.price
+      assign base_discount = _price | times: BASE_DISCOUNT_PERCENT | divided_by: 100
+      assign price_after_base = _price | minus: base_discount
+      assign extra_discount = price_after_base | times: EXTRA_DISCOUNT_PERCENT | divided_by: 100
+      assign final_price = price_after_base | minus: extra_discount
+    %}
+    {% if ENABLE_ANIMATIONS %}
+      <div class="discount-badge default" style="margin-top:8px">
+        <span class="discount-text">{{ DISCOUNT_TEXT }} <span class="price-amount">{{ final_price | money }}</span></span>
+        <span class="coupon-text">{{ COUPON_TEXT }}</span>
+      </div>
+    {% else %}
+      <div class="simple-discount">{{ DISCOUNT_TEXT }} {{ final_price | money }} {{ COUPON_TEXT }}</div>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% comment %} 
+  ============= STYLING =============
+{% endcomment %}
+{% if ENABLE_ANIMATIONS %}
+<style>
+  .discount-badge {
+    background: #235A49;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    max-width: 100%;
+    box-shadow: 0 2px 4px rgba(35, 74, 89, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .discount-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(35, 74, 89, 0.4);
+  }
+
+  .discount-text {
+    font-weight: 400;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  .price-amount {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .coupon-text {
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 13px;
+  }
+
+  .discount-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), rgba(255,255,255,0.4), rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.15), transparent);
+    animation: shine 2.5s infinite;
+    z-index: 1;
+  }
+
+  @keyframes shine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  .discount-badge.special {
+    background: #5a2d47;
+  }
+
+  .discount-badge.combo {
+    background: #2d5a47;
+  }
+
+  .discount-badge * {
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .discount-badge {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .price-amount { font-size: 14px; }
+    .coupon-text { font-size: 12px; }
+  }
+</style>
+{% else %}
+<style>
+  .simple-discount {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #333;
+    display: inline-block;
+    font-weight: 600;
+  }
+  @media (max-width: 768px) {
+    .simple-discount { font-size: 12px; padding: 6px 10px; }
+  }
+</style>
+{% endif %} {% endcomment %}

@@ -1,0 +1,1431 @@
+
+
+
+{%- style -%}
+        /* Main container */
+        .uq-section-{{ section.id }}-padding {
+          width: 100%;
+          padding: 0;
+          background: #F5F5F5;
+          min-height: 100vh;
+        }
+
+        @media screen and (min-width: 750px) {
+          .uq-section-{{ section.id }}-padding {
+            padding: 0;
+          }
+        }
+
+        /* Account Container - Two Column Layout */
+        .uq-account-container {
+          /* max-width: 1400px; */
+          margin: 0 auto;
+          background: white;
+          border-radius: 0;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Desktop Layout */
+        @media screen and (min-width: 750px) {
+          .uq-account-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 600px;
+            margin-top: 0;
+          }
+        }
+
+        /* Mobile Layout */
+        @media screen and (max-width: 749px) {
+          .uq-account-container {
+            margin-top: 0;
+            border-radius: 0;
+          }
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .uq-sidebar-navigation {
+          background: #FFFFFF;
+          border-right: 1px solid #E0E0E0;
+          padding: 40px 0;
+        }
+
+        .sidebar-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+          padding: 0 24px 24px;
+          border-bottom: 1px solid #E0E0E0;
+          margin-bottom: 8px;
+        }
+
+        .uq-nav-button {
+          width: 100%;
+          padding: 16px 24px;
+          font-size: 15px;
+          font-weight: 500;
+          color: #666;
+          background: transparent;
+          border: none;
+          border-left: 3px solid transparent;
+          cursor: pointer;
+          text-align: left;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .uq-nav-button:hover {
+          background: #F8F8F8;
+          color: #235A49;
+        }
+
+        .uq-nav-button.uq-active {
+          background: #E8F5E9;
+          color: #235A49;
+          border-left-color: #235A49;
+          font-weight: 600;
+        }
+
+        .uq-nav-icon {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+
+        /* Mobile Navigation - Horizontal Layout */
+        @media screen and (max-width: 749px) {
+          .sidebar-title {
+            display: none; /* Hide "My Account" title on mobile */
+          }
+
+          .uq-sidebar-navigation {
+            border-right: none;
+            border-bottom: none;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: stretch;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: white;
+          }
+
+          .uq-nav-button {
+            flex: 1;
+            min-width: 80px;
+            max-width: 100px;
+            padding: 14px 8px;
+            font-size: 10px;
+            flex-direction: column;
+            gap: 8px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            text-align: center;
+            background: white;
+            transition: all 0.2s ease;
+          }
+
+          .uq-nav-button span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            font-weight: 500;
+          }
+
+          .uq-nav-button.uq-active {
+            background: #E8F5E9;
+            border: 2px solid #A5D6A7;
+            color: #235A49;
+          }
+
+          .uq-nav-button:hover {
+            background: #F5F5F5;
+          }
+
+          .uq-nav-icon {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto;
+          }
+
+          .uq-nav-button.uq-active .uq-nav-icon {
+            stroke: #235A49;
+          }
+        }
+
+        /* MAIN CONTENT AREA */
+        .uq-main-content {
+          padding: 32px;
+          background: #FAFAFA;
+          overflow-y: auto;
+        }
+
+        @media screen and (max-width: 749px) {
+          .uq-main-content {
+            padding: 16px 12px;
+          }
+        }
+
+        /* Tab content visibility */
+        .uq-content-panel {
+          display: none;
+        }
+
+        .uq-content-panel.uq-active {
+          display: block;
+          animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* WALLET SECTION - EXACT WIREFRAME MATCH */
+
+        /* Balance Header Card */
+        .wallet-balance-card {
+          background: #E8F5E9;
+          border: 1px solid #C8E6C9;
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+
+        .wallet-balance-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+        }
+
+        .wallet-coin-icon {
+          width: 45px;
+          height: 45px;
+          flex-shrink: 0;
+        }
+
+        .wallet-balance-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .wallet-balance-label {
+          font-size: 13px;
+          color: #235A49;
+          font-weight: 600;
+        }
+
+        .wallet-balance-amount {
+          font-size: 26px;
+          font-weight: 700;
+          color: #235A49;
+          line-height: 1;
+        }
+
+        .wallet-actions {
+          display: flex;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+
+        .wallet-btn {
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 13px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        /* Mobile Responsive for Balance Card */
+        @media screen and (max-width: 749px) {
+          .wallet-balance-card {
+            padding: 16px;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .wallet-balance-left {
+            width: 100%;
+            gap: 10px;
+          }
+
+          .wallet-coin-icon {
+            width: 40px;
+            height: 40px;
+          }
+
+          .wallet-balance-label {
+            font-size: 12px;
+          }
+
+          .wallet-balance-amount {
+            font-size: 22px;
+          }
+
+          .wallet-actions {
+            width: 100%;
+            gap: 8px;
+          }
+
+          .wallet-btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 12px;
+          }
+        }
+
+        .wallet-btn-redeem {
+          background: #235A49;
+          color: white;
+        }
+
+        .wallet-btn-redeem:hover {
+          background: #1d4a3b;
+          transform: translateY(-1px);
+        }
+
+        .wallet-btn-earn {
+          background: #FFC107;
+          color: #333;
+        }
+
+        .wallet-btn-earn:hover {
+          background: #FFB300;
+          transform: translateY(-1px);
+        }
+
+        /* How to Earn Section */
+        .how-to-earn {
+          background: white;
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 24px;
+          border: 1px solid #E0E0E0;
+        }
+
+        .how-to-earn-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #235A49;
+          margin-bottom: 16px;
+        }
+
+        .earn-methods {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+        }
+
+        .earn-method {
+          background: #F1F8F5;
+          /* border: 1px solid #E0E0E0; */
+          border-radius: 8px;
+          padding: 16px 12px;
+          text-align: center;
+          transition: all 0.2s;
+        }
+
+        .earn-method:hover {
+          border-color: #235A49;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(35,90,73,0.1);
+        }
+
+        .earn-method-icon {
+          width: 44px;
+          height: 44px;
+          margin: 0 auto 10px;
+          display: block;
+        }
+
+        .earn-method-text {
+          font-size: 12px;
+          font-weight: 500;
+          color: #555;
+          line-height: 1.3;
+        }
+
+        /* Mobile Responsive for How to Earn */
+        @media screen and (max-width: 749px) {
+          .how-to-earn {
+            padding: 16px;
+          }
+
+          .how-to-earn-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+          }
+
+          .earn-methods {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+
+          .earn-method {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            padding: 12px;
+            gap: 12px;
+          }
+
+          .earn-method-icon {
+            width: 36px;
+            height: 36px;
+            margin: 0;
+          }
+
+          .earn-method-text {
+            font-size: 13px;
+            flex: 1;
+          }
+        }
+
+        /* Transaction History */
+        .transaction-history {
+          background: white;
+          border-radius: 12px;
+          padding: 20px;
+          border: 1px solid #E0E0E0;
+        }
+
+        .history-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #235A49;
+          margin-bottom: 16px;
+        }
+
+        .transaction-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 0;
+          border-bottom: 1px solid #F0F0F0;
+        }
+
+        .transaction-item:last-child {
+          border-bottom: none;
+        }
+
+        .transaction-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+        }
+
+        .transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background-size: 22px 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+        .transaction-details {
+          flex: 1;
+        }
+
+        .transaction-type {
+          font-weight: 600;
+          color: #333;
+          font-size: 14px;
+          margin-bottom: 3px;
+        }
+
+        .transaction-date {
+          font-size: 11px;
+          color: #999;
+        }
+
+        .transaction-amount {
+          font-size: 16px;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+
+        .transaction-amount.credit {
+          color: #4CAF50;
+        }
+
+        .transaction-amount.debit {
+          color: #F44336;
+        }
+
+        /* Mobile Responsive for Transaction History */
+        @media screen and (max-width: 749px) {
+          .transaction-history {
+            padding: 16px;
+          }
+
+          .history-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+          }
+
+          .transaction-item {
+            padding: 12px 0;
+          }
+
+          .transaction-icon {
+  width: 36px;
+  height: 36px;
+  background-size: 18px 18px;
+}
+
+
+          .transaction-type {
+            font-size: 13px;
+          }
+
+          .transaction-date {
+            font-size: 10px;
+          }
+
+          .transaction-amount {
+            font-size: 15px;
+          }
+        }
+
+        .no-transactions {
+          text-align: center;
+          padding: 60px 20px;
+          color: #999;
+          font-size: 15px;
+        }
+
+        /* Load More Button */
+        .load-more-container {
+          text-align: center;
+          padding: 20px 0 10px;
+          border-top: 1px solid #F0F0F0;
+          margin-top: 10px;
+        }
+
+        .load-more-btn {
+          background: #4A5568;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 28px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s;
+          text-transform: lowercase;
+        }
+
+        .load-more-btn:hover {
+          background: #2D3748;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .load-more-btn svg {
+          transition: transform 0.2s;
+        }
+
+        .load-more-btn:hover svg {
+          transform: translateY(2px);
+        }
+
+        /* FAQs Section */
+        .faqs-section {
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          margin-top: 24px;
+          border: 1px solid #E0E0E0;
+        }
+
+        .faqs-title {
+          font-size: 20px;
+          font-weight: 700;
+          color: #235A49;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .faq-accordion {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .faq-item {
+          background: #F5F5F5;
+          border-radius: 8px;
+          overflow: hidden;
+          transition: all 0.2s;
+        }
+
+        .faq-question {
+          width: 100%;
+          padding: 16px 20px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          text-align: left;
+          font-size: 15px;
+          font-weight: 500;
+          color: #333;
+          transition: all 0.2s;
+        }
+
+        .faq-question:hover {
+          background: #E8E8E8;
+        }
+
+        /* Active FAQ - Light Green Background */
+        .faq-item.active .faq-question {
+          background: #F1F8F5;
+          color: #235A49;
+        }
+
+        .faq-number {
+          color: #235A49;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+
+        .faq-text {
+          flex: 1;
+        }
+
+        .faq-icon {
+          flex-shrink: 0;
+          transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+          transform: rotate(180deg);
+        }
+
+        .faq-answer {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease, padding 0.3s ease;
+          padding: 0 20px;
+          background: #F1F8F5;
+        }
+
+        .faq-item.active .faq-answer {
+          max-height: 500px;
+          padding: 0 20px 20px;
+        }
+
+        .faq-answer p {
+          margin: 0;
+          padding-top: 8px;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #666;
+        }
+
+        @media screen and (max-width: 749px) {
+          .faqs-title {
+            font-size: 18px;
+          }
+
+          .faq-question {
+            padding: 14px 16px;
+            font-size: 14px;
+          }
+
+          .faq-answer {
+            padding: 0 16px;
+          }
+
+          .faq-item.active .faq-answer {
+            padding: 0 16px 16px;
+          }
+
+          .load-more-btn {
+            font-size: 13px;
+            padding: 10px 24px;
+          }
+        }
+
+        /* Loading state */
+        .wallet-loading {
+          text-align: center;
+          padding: 60px;
+          color: #666;
+          font-size: 15px;
+        }
+
+        /* ACCOUNT & ORDERS SECTIONS */
+        .uq-main-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 20px;
+        }
+
+        @media screen and (max-width: 749px) {
+          .uq-main-title {
+            font-size: 20px;
+            margin-bottom: 16px;
+          }
+        }
+
+        .uq-account-details,
+        .uq-address-section {
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 20px;
+          border: 1px solid #E0E0E0;
+        }
+
+        .uq-section-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 16px;
+        }
+
+        .uq-info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #F0F0F0;
+        }
+
+        .uq-info-row:last-child {
+          border-bottom: none;
+        }
+
+        .uq-info-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #666;
+        }
+
+        .uq-info-value {
+          font-size: 14px;
+          font-weight: 600;
+          color: #333;
+          text-align: right;
+        }
+
+        .uq-btn-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 24px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #ffffff;
+          background: #235A49;
+          border: none;
+          border-radius: 8px;
+          text-decoration: none;
+          transition: all 0.2s;
+          cursor: pointer;
+        }
+
+        .uq-btn-primary:hover {
+          background: #1d4a3b;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(35,90,73,0.2);
+        }
+
+        .logout-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #F44336;
+          color: #fff;
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+          background: #D32F2F;
+          transform: translateY(-1px);
+        }
+
+        /* Bottom Banner Image - Responsive */
+        .wallet-bottom-banner {
+          margin-top: 24px;
+          border-radius: 12px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .wallet-bottom-banner img {
+          width: 100%;
+          height: auto;
+          display: block;
+          vertical-align: middle;
+          border: 0;
+        }
+
+        /* Hide any text nodes before/after images */
+        .wallet-bottom-banner::before,
+        .wallet-bottom-banner::after {
+          content: none;
+          display: none;
+        }
+
+        /* Desktop Image - Hidden on Mobile */
+        .wallet-banner-desktop {
+          display: none;
+        }
+
+        @media screen and (min-width: 750px) {
+          .wallet-banner-desktop {
+            display: block;
+          }
+          .wallet-banner-mobile {
+            display: none;
+          }
+        }
+
+        /* Mobile Image - Hidden on Desktop */
+        .wallet-banner-mobile {
+          display: block;
+        }
+
+        @media screen and (min-width: 750px) {
+          .wallet-banner-mobile {
+            display: none;
+          }
+        }
+{%- endstyle -%}
+<style>
+.tx-icon-credit { background-color: #E8F5E9; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='16'/%3E%3Cline x1='8' y1='12' x2='16' y2='12'/%3E%3C/svg%3E"); }
+.tx-icon-debit { background-color: #FFEBEE; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23F44336' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='9' cy='21' r='1'/%3E%3Ccircle cx='20' cy='21' r='1'/%3E%3Cpath d='M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6'/%3E%3C/svg%3E"); }
+.tx-icon-restore { background-color: #E3F2FD; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%232196F3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='1 4 1 10 7 10'/%3E%3Cpath d='M3.51 15a9 9 0 1 0 2.13-9.36L1 10'/%3E%3C/svg%3E"); }
+.tx-icon-bonus { background-color: #F3E5F5; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%239C27B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 12 20 22 4 22 4 12'/%3E%3Crect x='2' y='7' width='20' height='5'/%3E%3Cline x1='12' y1='22' x2='12' y2='7'/%3E%3Cpath d='M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z'/%3E%3Cpath d='M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z'/%3E%3C/svg%3E"); }
+.tx-icon-warning { background-color: #FFF3E0; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23FF9800' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E"); }
+.tx-icon-expired { background-color: #FFEBEE; background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23F44336' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E"); }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.uq-nav-button[data-tab-target]');
+    const contents = document.querySelectorAll('.uq-content-panel');
+
+    // Activate first tab by default, but check for pagination
+    if (tabs.length > 0 && contents.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasPageParam = urlParams.has('page');
+
+      if (hasPageParam) {
+        const ordersTab = document.querySelector('.uq-nav-button[data-tab-target="orders"]');
+        const ordersContent = document.querySelector('#uq-content-orders');
+
+        if (ordersTab && ordersContent) {
+          tabs.forEach(t => t.classList.remove('uq-active'));
+          contents.forEach(c => c.classList.remove('uq-active'));
+          ordersTab.classList.add('uq-active');
+          ordersContent.classList.add('uq-active');
+          setTimeout(() => {
+            ordersContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+      } else {
+        tabs[0].classList.add('uq-active');
+        contents[0].classList.add('uq-active');
+      }
+    }
+
+    // Tab switching
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        // Remove active from all
+        tabs.forEach((item) => item.classList.remove('uq-active'));
+        contents.forEach((content) => content.classList.remove('uq-active'));
+
+        // Add active to clicked
+        const targetId = tab.dataset.tabTarget;
+        const targetContent = document.querySelector(`#uq-content-${targetId}`);
+
+        tab.classList.add('uq-active');
+        if (targetContent) {
+          targetContent.classList.add('uq-active');
+
+          // Load wallet data when wallet tab is clicked
+          if (targetId === 'wallet') {
+            loadWalletData();
+            // Attach FAQ listeners after wallet tab is visible
+            setTimeout(() => {
+              attachFAQListeners();
+            }, 100);
+          }
+        }
+      });
+    });
+
+    // Attach FAQ listeners on page load (for Liquid-rendered FAQs)
+    attachFAQListeners();
+  });
+
+  // Wallet Data Loading
+  async function loadWalletData() {
+    const container = document.getElementById('wallet-data-container');
+    if (!container) return;
+
+    // Reset pagination
+    displayedCount = 5;
+
+    container.innerHTML = '<div class="wallet-loading">⏳ Loading wallet data...</div>';
+
+    try {
+      const phone = getCustomerPhone();
+      if (!phone) {
+        container.innerHTML = '<div class="wallet-loading">❌ Phone number not found. Please update your profile.</div>';
+        return;
+      }
+
+      // API Headers
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-API-Key': '242b8492f3e718988f127bc4e94fbd7d3274d2cc6c8ca328d324ab7825d100b3',
+        'X-User-Phone': phone
+      };
+
+      // Fetch wallet data
+      const response = await fetch(`https://puritycoins.anveshan.farm/api/v1/user/${phone}/wallet`, {
+        method: 'GET',
+        headers: headers
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        container.innerHTML = '<div class="wallet-loading">❌ Failed to load wallet data</div>';
+        return;
+      }
+
+      // Fetch transactions
+      const txResponse = await fetch(`https://puritycoins.anveshan.farm/api/v1/user/${phone}/transactions?limit=50`, {
+        method: 'GET',
+        headers: headers
+      });
+      const txData = await txResponse.json();
+
+      renderWalletUI(data, txData.transactions || []);
+
+    } catch (error) {
+      console.error('❌ Wallet load error:', error);
+      container.innerHTML = '<div class="wallet-loading">❌ Error loading wallet data</div>';
+    }
+  }
+
+  function getCustomerPhone() {
+    // Try window.customer first
+    if (window.customer && window.customer.phone) {
+      return cleanPhone(window.customer.phone);
+    }
+
+    // Try Liquid customer object
+    {% if customer.default_address.phone %}
+      return cleanPhone('{{ customer.default_address.phone }}');
+    {% endif %}
+
+    // Try localStorage
+    const saved = localStorage.getItem('anveshan_user_phone');
+    if (saved) return saved;
+
+    return null;
+  }
+
+  function cleanPhone(phone) {
+    if (!phone) return null;
+    let cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      cleaned = '+91' + cleaned;
+    } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      cleaned = '+' + cleaned;
+    } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+      cleaned = '+91' + cleaned.slice(1);
+    }
+    if (!cleaned.startsWith('+')) cleaned = '+' + cleaned;
+    return cleaned;
+  }
+
+  // Global variable to track displayed transactions
+  let allTransactions = [];
+  let displayedCount = 5;
+
+  function renderWalletUI(data, transactions) {
+    const container = document.getElementById('wallet-data-container');
+    const wallet = data.wallet || {};
+    const userData = data.userData || {};
+
+    const redeemableAmount = parseFloat(userData.redeemableAmount || wallet.redeemableAmount || 0);
+    const currentBalance = parseFloat(userData.current_coin_balance || userData.coins || wallet.currentBalance || wallet.coins || 0);
+
+    // Store all transactions globally
+    allTransactions = transactions;
+
+    const html = `
+      <!-- Balance Card -->
+      <div class="wallet-balance-card">
+        <div class="wallet-balance-left">
+          <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/c0ed36c7572f14edde4e2d0cf711fac417344a39.png?v=1759468931" alt="Coin" class="wallet-coin-icon">
+          <div class="wallet-balance-info">
+            <div class="wallet-balance-label">Your Purity Balance</div>
+            <div class="wallet-balance-amount">${currentBalance} Coins</div>
+          </div>
+        </div>
+        <div class="wallet-actions">
+          <button class="wallet-btn wallet-btn-redeem" onclick="document.querySelector('cart-drawer').open()">Redeem</button>
+          <a href="/collections/all-products" class="wallet-btn wallet-btn-earn">Earn More</a>
+        </div>
+      </div>
+
+      <!-- How to Earn -->
+      <div class="how-to-earn">
+        <h3 class="how-to-earn-title">How to Earn Purity Coins</h3>
+        <div class="earn-methods">
+          <div class="earn-method">
+            <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_1_6185eb80-bddb-437b-b7b1-7a0ecd4049f1.svg?v=1759469020" alt="Sign Up" class="earn-method-icon">
+            <div class="earn-method-text">First-Time Sign-Up</div>
+          </div>
+          <div class="earn-method">
+            <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7183.svg?v=1759469056" alt="Order" class="earn-method-icon">
+            <div class="earn-method-text">With Every Order</div>
+          </div>
+          <div class="earn-method">
+            <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7184.svg?v=1759469165" alt="Referral" class="earn-method-icon">
+            <div class="earn-method-text">With Every Referral</div>
+          </div>
+          <div class="earn-method">
+            <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_1_1.svg?v=1759469193" alt="Birthday" class="earn-method-icon">
+            <div class="earn-method-text">Your Birthday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction History -->
+      <div class="transaction-history">
+        <h3 class="history-title">History</h3>
+        <div id="transactions-container">
+          ${renderTransactions()}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    
+    // Attach event listeners
+    attachLoadMoreListener();
+  }
+
+ function renderTransactions() {
+    if (allTransactions.length === 0) {
+      return '<div class="no-transactions">No transactions yet</div>';
+    }
+
+    const visibleTransactions = allTransactions.slice(0, displayedCount);
+    const hasMore = displayedCount < allTransactions.length;
+    const debitTypes = ['REDEEM', 'REDEEMED', 'BLOCK', 'ORDER_CANCELED', 'BULK_DEDUCTION', 'BULK_DEDUCT', 'REVOKED', 'EXPIRY', 'ADMIN_DEDUCTION'];
+
+    const transactionsHTML = visibleTransactions.map(tx => {
+      const isDebit = debitTypes.includes(tx.type);
+      const icon = getTransactionIcon(tx.type);
+      return `
+      <div class="transaction-item">
+        <div class="transaction-info">
+          <div class="transaction-icon" style="background-color:${icon.bg};display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${icon.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon.path}</svg>
+          </div>
+          <div class="transaction-details">
+            <div class="transaction-type">${getTransactionTitle(tx.type)}</div>
+            <div class="transaction-date">${formatDate(tx.timestamp)}</div>
+          </div>
+        </div>
+        <div class="transaction-amount ${isDebit ? 'debit' : 'credit'}">
+          ${isDebit ? '-' : '+'}${Math.abs(tx.amount)}
+        </div>
+      </div>
+    `;
+    }).join('');
+
+    const loadMoreButton = hasMore ? `
+      <div class="load-more-container">
+        <button class="load-more-btn" id="load-more-history">
+          load more history
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+    ` : '';
+
+    return transactionsHTML + loadMoreButton;
+  }
+
+
+
+  function attachLoadMoreListener() {
+    const loadMoreBtn = document.getElementById('load-more-history');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        displayedCount += 5;
+        const container = document.getElementById('transactions-container');
+        container.innerHTML = renderTransactions();
+        attachLoadMoreListener(); // Re-attach listener for new button
+      });
+    }
+  }
+
+  function renderFAQs() {
+    // FAQs will be fetched from Shopify metaobject via Liquid
+    // Data is injected in the HTML section below
+    return ''; // Empty since we're using Liquid to render FAQs
+  }
+
+  function attachFAQListeners() {
+    // Use event delegation to avoid duplicate listeners
+    const faqContainer = document.querySelector('.faq-accordion');
+    if (!faqContainer) return;
+
+    // Remove any existing listener
+    const existingListener = faqContainer._faqListener;
+    if (existingListener) {
+      faqContainer.removeEventListener('click', existingListener);
+    }
+
+    // Create and attach new listener
+    const listener = (e) => {
+      const button = e.target.closest('.faq-question');
+      if (!button) return;
+
+      const faqItem = button.parentElement;
+      const isActive = faqItem.classList.contains('active');
+      
+      // Close all FAQs
+      document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Open clicked FAQ if it wasn't active
+      if (!isActive) {
+        faqItem.classList.add('active');
+      }
+    };
+
+    faqContainer.addEventListener('click', listener);
+    faqContainer._faqListener = listener; // Store reference for later removal
+  }
+
+  function getTransactionIcon(type) {
+    const icons = {
+      credit:  { bg: '#E8F5E9', color: '#4CAF50', path: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>' },
+      debit:   { bg: '#FFEBEE', color: '#F44336', path: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>' },
+restore: { bg: '#E8F5E9', color: '#235A49', path: '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>' },
+      bonus:   { bg: '#F3E5F5', color: '#9C27B0', path: '<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>' },
+      warning: { bg: '#FFF3E0', color: '#FF9800', path: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>' },
+      expired: { bg: '#FFEBEE', color: '#F44336', path: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' }
+    };
+    const t = (type || '').toUpperCase();
+    if (['CASHBACK','EARNED','MANUAL_CREDIT','ADMIN_CREDIT','SIGNUP','SIGNUP_BONUS','BULK_BONUS'].includes(t)) return icons.credit;
+    if (['BLOCK','REDEEM','REDEEMED','BULK_DEDUCTION','BULK_DEDUCT','ADMIN_DEDUCTION'].includes(t)) return icons.debit;
+    if (['CASHBACK_REVERSAL','UNBLOCK','REFUND','RESTORED','REDEMPTION_REFUND'].includes(t)) return icons.restore;
+    if (['BONUS','ZERO_BALANCE_BONUS'].includes(t)) return icons.bonus;
+    if (['ORDER_CANCELED','REVOKED'].includes(t)) return icons.warning;
+    if (t === 'EXPIRY') return icons.expired;
+    return icons.credit;
+  }
+
+  function getTransactionTitle(type) {
+  const titles = {
+    'SIGNUP': 'Order Rewards',
+    'SIGNUP_BONUS': 'Signup Bonus',
+    'CASHBACK': 'Order Rewards',
+    'EARNED': 'Order Rewards',
+    'MANUAL_CREDIT': 'Anveshan Bonus',
+    'BULK_BONUS': 'Launch Bonus',
+    'ADMIN_CREDIT': 'Anveshan Bonus',
+    'REDEEM': 'Redeemed',
+    'REDEEMED': 'Redeemed',
+    'BLOCK': 'Redeemed',
+    'CASHBACK_REVERSAL': 'Coins Restored',
+    'UNBLOCK': 'Coins Restored',
+    'REFUND': 'Coins Refunded',
+    'REDEMPTION_REFUND': 'Coins Refunded',
+    'ORDER_CANCELED': 'Order Canceled',
+    'BONUS': 'Bonus Credited',
+    'ZERO_BALANCE_BONUS': 'Anveshan Reward',
+    'BULK_DEDUCTION': 'Anveshan Deducted',
+    'BULK_DEDUCT': 'Anveshan Deducted',
+    'ADMIN_DEDUCTION': 'Admin Deduction',
+    'REVOKED': 'Cashback Reversed',
+    'EXPIRY': 'Expired',
+    'RESTORED': 'Coins Restored'
+  };
+  return titles[type] || type.replace(/_/g, ' ');
+}
+
+
+  function formatDate(timestamp) {
+    if (!timestamp) return 'N/A';
+
+    try {
+      let date;
+      if (timestamp._seconds) {
+        date = new Date(timestamp._seconds * 1000);
+      } else if (typeof timestamp === 'object' && timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+      } else {
+        date = new Date(timestamp);
+      }
+
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+</script>
+
+<div class="uq-section-{{ section.id }}-padding">
+  <div class="uq-account-container">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <div class="uq-sidebar-navigation" role="tablist">
+      <h2 class="sidebar-title">My Account</h2>
+
+      <button class="uq-nav-button" data-tab-target="account" role="tab">
+        <svg class="uq-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Account Details</span>
+      </button>
+
+      <button class="uq-nav-button" data-tab-target="orders" role="tab">
+        {% comment %} <svg class="uq-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+        </svg> {% endcomment %}
+          <img class="uq-nav-icon" src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_13.jpg?v=1764072455" alt="Purity Wallet Icon" width="24" height="24"/>
+
+        <span>Order history</span>
+      </button>
+      <button class="uq-nav-button" data-tab-target="wallet" role="tab">
+          <img class="uq-nav-icon" src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/image_83.jpg?v=1764072418" alt="Purity Wallet Icon" width="24" height="24"/>
+        <span>Purity Wallet</span>
+      </button>
+
+      <button class="uq-nav-button" data-tab-target="logout" role="tab">
+        <svg class="uq-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16,17 21,12 16,7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Log out</span>
+      </button>
+    </div>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <div class="uq-main-content">
+      <!-- ACCOUNT DETAILS TAB -->
+      <div class="uq-content-panel" id="uq-content-account" role="tabpanel">
+        <h2 class="uq-main-title">Account Details</h2>
+
+        <div class="uq-account-details">
+          <div class="uq-info-row">
+            <div class="uq-info-label">Name</div>
+            <div class="uq-info-value">{{ customer.name }}</div>
+          </div>
+          <div class="uq-info-row">
+            <div class="uq-info-label">Email</div>
+            <div class="uq-info-value">{{ customer.email }}</div>
+          </div>
+          {% if customer.default_address.phone %}
+            <div class="uq-info-row">
+              <div class="uq-info-label">Phone</div>
+              <div class="uq-info-value">{{ customer.default_address.phone }}</div>
+            </div>
+          {% endif %}
+          <div class="uq-info-row">
+            <div class="uq-info-label">Total Orders</div>
+            <div class="uq-info-value">{{ customer.orders_count }}</div>
+          </div>
+          <div class="uq-info-row">
+            <div class="uq-info-label">Total Spent</div>
+            <div class="uq-info-value">{{ customer.total_spent | money }}</div>
+          </div>
+        </div>
+
+        <div class="uq-address-section">
+          <h3 class="uq-section-title">Default Address</h3>
+
+          {% if customer.default_address %}
+            {% if customer.default_address.address1 %}
+              <div class="uq-info-row">
+                <div class="uq-info-label">Address</div>
+                <div class="uq-info-value">{{ customer.default_address.address1 }}</div>
+              </div>
+            {% endif %}
+            {% if customer.default_address.city %}
+              <div class="uq-info-row">
+                <div class="uq-info-label">City</div>
+                <div class="uq-info-value">{{ customer.default_address.city }}</div>
+              </div>
+            {% endif %}
+            {% if customer.default_address.province %}
+              <div class="uq-info-row">
+                <div class="uq-info-label">State</div>
+                <div class="uq-info-value">{{ customer.default_address.province }}</div>
+              </div>
+            {% endif %}
+            {% if customer.default_address.zip %}
+              <div class="uq-info-row">
+                <div class="uq-info-label">Postal Code</div>
+                <div class="uq-info-value">{{ customer.default_address.zip }}</div>
+              </div>
+            {% endif %}
+          {% else %}
+            <p style="color: #999;">No default address saved.</p>
+          {% endif %}
+
+          <div style="margin-top: 20px;">
+            <a href="{{ routes.account_addresses_url }}" class="uq-btn-primary">
+              View All Addresses ({{ customer.addresses_count }})
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER HISTORY TAB -->
+      <div class="uq-content-panel" id="uq-content-orders" role="tabpanel">
+        {% comment %} <h2 class="uq-main-title">Order History</h2> {% endcomment %}
+        {% render 'order-list' %}
+      </div>
+
+      <!-- WALLET TAB -->
+      <div class="uq-content-panel" id="uq-content-wallet" role="tabpanel">
+        {% comment %} <h2 class="uq-main-title">💰 Purity Wallet</h2> {% endcomment %}
+        <div id="wallet-data-container">
+          <div class="wallet-loading">Click to load your wallet...</div>
+        </div>
+
+        <!-- FAQs Section - Fetched from Metaobject -->
+        {% assign wallet_faqs = shop.metaobjects.wallet_faq.values | where: 'is_active', true | sort: 'display_order' %}
+        
+        {% if wallet_faqs.size > 0 %}
+          <div class="faqs-section">
+            <h3 class="faqs-title">FAQs</h3>
+            <div class="faq-accordion">
+              {% for faq in wallet_faqs %}
+                <div class="faq-item">
+                  <button class="faq-question" type="button">
+                    <span class="faq-number">{{ forloop.index }}.</span>
+                    <span class="faq-text">{{ faq.question.value }}</span>
+                    <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+                  <div class="faq-answer">
+                    <p>{{ faq.answer.value }}</p>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Bottom Banner - Responsive Images -->
+        <div class="wallet-bottom-banner">
+          <!-- Mobile Image -->
+          <img 
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/coin-mobile.jpg?v=1764069294" 
+            alt="" 
+            class="wallet-banner-mobile"
+            loading="lazy"
+          >
+          
+          <!-- Desktop/Laptop Image -->
+          <img 
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/coin-laptop.jpg?v=1764069294" 
+            alt="" 
+            class="wallet-banner-desktop"
+            loading="lazy"
+          >
+        </div>
+      </div>
+
+      <!-- LOGOUT TAB -->
+      <div class="uq-content-panel" id="uq-content-logout" role="tabpanel">
+        <h2 class="uq-main-title">Logout</h2>
+        <div class="uq-account-details" style="text-align: center; padding: 60px 24px;">
+          <p style="margin-bottom: 24px; color: #666;">Are you sure you want to logout?</p>
+          <a href="{{ routes.account_logout_url }}" class="logout-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16,17 21,12 16,7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Account Page with Wallet",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}

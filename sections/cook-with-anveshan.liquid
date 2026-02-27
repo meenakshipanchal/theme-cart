@@ -1,0 +1,316 @@
+<!-- Cook with Anveshan Section - Firebase Powered -->
+<style>
+  .cook-section {
+    position: relative;
+    padding: 100px 15px 40px;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    min-height: 500px;
+  }
+  .cook-section-header {
+    display: none;
+  }
+  .cook-videos-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 20px 20px;
+    scrollbar-width: none;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+  .cook-videos-container::-webkit-scrollbar {
+    display: none;
+  }
+  .cook-video-card {
+    flex: 0 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    scroll-snap-align: start;
+  }
+  .cook-video-card video {
+    display: block;
+    height: 400px;
+    width: auto;
+  }
+  .cook-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    padding: 0 5px;
+  }
+  .cook-progress {
+    display: flex;
+    gap: 5px;
+  }
+  .cook-progress-dot {
+    width: 25px;
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .cook-progress-dot.active {
+    background: #235A49;
+  }
+  .cook-loading {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+  }
+  .cook-fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.4s ease-out, opacity 0.3s ease-out, visibility 0.4s;
+  }
+  .cook-fullscreen-overlay.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  .cook-fullscreen-overlay video {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+  .cook-fullscreen-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #333;
+    z-index: 10000;
+  }
+  @media (min-width: 990px) {
+    .cook-section {
+      padding: 180px 15px 40px;
+    }
+    .cook-videos-container {
+      gap: 18px;
+      padding: 10px 40px 20px;
+    }
+  }
+  @media (max-width: 749px) {
+    .cook-section {
+      padding: 90px 15px 40px;
+    }
+    .cook-videos-container {
+      justify-content: flex-start;
+      padding: 10px 15px 20px;
+      gap: 12px;
+    }
+  }
+</style>
+
+<section class="cook-section" id="cook-with-anveshan">
+  <div class="cook-videos-container" id="cook-videos-container">
+    <div class="cook-loading">Loading recipes...</div>
+  </div>
+  <div class="cook-footer">
+    <div class="cook-progress" id="cook-progress"></div>
+  </div>
+  <div class="cook-fullscreen-overlay" id="cook-fullscreen-overlay">
+    <button class="cook-fullscreen-close" id="cook-fullscreen-close">&times;</button>
+    <video id="cook-fullscreen-video" controls playsinline loop></video>
+  </div>
+</section>
+
+<script>
+(function() {
+  const API_URL = 'https://wcookabpoiok.meenakshi-a65.workers.dev';
+  const CACHE_KEY = 'cook_anveshan_data';
+  const CACHE_TIME = 5 * 60 * 1000;
+  const container = document.getElementById('cook-videos-container');
+  const progressContainer = document.getElementById('cook-progress');
+  const section = document.getElementById('cook-with-anveshan');
+
+  function renderData(data) {
+    if (!data.success || !data.data) {
+      container.innerHTML = '<p>Unable to load recipes</p>';
+      return;
+    }
+
+    let bgImage = '';
+    let bgImageDesktop = '';
+    const videos = [];
+
+    data.data.forEach(item => {
+      if (item.Bgimage) bgImage = item.Bgimage;
+      if (item.BgimageDesktop) bgImageDesktop = item.BgimageDesktop;
+      if (item.mediaUrl && (item.mediaType === 'video' || item.mediaUrl.includes('.mp4') || item.mediaUrl.includes('.webm') || item.mediaUrl.includes('.mov'))) {
+        videos.push(item);
+      }
+    });
+
+    videos.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+      const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+      return dateB - dateA;
+    });
+
+    // Desktop (990px+) uses BgimageDesktop, else Bgimage
+    const isDesktop = window.innerWidth >= 990;
+    const finalBg = isDesktop && bgImageDesktop ? bgImageDesktop : bgImage;
+    if (finalBg) section.style.backgroundImage = `url('${finalBg}')`;
+
+    if (videos.length === 0) {
+      container.innerHTML = '<p>No recipes found</p>';
+      return;
+    }
+
+    container.innerHTML = videos.map((video, index) => `
+      <div class="cook-video-card" data-index="${index}">
+        <video src="${video.mediaUrl}" muted loop playsinline preload="metadata" ${index === 0 ? 'autoplay' : ''}></video>
+      </div>
+    `).join('');
+
+    progressContainer.innerHTML = videos.map((_, index) => `
+      <div class="cook-progress-dot${index === 0 ? ' active' : ''}" data-index="${index}"></div>
+    `).join('');
+
+    const overlay = document.getElementById('cook-fullscreen-overlay');
+    const fullscreenVideo = document.getElementById('cook-fullscreen-video');
+    const closeBtn = document.getElementById('cook-fullscreen-close');
+    const allVideos = container.querySelectorAll('.cook-video-card video');
+    let currentPlayingIndex = 0;
+
+    function playVideoAtIndex(index) {
+      allVideos.forEach((v, i) => {
+        if (i === index) {
+          v.currentTime = 0;
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      });
+      currentPlayingIndex = index;
+      progressContainer.querySelectorAll('.cook-progress-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    playVideoAtIndex(0);
+
+    container.querySelectorAll('.cook-video-card').forEach((card, index) => {
+      const video = card.querySelector('video');
+      card.addEventListener('click', () => {
+        allVideos.forEach(v => v.pause());
+        fullscreenVideo.src = video.src;
+        fullscreenVideo.muted = false;
+        overlay.classList.add('active');
+        fullscreenVideo.play().catch(() => {});
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeFullscreen() {
+      overlay.classList.remove('active');
+      fullscreenVideo.pause();
+      fullscreenVideo.src = '';
+      document.body.style.overflow = '';
+      playVideoAtIndex(currentPlayingIndex);
+    }
+
+    closeBtn.addEventListener('click', closeFullscreen);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeFullscreen();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeFullscreen();
+    });
+
+    let scrollTimeout;
+    container.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const cardWidth = container.querySelector('.cook-video-card').offsetWidth + 12;
+        const activeIndex = Math.round(container.scrollLeft / cardWidth);
+        if (activeIndex !== currentPlayingIndex && activeIndex < allVideos.length) {
+          playVideoAtIndex(activeIndex);
+        }
+      }, 150);
+    });
+  }
+
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TIME) {
+        renderData(data);
+        return;
+      }
+    }
+  } catch(e) {}
+
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+      } catch(e) {}
+      renderData(data);
+    })
+    .catch(err => {
+      console.error('Cook section error:', err);
+      container.innerHTML = '<p>Unable to load recipes</p>';
+    });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cook with Anveshan",
+  "tag": "section",
+  "class": "cook-with-anveshan-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Cook with anveshan"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Traditional or diet-friendly!"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "Delicious dishes made with the Anveshan range"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cook with Anveshan"
+    }
+  ]
+}
+{% endschema %}

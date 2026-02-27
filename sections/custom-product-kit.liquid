@@ -1,0 +1,21 @@
+{{ 'custom-product-kit.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+<script src="{{ 'vue.min.js' | asset_url }}" defer></script>
+{% liquid
+  if product.metafields.custom.product_kit != blank
+    assign kits = product.metafields.custom.product_kit.value.system
+    assign kitdata = shop.metaobjects[kits.type][kits.handle]
+    render 'custom-fix-price-kit', kitData: kitdata, product: product
+  endif
+%}
+<script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+  {
+    "name": "Custom Product Kit",
+    "settings": []
+  }
+{% endschema %}

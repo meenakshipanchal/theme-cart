@@ -1,0 +1,22 @@
+{% render 'fbt-shared-styles' %}
+
+<div class="fbt-section-wrapper">
+  <h3 class="fbt-section-heading">
+    High-Demand Superfood Picks
+  </h3>
+  <div id="fbt-weekly-container" class="fbt-section-grid">
+    <div class="fbt-section-loading">Loading High-Demand Superfood Picks...</div>
+  </div>
+</div>
+
+<script src="{{ 'fbt-section.js' | asset_url }}" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    window.initializeWeeklyBestsellers = window.initFbtSection({
+      apiUrl: 'https://fbt-api.anveshan.farm/api/public/trending/week?category=Superfoods',
+      sectionType: 'Weekly',
+      gaEventName: 'cart_fbt_weekly_superfoods',
+      containerId: 'fbt-weekly-container'
+    });
+  });
+</script>

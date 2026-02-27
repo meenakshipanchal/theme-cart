@@ -1,0 +1,31 @@
+{{ 'collection-menu.css' | asset_url | stylesheet_tag }}
+{% liquid
+  assign nav_list = collection.metafields.custom.navigation.value
+  assign menu_list = nav_list.menu.value
+%}
+<div class="collectionMenu">
+  <div class="collection-container grid">
+    {% if menu_list.count > 0 %}
+      {% for menu in menu_list %}
+        {% liquid
+          assign collection_link = menu.select_collection.value.url
+          assign title = menu.title.value
+          assign img = menu.icon.value
+          if collection.url == collection_link
+            assign img = menu.active_icon.value
+          endif
+        %}
+        <a href="{{ collection_link }}">
+          {{ img | image_url: width: 60 | image_tag: alt: title, loading: 'lazy' }}
+          <strong>{{ title }}</strong>
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% schema %}
+  {
+    "name": "Metaobject Collecion Menu",
+    "settings": []
+  }
+{% endschema %}

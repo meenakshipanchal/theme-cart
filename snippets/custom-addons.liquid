@@ -1,0 +1,498 @@
+{% liquid
+  assign unlockPrice = 49900
+  assign kitdata = shop.metaobjects.cart_drawer_list.RewordsSections
+  assign kitdata_product = kitdata.products.value
+  if cart.original_total_price < unlockPrice
+    assign addons = true
+    assign amount = unlockPrice | minus: cart.original_total_price | money_with_currency
+  endif
+
+  
+  assign oils_products = collections['wood-press-oil'].products
+  if oils_products.size == 0
+    assign oils_products = collections['oils'].products
+  endif
+  if oils_products.size == 0
+    assign oils_products = collections['oil'].products
+  endif
+
+  assign superfoods_products = collections.superfoods.products
+  if superfoods_products.size == 0
+    assign superfoods_products = collections['super-foods'].products
+  endif
+
+  assign ghee_products = collections['desi-ghee'].products
+  if ghee_products.size == 0
+    assign ghee_products = collections['ghee'].products
+  endif
+
+  assign combo_products = collections['a2-desi-ghee-wood-press-oil-combo-packs'].products
+  assign newly_launched_products = collections['newly-launched'].products
+  
+  
+  assign all_collection_products = ''
+  assign temp_products = ''
+  
+  
+  for product in superfoods_products
+    if temp_products == ''
+      assign temp_products = product.handle
+    else
+      assign temp_products = temp_products | append: '|' | append: product.handle
+    endif
+  endfor
+  
+  
+  for product in ghee_products
+    if temp_products == ''
+      assign temp_products = product.handle
+    else
+      assign temp_products = temp_products | append: '|' | append: product.handle
+    endif
+  endfor
+  
+  
+  for product in combo_products
+    if temp_products == ''
+      assign temp_products = product.handle
+    else
+      assign temp_products = temp_products | append: '|' | append: product.handle
+    endif
+  endfor
+  
+  
+  for product in newly_launched_products
+    if temp_products == ''
+      assign temp_products = product.handle
+    else
+      assign temp_products = temp_products | append: '|' | append: product.handle
+    endif
+  endfor
+  
+  
+  for product in oils_products
+    if temp_products == ''
+      assign temp_products = product.handle
+    else
+      assign temp_products = temp_products | append: '|' | append: product.handle
+    endif
+  endfor
+  
+  assign all_product_handles = temp_products | split: '|'
+  assign total_collection_products = all_product_handles.size
+  
+  
+  if total_collection_products == 0
+    assign all_collection_products = collections.all.products
+    assign total_collection_products = all_collection_products.size
+  endif
+
+  assign random_seed = 'now' | date: '%s' | modulo: 10000
+  if request.url contains 'refresh_seed='
+    assign url_parts = request.url | split: 'refresh_seed='
+    assign seed_part = url_parts[1] | split: '&' | first
+    assign random_seed = seed_part | plus: 0
+  endif
+
+  assign shuffled_products = ''
+  assign products_to_show = 15
+  assign step_size = 3
+  
+  
+  for i in (0..products_to_show)
+    if total_collection_products > 0
+      assign index = random_seed | plus: i | times: step_size | modulo: total_collection_products
+      if all_product_handles.size > 0
+        assign product_handle = all_product_handles[index]
+        if product_handle and product_handle != blank
+          assign shuffled_products = shuffled_products | append: product_handle | append: ','
+        endif
+      else
+        assign product = all_collection_products[index]
+        if product and product.available
+          assign shuffled_products = shuffled_products | append: product.handle | append: ','
+        endif
+      endif
+    endif
+  endfor
+  
+  assign product_handles = shuffled_products | split: ','
+%}
+
+{% capture sku_list %}
+  {% for item in cart.items %}
+    {{ item.sku }},
+  {% endfor %}
+{% endcapture %}
+
+<style>
+.addons-head,
+.addons-head.unlock {
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addons-head h4 {
+  font-family: 'Roboto Slab', serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #235A49;
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  margin: 0;
+  padding: 0;
+}
+
+.refresh-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-btn:hover {
+  background-color: rgba(35, 90, 73, 0.1);
+}
+
+.refresh-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: #235A49;
+  transition: transform 0.3s;
+}
+
+.refresh-btn:active svg,
+.refreshing svg {
+  transform: rotate(180deg);
+}
+
+.refreshing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.refreshing svg {
+  animation: spin 0.5s linear;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.debug-info {
+  font-size: 12px;
+  color: #666;
+  margin: 10px 0;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+</style>
+
+<div id="recommendation-section" class="addons-head{% unless addons %} unlock{% endunless %}">
+  <div>
+    {% if addons %}
+      <h4>Handpicked for Your Kitchen</h4>
+    {%- else %}
+      <h4>Handpicked for Your Kitchen</h4>
+    {%- endif %}
+  </div>
+  {% comment %} <button class="refresh-btn" onclick="refreshRecommendations()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+    </svg>
+  </button> {% endcomment %}
+</div>
+
+
+{% comment %} <div class="debug-info">
+  <strong>Debug Info:</strong><br>
+  Oils: {{ oils_products.size }} products<br>
+  Superfoods: {{ superfoods_products.size }} products<br>
+  Ghee: {{ ghee_products.size }} products<br>
+  Combo: {{ combo_products.size }} products<br>
+  Newly Launched: {{ newly_launched_products.size }} products<br>
+  <strong>Total: {{ total_collection_products }} products</strong> (Expected: {{ superfoods_products.size | plus: ghee_products.size | plus: combo_products.size | plus: newly_launched_products.size | plus: oils_products.size }})<br>
+  Product Handles: {{ shuffled_products | truncate: 200 }}<br>
+  Random Seed: {{ random_seed }}<br>
+  All Handles: {{ temp_products | truncate: 300 }}
+</div> {% endcomment %}
+
+<ul id="recommendations-list" class="recommended-products addons-products">
+  
+  {%- if kitdata_product and kitdata_product.size > 0 -%}
+    {%- for card_product in kitdata_product -%}
+      {% assign main_product = card_product.metafields.custom.main_product.value %}
+      {% unless sku_list contains main_product.sku %}
+        <li>
+          <div class="recommended--product cart-item">
+            <figure>
+              <a href="{{ main_product.url }}">
+              {{
+                card_product.featured_media
+                | image_url: width: 200
+                | image_tag: widths: '50,100,200', class: 'motion-reduce', loading: 'lazy', alt: card_product.title
+              }}</a>
+            </figure>
+            <div>
+              <h5>{{ card_product.title }}</h5>
+              <div class="button-with-price">
+                <span class="price">
+                  {% if card_product.compare_at_price and card_product.compare_at_price > card_product.price %}
+                    <s>{{ card_product.compare_at_price | money }}</s>
+                  {% endif %}
+                  {{ card_product.price | money }}
+                </span>
+                <div class="quick-add no-js-hidden">
+                  {%- liquid
+                    assign variant = card_product.selected_or_first_available_variant
+                    if variant and variant.available
+                      assign ids = variant.id
+                      assign product_form_id = 'quick-add-' | append: section_id | append: ids
+                    endif
+                  -%}
+                  {% if variant and variant.available and ids %}
+                    <product-form data-section-id="{{ section.id }}">
+                      {%- form 'product',
+                        card_product,
+                        id: product_form_id,
+                        class: 'form',
+                        novalidate: 'novalidate',
+                        data-type: 'add-to-cart-form'
+                      -%}
+                        <input
+                          type="hidden"
+                          name="id"
+                          value="{{ ids }}"
+                          class="product-variant-id"
+                        >
+                        <input type="hidden" name="properties[_type]" value="winter">
+                        <button
+                          id="{{ product_form_id }}-submit"
+                          type="submit"
+                          name="add"
+                          class="quick-add__submit button button--primary"
+                          aria-haspopup="dialog"
+                          aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ ids }}"
+                          aria-live="polite"
+                          data-sold-out-message="true"
+                        >
+                          <span>Add</span>
+                          {%- render 'loading-spinner' -%}
+                        </button>
+                      {%- endform -%}
+                    </product-form>
+                  {% else %}
+                    <button class="quick-add__submit button button--primary" disabled>
+                      <span>Out of Stock</span>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      {% endunless %}
+    {%- endfor -%}
+  {% endif %}
+  
+  
+  {%- for product_handle in product_handles limit: 15 -%}
+    {% if product_handle != blank %}
+      {% assign rand_product = null %}
+      
+      
+      {%- for product in superfoods_products -%}
+        {% if product.handle == product_handle %}
+          {% assign rand_product = product %}
+          {% break %}
+        {% endif %}
+      {%- endfor -%}
+      
+      {% unless rand_product %}
+        {%- for product in ghee_products -%}
+          {% if product.handle == product_handle %}
+            {% assign rand_product = product %}
+            {% break %}
+          {% endif %}
+        {%- endfor -%}
+      {% endunless %}
+      
+      {% unless rand_product %}
+        {%- for product in combo_products -%}
+          {% if product.handle == product_handle %}
+            {% assign rand_product = product %}
+            {% break %}
+          {% endif %}
+        {%- endfor -%}
+      {% endunless %}
+      
+      {% unless rand_product %}
+        {%- for product in newly_launched_products -%}
+          {% if product.handle == product_handle %}
+            {% assign rand_product = product %}
+            {% break %}
+          {% endif %}
+        {%- endfor -%}
+      {% endunless %}
+      
+      {% unless rand_product %}
+        {%- for product in oils_products -%}
+          {% if product.handle == product_handle %}
+            {% assign rand_product = product %}
+            {% break %}
+          {% endif %}
+        {%- endfor -%}
+      {% endunless %}
+      
+      {% if rand_product and rand_product.available %}
+        {% unless sku_list contains rand_product.sku %}
+          <li>
+            <div class="recommended--product cart-item">
+              <figure>
+                <a href="{{ rand_product.url }}">
+                {{
+                  rand_product.featured_media
+                  | image_url: width: 200
+                  | image_tag: widths: '50,100,200', class: 'motion-reduce', loading: 'lazy', alt: rand_product.title
+                }}</a>
+              </figure>
+              <div>
+                <h5>{{ rand_product.title }}</h5>
+                <div class="button-with-price">
+                  <span class="price">
+                    {% if rand_product.compare_at_price and rand_product.compare_at_price > rand_product.price %}
+                      <s>{{ rand_product.compare_at_price | money }}</s>
+                    {% endif %}
+                    {{ rand_product.price | money }}
+                  </span>
+                  <div class="quick-add no-js-hidden">
+                    {%- liquid
+                      assign variant = rand_product.selected_or_first_available_variant
+                      if variant and variant.available
+                        assign ids = variant.id
+                        assign product_form_id = 'quick-add-random-' | append: rand_product.id | append: ids
+                      endif
+                    -%}
+                    {% if variant and variant.available and ids %}
+                      <product-form data-section-id="{{ section.id }}">
+                        {%- form 'product',
+                          rand_product,
+                          id: product_form_id,
+                          class: 'form',
+                          novalidate: 'novalidate',
+                          data-type: 'add-to-cart-form'
+                        -%}
+                          <input
+                            type="hidden"
+                            name="id"
+                            value="{{ ids }}"
+                            class="product-variant-id"
+                          >
+                          <input type="hidden" name="properties[_type]" value="winter">
+                          <button
+                            id="{{ product_form_id }}-submit"
+                            type="submit"
+                            name="add"
+                            class="quick-add__submit button button--primary"
+                            aria-haspopup="dialog"
+                            aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ ids }}"
+                            aria-live="polite"
+                            data-sold-out-message="true"
+                          >
+                            <span>Add</span>
+                            {%- render 'loading-spinner' -%}
+                          </button>
+                        {%- endform -%}
+                      </product-form>
+                    {% else %}
+                      <button class="quick-add__submit button button--primary" disabled>
+                        <span>Out of Stock</span>
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        {% endunless %}
+      {% endif %}
+    {% endif %}
+  {%- endfor -%}
+</ul>
+
+<script>
+function refreshRecommendations() {
+  const section = document.getElementById('recommendation-section');
+  const productsList = document.getElementById('recommendations-list');
+  
+  section.classList.add('refreshing');
+  
+  const newSeed = Date.now() + Math.floor(Math.random() * 10000);
+  
+  const currentUrl = new URL(window.location);
+  currentUrl.searchParams.set('refresh_seed', newSeed);
+  currentUrl.searchParams.set('cache_bust', Date.now());
+  
+  fetch(currentUrl.toString(), {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.text();
+  })
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newRecommendationsList = doc.getElementById('recommendations-list');
+    
+    if (newRecommendationsList) {
+      productsList.innerHTML = newRecommendationsList.innerHTML;
+      
+      if (typeof window.Shopify !== 'undefined' && window.Shopify.ProductForm) {
+        const forms = productsList.querySelectorAll('product-form');
+        forms.forEach(form => {
+          if (form.reinit) form.reinit();
+        });
+      }
+    } else {
+      window.location.reload();
+    }
+    
+    section.classList.remove('refreshing');
+  })
+  .catch(error => {
+    console.error('Error refreshing recommendations:', error);
+    section.classList.remove('refreshing');
+    window.location.href = currentUrl.toString();
+  });
+}
+
+document.addEventListener('submit', function(e) {
+  if (document.getElementById('recommendation-section').classList.contains('refreshing')) {
+    e.preventDefault();
+    return false;
+  }
+});
+</script>

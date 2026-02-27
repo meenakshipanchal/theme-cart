@@ -1,0 +1,872 @@
+<style>
+ 
+  .empty-cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 1s ease-out;
+    padding: 40px 20px;
+    min-height: 60vh; /* Takes up most of the visible height */
+    height: 100%;
+    position: relative;
+  }
+
+  /* Full height container for empty state */
+  .drawer__inner-empty {
+    display: flex;
+    flex-direction: column;
+    min-height: 70vh;
+    justify-content: center;
+
+  }
+ 
+  .cart-image {
+    width: 240px;
+    height: 240px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    animation: bounceIn 1s ease;
+  }
+
+  /* Primary text styling */
+  .main-text {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    animation: fadeInUp 1s ease forwards;
+    color: #235A49;
+    text-align: center;
+  }
+
+  /* Secondary descriptive text */
+  .sub-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: #4A7D69;
+    margin-bottom: 18px;
+    animation: fadeInUp 1.2s ease forwards;
+    text-align: center;
+  }
+ 
+  .continue-button {
+    background: linear-gradient(90deg, #1abc9c, #16a085);
+    padding: 12px 24px;
+    border: none;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 25px;
+    cursor: pointer;
+    animation: fadeInUp 1.4s ease forwards;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  /* Button hover effects */
+  .continue-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+  }
+ 
+  /* Bounce effect for main image */
+  @keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  /* Slide up animation for text elements */
+  @keyframes fadeInUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Simple fade in animation */
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+ 
+  @media (max-width: 768px) {
+    .cart-image {
+      width: 180px;
+      height: 180px;
+    }
+
+    .empty-cart-container {
+      padding: 20px 15px;
+      min-height: 50vh;
+    }
+  }
+</style>
+ 
+<script>
+  function closeCartDrawer() {
+     {% comment %} console.log('closeCartDrawer called'); // DEBUG LINE ADD KARO {% endcomment %}
+
+     const cartDrawer = document.querySelector('cart-drawer');
+
+     if (cartDrawer) {
+       const drawerInner = cartDrawer.querySelector('.drawer__inner');
+       const overlay = cartDrawer.querySelector('#CartDrawer-Overlay');
+
+       // Add transitions
+       if (drawerInner) {
+         drawerInner.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+         drawerInner.style.transform = 'translateX(100%)';
+       }
+
+       if (overlay) {
+         overlay.style.transition = 'opacity 0.3s ease-in-out';
+         overlay.style.opacity = '0';
+         overlay.style.pointerEvents = 'none';
+       }
+
+       cartDrawer.style.transition = 'opacity 0.3s ease-in-out';
+       cartDrawer.style.opacity = '0';
+       cartDrawer.style.pointerEvents = 'none';
+
+       // FORCE RESTORE SCROLLING - MULTIPLE WAYS
+       document.body.style.overflow = '';
+       document.body.style.overflow = 'visible';
+       document.body.style.overflow = 'auto';
+       document.documentElement.style.overflow = 'auto'; // HTML element bhi
+
+       {% comment %} console.log('Scroll restored'); // DEBUG LINE {% endcomment %}
+
+       setTimeout(() => {
+         cartDrawer.classList.remove('active', 'is-open');
+         cartDrawer.style.visibility = 'hidden';
+         cartDrawer.style.pointerEvents = '';
+
+         if (overlay) {
+           overlay.style.visibility = 'hidden';
+           overlay.style.pointerEvents = '';
+         }
+       }, 300);
+     }
+   }
+
+   // EMERGENCY SCROLL FIX FUNCTION
+   function forceScrollFix() {
+     document.body.style.overflow = 'auto';
+     document.documentElement.style.overflow = 'auto';
+     document.body.style.position = '';
+     {% comment %} console.log('Emergency scroll fix applied'); {% endcomment %}
+   }
+   function handleCartClick(event) {
+     if (!event.target.closest('.continue-button')) {
+       closeCartDrawer();
+     }
+   }
+</script>
+ 
+<cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
+  <div id="CartDrawer" class="cart-drawer">
+     
+    <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
+
+    
+    <div
+      class="drawer__inner gradient color-{{ settings.cart_color_scheme }}"
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ 'sections.cart.title' | t }}"
+      tabindex="-1"
+    >
+       
+      {%- if cart == empty -%}
+        <div class="drawer__inner-empty" onclick="handleCartClick(event)">
+          <!-- Close button for empty cart -->
+          <button
+            class="drawer__close"
+            type="button"
+            onclick="closeCartDrawer()"
+            aria-label="{{ 'accessibility.close' | t }}"
+          >
+            <div>
+              <span class="svg-wrapper">
+                {{- 'icon-close.svg' | inline_asset_content -}}
+              </span>
+            </div>
+          </button>
+
+          <!-- Animated Empty Cart Content -->
+          <div class="empty-cart-container">
+            <img
+              class="cart-image"
+              src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/empty_cart_copy.webp?v=1767422397"
+              alt="Empty Cart"
+            >
+            <div class="main-text">Nothing in your cart yet.</div>
+            <div class="sub-text">Let's fix that with something pure and delicious.</div>
+
+            <a href="/collections/all-products" class="continue-button" onclick="event.stopPropagation()"
+              >Continue Shopping</a
+            >
+          </div>
+        </div>
+        {% comment %}
+          <div class="drawer__inner-empty">
+            <!-- Close button for empty cart -->
+            <button
+              class="drawer__close"
+              type="button"
+              onclick="closeCartDrawer()"
+              aria-label="{{ 'accessibility.close' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-close.svg' | inline_asset_content -}}
+              </span>
+            </button>
+
+            <!-- Animated Empty Cart Content -->
+            <div class="empty-cart-container">
+              <img
+                class="cart-image"
+                src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/empty_cart_copy.png?v=1750931181"
+                alt="Empty Cart"
+              >
+              <div class="main-text">Nothing in your cart yet.</div>
+              <div class="sub-text">Let's fix that with something pure and delicious.</div>
+              {% comment %} {%- if shop.customer_accounts_enabled and customer == null -%} {% endcomment %}
+              {% comment %}
+                <div class=" ">
+                  <div class=" ">
+                    <label for="popcoins" id="buywith-pop-coins-label">
+                      <span onclick="openLoadedIframe()">
+                        <span class="underline">Click</span> &amp; get upto 30% off using POPcoins
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              {% endcomment %}
+
+              <!-- Login Prompt -->
+              {% comment %}
+                <p class="cart__login-title h4">{{ 'sections.cart.login.title' | t }}</p>
+                  <p class="cart__login-paragraph">
+                    {{ 'sections.cart.login.paragraph_html' | t: link: routes.account_login_url }}
+                  </p>
+                {%- endif -%}
+              {% endcomment %}
+
+              <!-- Optional Collection Display -->
+              {% comment %}
+                {%- if settings.cart_drawer_collection != blank -%}
+                  <div class="cart-drawer__collection">
+                    {% render 'card-collection', card_collection: settings.cart_drawer_collection, columns: 1 %}
+                  </div>
+                {%- endif -%}
+              {% endcomment %}
+              <a href="/collections/all-products" class="continue-button">Continue Shopping</a>
+
+              <!-- POPcoins Integration for Guest Users -->
+            </div>
+          </div>
+        {% endcomment %}
+      {%- endif -%}
+
+     
+      {% if cart != empty %}
+        
+        <div
+          class="drawer__header"
+          style="display: flex; align-items: center; padding: 15px 20px; background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;"
+        >
+          <!-- Back Icon - Left Section -->
+          <div style="flex: 1; display: flex; justify-content: flex-start;">
+            <button
+              type="button"
+              onclick="closeCartDrawer()"
+              style="background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; transition: background-color 0.2s ease; display: flex; align-items: center; justify-content: center;"
+              onmouseover="this.style.backgroundColor='#f0f0f0'"
+              onmouseout="this.style.backgroundColor='transparent'"
+              aria-label="Go back"
+            >
+              <span style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: #235A49;">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        
+
+          <!-- Cart Title - Center Section -->
+          <div style="flex: 1; display: flex; justify-content: center;">
+            <h2 class="drawer__heading h2" style="margin: 0; font-size: 18px; font-weight: 600; color: #235A49;">
+              Your Cart
+            </h2>
+          </div>
+
+          <!-- Heart/Wishlist Icon - Right Section -->
+          <div style="flex: 1; display: flex; justify-content: flex-end;">
+            <a
+              {% comment %} href="/pages/wishlist" {% endcomment %}
+              style="background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; transition: background-color 0.2s ease; display: flex; align-items: center; justify-content: center; text-decoration: none;"
+              onmouseover="this.style.backgroundColor='#f0f0f0'"
+              onmouseout="this.style.backgroundColor='transparent'"
+              aria-label="Go to wishlist"
+            >
+              <span style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: #235A49; font-size: 20px;">
+                ♡
+              </span>
+            </a>
+          </div>
+        </div>
+        {% comment %} <div
+          style="
+            background-color: #235A49;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            text-align: center;
+            padding: 8px 0;
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+          "
+        >
+          Trusted by 10 Lakh+ Customers
+        </div> {% endcomment %}
+<div class="trust-banner-wrapper">
+  <div class="trust-banner-scroll">
+    <div class="scroll-text">Trusted by 10 Lakh+ Customers</div>
+    <div class="scroll-text">PURE15 is Live - Go Grab Products Now!</div>
+  </div>
+</div>
+
+<style>
+  .trust-banner-wrapper {
+    width: 100%;
+    background: linear-gradient(135deg, #235A49 0%, #1a4538 100%);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+    height: 42px;
+    position: relative;
+  }
+
+  .trust-banner-scroll {
+    display: flex;
+    flex-direction: column;
+    animation: smoothVerticalScroll 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .scroll-text {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 0 20px;
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  /* Smooth vertical scroll with fade */
+  @keyframes smoothVerticalScroll {
+    0% {
+      transform: translateY(0);
+    }
+    8% {
+      transform: translateY(0);
+    }
+    10% {
+      transform: translateY(5px);
+    }
+    15% {
+      transform: translateY(-42px);
+    }
+    50% {
+      transform: translateY(-42px);
+    }
+    58% {
+      transform: translateY(-42px);
+    }
+    60% {
+      transform: translateY(-37px);
+    }
+    65% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade overlay for smooth transition */
+  .trust-banner-wrapper::before,
+  .trust-banner-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .trust-banner-wrapper::before {
+    top: 0;
+    background: linear-gradient(to bottom, #235A49 0%, transparent 100%);
+  }
+
+  .trust-banner-wrapper::after {
+    bottom: 0;
+    background: linear-gradient(to top, #1a4538 0%, transparent 100%);
+  }
+
+  @media (max-width: 480px) {
+    .trust-banner-wrapper {
+      height: 38px;
+    }
+    .scroll-text {
+      height: 38px;
+      font-size: 12px;
+      padding: 0 12px;
+    }
+    @keyframes smoothVerticalScroll {
+      0% {
+        transform: translateY(0);
+      }
+      8% {
+        transform: translateY(0);
+      }
+      10% {
+        transform: translateY(5px);
+      }
+      15% {
+        transform: translateY(-38px);
+      }
+      50% {
+        transform: translateY(-38px);
+      }
+      58% {
+        transform: translateY(-38px);
+      }
+      60% {
+        transform: translateY(-33px);
+      }
+      65% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+  }
+</style>
+         
+
+        <!-- Freebies Announcement Bar -->
+        {% if section.settings.enable %}
+          {% render 'freebies-announce-bar', cart: cart, freebies: section.blocks %}
+        {% endif %}
+
+        <!-- Optional Banner Image -->
+        {% assign image_block = section.blocks | where: 'type', 'banner' | first %}
+        {% if image_block %}
+          {{
+            image_block.settings.image
+            | image_url: width: 480
+            | image_tag: widths: '360,480', loading: 'lazy', style: 'width:100%;height:auto'
+          }}
+        {% endif %}
+
+        <!-- Future: Dynamic Freebie Notifications Container -->
+        <!-- <div id="freebie-notification-container"></div> -->
+      {% endif %}
+ 
+      <cart-drawer-items
+        {% if cart == empty %}
+          class=" is-empty"
+        {% endif %}
+      >
+        <!-- Main Cart Form -->
+        <form
+          style=" background: "
+          action="{{ routes.cart_url }}"
+          id="CartDrawer-Form"
+          class="cart__contents cart-drawer__form"
+          method="post"
+        >
+          <div style="background- w " id="CartDrawer-CartItems" class="drawer__contents js-contents">
+            {%- if cart != empty -%}
+              <div>
+                {% comment %} {% render 'rewards-progress-bar' %} {% endcomment %}
+              </div>
+              <div
+                class="cart-details-header"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 15px 20px;
+                  {% comment %} background-color: #f8f9fa;  {% endcomment %}
+                  border-top: 1px solid #e9ecef;
+                  margin-bottom: 0;
+                "
+              >
+                <!-- Left Section: Cart Icon + Cart details text -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                  "
+                >
+                  <svg width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_883_2888)">
+                    <path d="M23.6967 10.7252H6.64545C6.43829 10.7252 6.27051 10.5516 6.27051 10.3371C6.27051 10.1227 6.43829 9.94904 6.64545 9.94904H23.6967C23.9039 9.94904 24.0717 10.1227 24.0717 10.3371C24.0717 10.5516 23.9039 10.7252 23.6967 10.7252Z" fill="#181725"/>
+                    <path d="M21.6715 15.7793H8.85887C8.16524 15.7793 7.55502 15.2952 7.37318 14.6024L4.96513 5.35486C4.95669 5.33158 4.95013 5.30635 4.94545 5.28112L3.91061 1.30694C3.82907 0.994516 3.55348 0.776208 3.24041 0.776208H0.374939C0.167785 0.776208 0 0.602531 0 0.388104C0 0.173676 0.167785 0 0.374939 0H3.24135C3.89187 0 4.46552 0.454081 4.63518 1.10416L5.60534 4.82995L23.8592 4.9066C24.2089 4.90854 24.5351 5.07155 24.7525 5.35583C24.97 5.64012 25.0497 6.00494 24.9709 6.35811L23.1384 14.5723C22.98 15.2826 22.3773 15.7793 21.6724 15.7793H21.6715ZM5.80781 5.60713L8.09775 14.4006C8.19054 14.7557 8.50362 15.0031 8.85887 15.0031H21.6715C22.0249 15.0031 22.3276 14.7538 22.4073 14.3977L24.2398 6.18346C24.267 6.06218 24.2398 5.93605 24.1648 5.83805C24.0898 5.74005 23.9774 5.68378 23.8564 5.68281L5.80874 5.60713H5.80781Z" fill="#181725"/>
+                    <path d="M22.2248 19.0918H7.06698C5.9956 19.0918 5.10793 18.1895 5.08918 17.0805C5.07981 16.5255 5.28134 16.0025 5.65815 15.6076C6.03309 15.2137 6.5327 14.9973 7.06698 14.9973H7.07261L8.86013 15.0031C9.06728 15.0031 9.23507 15.1778 9.23413 15.3922C9.23413 15.6066 9.06541 15.7793 8.85919 15.7793H8.85826L7.07073 15.7735H7.06698C6.73516 15.7735 6.4249 15.9084 6.19244 16.1519C5.95904 16.3974 5.83343 16.7224 5.83906 17.0659C5.85031 17.7548 6.40147 18.3146 7.06698 18.3146H22.2248C22.432 18.3146 22.5998 18.4883 22.5998 18.7027C22.5998 18.9172 22.432 19.0908 22.2248 19.0908V19.0918Z" fill="#181725"/>
+                    <path d="M10.5547 23C9.30714 23 8.29199 21.9492 8.29199 20.6578C8.29199 19.3664 9.30714 18.3156 10.5547 18.3156C11.8024 18.3156 12.8175 19.3664 12.8175 20.6578C12.8175 21.9492 11.8024 23 10.5547 23ZM10.5547 19.0918C9.72051 19.0918 9.04187 19.7943 9.04187 20.6578C9.04187 21.5213 9.72051 22.2238 10.5547 22.2238C11.389 22.2238 12.0676 21.5213 12.0676 20.6578C12.0676 19.7943 11.389 19.0918 10.5547 19.0918Z" fill="#181725"/>
+                    <path d="M20.0977 23C18.8501 23 17.835 21.9492 17.835 20.6578C17.835 19.3664 18.8501 18.3156 20.0977 18.3156C21.3453 18.3156 22.3605 19.3664 22.3605 20.6578C22.3605 21.9492 21.3453 23 20.0977 23ZM20.0977 19.0918C19.2635 19.0918 18.5848 19.7943 18.5848 20.6578C18.5848 21.5213 19.2635 22.2238 20.0977 22.2238C20.932 22.2238 21.6106 21.5213 21.6106 20.6578C21.6106 19.7943 20.932 19.0918 20.0977 19.0918Z" fill="#181725"/>
+                    <path d="M11.6753 15.7803C11.4906 15.7803 11.3294 15.6387 11.3041 15.4436L9.99743 5.28016C9.97025 5.06768 10.1146 4.87265 10.3199 4.84452C10.5252 4.81541 10.7136 4.9658 10.7407 5.17829L12.0474 15.3418C12.0746 15.5542 11.9302 15.7493 11.725 15.7774C11.7081 15.7793 11.6912 15.7813 11.6753 15.7813V15.7803Z" fill="#181725"/>
+                    <path d="M15.3261 15.7696C15.119 15.7696 14.9512 15.596 14.9512 15.3815V5.2559C14.9512 5.04147 15.119 4.8678 15.3261 4.8678C15.5333 4.8678 15.701 5.04147 15.701 5.2559V15.3815C15.701 15.596 15.5333 15.7696 15.3261 15.7696Z" fill="#181725"/>
+                    <path d="M18.977 15.7783C18.961 15.7783 18.9442 15.7774 18.9273 15.7754C18.722 15.7473 18.5777 15.5523 18.6049 15.3398L19.8956 5.21999C19.9228 5.0075 20.1093 4.85808 20.3164 4.88622C20.5217 4.91435 20.6661 5.10938 20.6389 5.32186L19.3482 15.4417C19.3229 15.6367 19.1626 15.7793 18.977 15.7793V15.7783Z" fill="#181725"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_883_2888">
+                    <rect width="25" height="23" fill="white"/>
+                    </clipPath>
+                    </defs>
+                  </svg>
+
+                  <h2
+                    style="
+                      margin: 0;
+                      font-size: 18px;
+                      font-weight: 600;
+                      color: #235A49;
+                      font-family: Roboto Slab;
+                    "
+                  >
+                    Cart details
+                  </h2>
+                </div>
+
+                <!-- Right Section: Total items count -->
+                <div
+                  style="
+                    font-size: 16px;
+                    color: #404040;
+                    font-weight: 400;
+                    font-family: Roboto Slab;
+                  "
+                >
+                  Total items: <span id="cart-item-count">{{ cart.item_count }}</span>
+                </div>
+              </div>
+
+              <div class="drawer__cart-items-wrapper">
+                <div class="cart-items">
+                  
+                  {%- for item in cart.items -%}
+                    {% liquid
+                      assign _total = _total | plus: item.original_line_price
+                      assign item_mrp = item.variant.compare_at_price | times: item.quantity
+                      assign _mrp = _mrp | plus: item_mrp
+                      if item.properties._type == 'winter'
+                        assign winterPrice = winterPrice | plus: item.final_price
+                        assign winterId = item.index | plus: 1
+                      endif
+                    %}
+                    {% render 'cart-draw-item', item: item %}
+                  {%- endfor -%}
+                  
+
+                  <div
+                    class="add-more-items-container"
+                    style="
+                      {% comment %} padding: 0px 10px; {% endcomment %}
+                      display: flex;
+                      justify-content: flex-start;
+                      background: #Fff;
+                    "
+                  >
+                    <a
+                      href="/collections/all-products"
+                      class="add-more-items-btn"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 8px 16px;
+                        border: 2px solid #235A49;
+                        border-radius: 25px;
+                        background: transparent;
+                        color: #235A49;
+                        text-decoration: none;
+                        font-size: 16px;
+                        font-weight: 500;
+                        font-family: Roboto Slab;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                      "
+                      onmouseover="
+                        this.style.background = '#235A49';
+                        this.style.color = '#fff';
+                        this.style.transform = 'translateY(-1px)';
+                        this.style.boxShadow = '0 4px 12px rgba(35, 90, 73, 0.2)';
+                      "
+                      onmouseout="
+                        this.style.background = 'transparent';
+                        this.style.color = '#235A49';
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = 'none';
+                      "
+                    >
+                      <span>Add more items</span>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        style="transition: transform 0.2s ease;"
+                      >
+                        <path d="m9 18 6-6-6-6"/>
+                      </svg>
+                    </a>
+                  </div>
+
+                  <style>
+                    /* Enhanced styles for the button */
+                    .add-more-items-btn:hover svg {
+                      transform: translateX(2px);
+                    }
+
+                    .add-more-items-btn:active {
+                      transform: translateY(0px) !important;
+                      box-shadow: 0 2px 4px rgba(35, 90, 73, 0.2) !important;
+                    }
+
+                    /* Responsive design */
+                    @media (max-width: 480px) {
+                      .add-more-items-container {
+                        {% comment %} padding: 10px 16px !important; {% endcomment %}
+                      }
+
+                      .add-more-items-btn {
+                        font-size: 14px !important;
+                        {% comment %} padding: 6px 14px !important; {% endcomment %}
+                      }
+                    }
+
+                    /* Optional: Focus styles for accessibility */
+                    .add-more-items-btn:focus {
+                      outline: 2px solid #235A49;
+                      outline-offset: 2px;
+                    }
+                  </style>
+                </div>
+              </div>
+
+              <!-- Hidden Inputs for JavaScript Integration -->
+              <input type="hidden" value="{{ winterPrice | divided_by: 100 }}" id="winterCartPrice">
+              <input type="hidden" value="{{ winterId }}" id="winterCartId">
+            {%- endif -%}
+
+            <!-- Accessibility Live Regions -->
+            <p id="CartDrawer-LiveRegionText" class="visually-hidden" role="status"></p>
+            <p id="CartDrawer-LineItemStatus" class="visually-hidden" aria-hidden="true" role="status">
+              {{ 'accessibility.loading' | t }}
+            </p>
+          </div>
+
+          <!-- Error Messages Container -->
+          <div id="CartDrawer-CartErrors" role="alert"></div>
+          <!-- Add this button after your form closing tag -->
+          {% render 'coupon-list', cart: cart %}
+          {% render 'fbt-recommendations' %}
+          {% render 'week-recommendations' %}
+        </form>
+         
+
+        {% unless cart.empty? %}
+          <!-- Cart Freebies System -->
+          {% if section.settings.enable %}
+            {% render 'cart-freebies', cart: cart, freebies: section.blocks %}
+          {% endif %}
+
+          <!-- Custom Add-ons for Exclusive Items -->
+          {% comment %} {% if section.settings.exclusive %}
+            {% render 'custom-addons', cart: cart %}
+          {% endif %} {% endcomment %}
+
+          {% comment %}{% render 'cart-recommend-product' %}{% endcomment %}
+        {% endunless %}
+      </cart-drawer-items>
+    {%- unless cart == empty -%}
+    <div id="freecash-widget-container">
+    {% render 'anveshan-coins-widget' %}
+  </div>
+      <div class="drawer__footer">
+        
+        {%- if settings.show_cart_note -%}
+          <details id="Details-CartDrawer">
+            <summary>
+              <span class="summary__title">
+                {{ 'sections.cart.note' | t }}
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </summary>
+            <cart-note class="cart__note field">
+              <label class="visually-hidden" for="CartDrawer-Note">{{ 'sections.cart.note' | t }}</label>
+              <textarea
+                id="CartDrawer-Note"
+                class="text-area text-area--resize-vertical field__input"
+                name="note"
+                placeholder="{{ 'sections.cart.note' | t }}"
+              >{{ cart.note }}</textarea>
+            </cart-note>
+          </details>
+        {%- endif -%}
+
+        
+        <div id="cartSummary" class="cart-drawer__footer" style="display:none;" {{ block.shopify_attributes }}>
+         
+          {% liquid
+            assign cart_total = cart.total_price
+            if cart.total_price <= 49900
+              assign cart_total = cart.total_price | plus: 4900
+            endif
+            assign prepaid_discount = cart_total | times: 0.02
+            assign online_pay = cart_total | minus: prepaid_discount
+            assign save_money = _mrp | minus: online_pay
+            if _mrp <= online_pay
+              assign save_money = prepaid_discount
+            endif
+          %}
+
+          <h3>Price Summary</h3>
+
+          <!-- Order Total Line -->
+          <div>
+            <span>Order Total</span>
+            <span>{{ _mrp | money | replace: ',', '' }}</span>
+          </div>
+
+          <!-- Items Discount Line -->
+          <div>
+            <span>Items Discount</span>
+            <span>{{ _mrp | minus: cart.original_total_price | money | replace: ',', '' }}</span>
+          </div>
+
+          <!-- Shipping Line -->
+          <div>
+            <span>Shipping</span>
+            <span>
+              {% if cart.total_price > 49900 %}
+                Free <s>₹49</s>
+              {% else %}
+                ₹49
+              {% endif %}
+            </span>
+          </div>
+
+          <!-- Prepaid Discount Line -->
+          <div>
+            <span>2% Prepaid Discount</span>
+            <span>{{ prepaid_discount | money }}</span>
+          </div>
+
+          <!-- Final Amount Line -->
+          <div style="font-weight:600;">
+            <span>To Pay</span>
+            <span id="totalAmount" data-total="{{ online_pay | money | replace: ',', '' }}">
+              {{ online_pay | money | replace: ',', '' }}
+            </span>
+          </div>
+
+          <!-- Savings Announcement -->
+          <div class="save-announce">
+            <img
+              src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/noto_party-popper.png?v=1734506560"
+              alt=""
+              loading="lazy"
+            >
+            You saved {{ save_money | money | replace: ',', '' }} on this order
+          </div>
+
+          <!-- Payment Methods Image -->
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/payment-mathod.jpg?v=1734514850"
+            alt=""
+            width="100%"
+            loading="lazy"
+          >
+        </div>
+
+        {% comment %} Purity Coins Widget - Already rendered above in freecash-widget-container {% endcomment %}
+        {% comment %} {% render 'anveshan-coins-widget' %} {% endcomment %}
+
+        {% comment %} Avail Purity Coins at checkout bar {% endcomment %}
+        {% render 'purity-coins-cart' %}
+
+        <div class="cart__ctas" {{ block.shopify_attributes }}>
+          <!-- Fallback Update Button (No JavaScript) -->
+          <noscript>
+            <button type="submit" class="cart__update-button button button--secondary" form="CartDrawer-Form">
+              {{ 'sections.cart.update' | t }}
+            </button>
+          </noscript>
+
+          <!-- Cart Total Display with Price Summary Toggle -->
+          <div style="width: 280px;margin:0 30px 0 0;">
+            <span class="totals__total-value" style="font-size: 26px;" onClick="priceSummary()">
+              {{ cart_total | money_with_currency }}
+              <svg class="icon icon-caret" viewBox="0 0 10 6" width="22px">
+                <path fill="currentColor" fill-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" clip-rule="evenodd"></path>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Primary Shiprocket Checkout Button -->
+          <div class="shiprocket-headless" data-type="mini-cart">
+            <button
+              type="button"
+              class="sr-headless-checkout"
+              onclick="shiprocketCheckoutEvents.buyCart(event)"
+              style="opacity: 1;background: #235A49!important;color:#235A49;text-transform: capitalize;font-weight: 600;font-size: 20px; color:white;border-radius: 50px;height: 44px;line-height: 1 !important;"
+            >
+              <div class="sr-d-flex flex-center">
+                <div class="sr-d-flex full-width flex-center">
+                  <span class="sr-checkout-visible2" style="display: inline-block;">Continue</span>
+                  <div class="loader5" style="display: none;"></div>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Alternative Checkout Button (Hidden) -->
+          <button
+            type="button"
+            id="checkout2"
+            onclick="handleFloCheckoutBtn()"
+            class="cart__checkout-button button"
+            name="checkout2"
+            form="CartDrawer-Form"
+            style="display:none;"
+            {% if cart == empty %}
+              disabled
+            {% endif %}
+          >
+            <span class="btn-text">
+              <span>Proceed to Checkout</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    {%- endunless -%}
+    </div>
+  </div>
+</cart-drawer>

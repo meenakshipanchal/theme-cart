@@ -1,0 +1,530 @@
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .customer-review {
+    background-color: #fafcfa;
+    position: relative;
+  }
+
+  .testimonial-symbol {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+  }
+
+  .testimonial-symbol img {
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .customer-review-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  @media screen and (max-width: 749px) {
+    .customer-review-title {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .review-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 0 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e8ed;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .review-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .review-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+  }
+
+  .review-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e1e8ed;
+    background-color: #3a7f72;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .author-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .star-rating {
+    display: flex;
+    gap: 2px;
+  }
+
+  .star {
+    color: #ffc107;
+    font-size: 1rem;
+  }
+
+  .reviews-slider {
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .reviews-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reviews-grid {
+    display: flex;
+    gap: 1rem;
+    padding: 0 1rem;
+    min-width: max-content;
+  }
+
+  .review-item {
+    flex: 0 0 auto;
+    width: 350px;
+    max-width: 90vw;
+  }
+
+  @media screen and (max-width: 749px) {
+    .review-item {
+      width: 280px;
+    }
+    
+    .review-card {
+      padding: 1.5rem;
+      margin: 0 0.25rem;
+    }
+    
+    .reviews-grid {
+      padding: 0 0.5rem;
+    }
+  }
+
+  .slider-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+
+  .slider-btn {
+    background: white;
+    border: 2px solid #3a7f72;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #3a7f72;
+  }
+
+  .slider-btn:hover {
+    background: #3a7f72;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .slider-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .slider-dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .dot.active {
+    background: #3a7f72;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign reviews_to_display = section.blocks.size
+  
+  if section.blocks.size > section.settings.reviews_to_show
+    assign reviews_to_display = section.settings.reviews_to_show
+  endif
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} isolate gradient">
+  <div class="customer-review section-{{ section.id }}-padding">
+    {% comment %}
+    {%- if section.settings.show_symbol -%}
+      <div class="testimonial-symbol">
+        <img src="{{ 'heartinhand.png' | asset_img_url: '90x' }}" alt="Customer Love" width="90" height="90" loading="lazy">
+      </div>
+    {%- endif -%}
+{% endcomment %}
+    <div class="page-width">
+      {%- if section.settings.title != blank -%}
+        <h2 class="customer-review-title {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          {{ section.settings.title }}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.description != blank -%}
+        <div class="review-description rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" style="text-align: center; margin-bottom: 2rem; color: #666;">
+          {{ section.settings.description }}
+        </div>
+      {%- endif -%}
+
+      <div class="reviews-slider{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" id="reviews-slider-{{ section.id }}">
+        <div class="reviews-grid">
+          {%- for block in section.blocks limit: reviews_to_display -%}
+            <div class="review-item" {{ block.shopify_attributes }}>
+              <div class="review-card">
+                <div class="review-text">
+                  {{ block.settings.review }}
+                </div>
+                
+                <div class="review-author">
+                  {%- if block.settings.image != blank -%}
+                    {{
+                      block.settings.image
+                      | image_url: width: 120
+                      | image_tag:
+                        class: 'user-avatar',
+                        alt: block.settings.title,
+                        loading: 'lazy'
+                    }}
+                  {%- else -%}
+                    <div class="user-avatar">
+                      {{ block.settings.title | slice: 0 }}
+                    </div>
+                  {%- endif -%}
+                  
+                  <div class="author-info">
+                    <h3>{{ block.settings.title }}</h3>
+                    <div class="star-rating">
+                      {%- for i in (1..5) -%}
+                        <span class="star">★</span>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- else -%}
+            {%- comment -%} Default reviews for preview {%- endcomment -%}
+            {%- for i in (1..3) -%}
+              <div class="review-item">
+                <div class="review-card">
+                  <div class="review-text">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                  </div>
+                  
+                  <div class="review-author">
+                    <div class="user-avatar">
+                      {{ 'Customer' | append: i | slice: 0 }}
+                    </div>
+                    
+                    <div class="author-info">
+                      <h3>Customer {{ i }}</h3>
+                      <div class="star-rating">
+                        {%- for j in (1..5) -%}
+                          <span class="star">★</span>
+                        {%- endfor -%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      {%- if section.blocks.size > 1 -%}
+        <div class="slider-navigation">
+          <button class="slider-btn" id="prev-btn-{{ section.id }}" aria-label="Previous reviews">
+            &#8249;
+          </button>
+          
+          <div class="slider-dots" id="dots-{{ section.id }}">
+            {%- for block in section.blocks limit: reviews_to_display -%}
+              <span class="dot{% if forloop.first %} active{% endif %}" data-slide="{{ forloop.index0 }}"></span>
+            {%- endfor -%}
+          </div>
+          
+          <button class="slider-btn" id="next-btn-{{ section.id }}" aria-label="Next reviews">
+            &#8250;
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const slider = document.getElementById('reviews-slider-{{ section.id }}');
+  const prevBtn = document.getElementById('prev-btn-{{ section.id }}');
+  const nextBtn = document.getElementById('next-btn-{{ section.id }}');
+  const dots = document.querySelectorAll('#dots-{{ section.id }} .dot');
+  
+  if (!slider || !prevBtn || !nextBtn) return;
+  
+  let currentIndex = 0;
+  const itemWidth = 350; // Width of each review item + gap
+  const visibleItems = Math.floor(slider.offsetWidth / itemWidth);
+  const maxIndex = Math.max(0, {{ section.blocks.size }} - visibleItems);
+  
+  function updateSlider() {
+    const scrollPosition = currentIndex * itemWidth;
+    slider.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentIndex);
+    });
+    
+    // Update button states
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= maxIndex;
+  }
+  
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateSlider();
+    }
+  });
+  
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < maxIndex) {
+      currentIndex++;
+      updateSlider();
+    }
+  });
+  
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      currentIndex = Math.min(index, maxIndex);
+      updateSlider();
+    });
+  });
+  
+  // Initialize
+  updateSlider();
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    const newVisibleItems = Math.floor(slider.offsetWidth / itemWidth);
+    const newMaxIndex = Math.max(0, {{ section.blocks.size }} - newVisibleItems);
+    if (currentIndex > newMaxIndex) {
+      currentIndex = newMaxIndex;
+      updateSlider();
+    }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "tag": "section",
+  "class": "section customer-review",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "What Our Customer say",
+      "label": "Section Title"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading Size"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_symbol",
+      "label": "Show Heart Symbol",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "reviews_to_show",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "label": "Maximum Reviews to Show"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Customer Review",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Customer Name",
+          "default": "Hariom Saini"
+        },
+        {
+          "type": "richtext",
+          "id": "review",
+          "label": "Review Text",
+          "default": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Customer Photo (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "title": "Hariom Saini",
+            "review": "<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Sarah Johnson",
+            "review": "<p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Michael Chen",
+            "review": "<p>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

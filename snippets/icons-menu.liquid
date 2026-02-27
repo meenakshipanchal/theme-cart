@@ -1,0 +1,91 @@
+{% comment %} {%- assign icon_image = '' -%}
+{%- capture icon_image -%}
+{%- case icons -%} 
+{%- when 'a2 ghee' -%}nav-ghee.svg
+{%- when 'gir@999' -%}nav-ghee.svg
+{%- when 'wood-pressed oils' -%}nav-oils.svg
+{%- when 'honey' -%}nav-honey.svg
+{%- when 'healthy combo packs' or 'combos' -%}nav-combo.svg
+{%- when 'healthy gifting' -%}nav-giftbox.svg
+{%- when 'superfoods' -%}anv-superfood.svg
+{%- when 'deal of the week' or 'deals' or 'lightning deal' -%}nav-deals.svg
+{%- when 'flash sale' -%}nav-deals.svg
+{%- when 'bogo sale' -%}nav-deals.svg
+{%- when 'b2g1 sale' -%}nav-deals.svg
+{%- when 'all products' -%}nav-all.svg
+{%- when 'newly launched' -%}nav-new.svg
+{%- when 'rewards' -%}nav-rewards.svg
+{%- when 'sampler kits' -%}nav-sampler_kit.svg
+{%- when 'our story' -%}nan-story.svg
+{%- when 'shop' -%}nav-category.svg
+{%- when 'shop by solutions' -%}nav-solution.svg
+{%- when 'anveshan blogs' or 'blogs' or 'know your superfoods' -%}nav-blog.svg
+{%- when 'healthy recipes' or 'medicinal recipes' -%}nav-recipes.svg
+{%- when 'digestive care' -%}nav-digestive_care.svg
+{%- when 'immunity-boosting' -%}nav-immunity_boosting.svg
+{%- when 'diabetic care' -%}nav-diabetic_care.svg
+{%- when 'energy-boosting' -%}nav-energy_boosting.svg
+{%- when 'weight management' -%}nav-weight_management.svg
+{%- when 'traceability' -%}nav-traceability.svg
+{%- when 'connect' -%}nav-connect.svg
+{%- when 'policies' -%}nav-policies.svg
+{%- when 'shop under ₹499' -%}nav-under-499.svg
+{%- when 'shop under ₹999' -%}nav-under-999.svg
+{%- when 'exclusive combo sale' -%}bottelAsset_1_4x_f5438082-18bb-4725-9c04-370f3b6ac291
+{%- endcase -%}
+{%- endcapture -%}
+{% if icon_image != '' %}
+  {% unless loading %}{% assign loading = 'lazy' %}{% endunless %}
+  {{- images[icon_image] | image_url: width: 28, height: 28 | image_tag: loading: loading, alt: icons -}}
+{%- endif -%}
+ {% endcomment %}
+
+ {%- assign icon_image = '' -%}
+{%- capture icon_image -%}
+{%- case icons -%} 
+{%- when 'a2 ghee' -%}nav-ghee.svg
+{%- when 'gir@999' -%}nav-ghee.svg
+{%- when 'wood-pressed oils' -%}nav-oils.svg
+{%- when 'honey' -%}nav-honey.svg
+{%- when 'healthy combo packs' or 'combos' -%}nav-combo.svg
+{%- when 'healthy gifting' -%}nav-giftbox.svg
+{%- when 'superfoods' -%}anv-superfood.svg
+{%- when 'anveshan health partner' -%}nav-affiliate.svg
+{%- when 'winter collection' -%}winter1.svg
+{%- when 'atta' -%}nav-atta.svg
+{%- when 'health reset sale' -%}nav_flat.svg
+{%- when 'deal of the week' or 'deals' or 'lightning deal' -%}nav-deals.svg
+{%- when 'flash sale' -%}nav-deals.svg
+{%- when 'b3p2' -%}nav-deals.svg
+{%- when 'bogo sale' -%}nav-deals.svg
+{%- when 'b2g1 sale' -%}nav-deals.svg
+{%- when 'all products' -%}nav-all.svg
+{%- when 'newly launched' -%}nav-new.svg
+{%- when 'rewards' -%}nav-rewards.svg
+{%- when 'sampler kits' -%}nav-sampler_kit.svg
+{%- when 'our story' -%}nan-story.svg
+{%- when 'shop' -%}nav-category.svg
+{%- when 'shop by solutions' -%}nav-solution.svg
+{%- when 'anveshan blogs' or 'blogs' or 'know your superfoods' -%}nav-blog.svg
+{%- when 'healthy recipes' or 'medicinal recipes' -%}nav-recipes.svg
+{%- when 'digestive care' -%}nav-digestive_care.svg
+{%- when 'immunity-boosting' -%}nav-immunity_boosting.svg
+{%- when 'diabetic care' -%}nav-diabetic_care.svg
+{%- when 'energy-boosting' -%}nav-energy_boosting.svg
+{%- when 'weight management' -%}nav-weight_management.svg
+{%- when 'traceability' -%}nav-traceability.svg
+{%- when 'connect' -%}nav-connect.svg
+{%- when 'policies' -%}nav-policies.svg
+{%- when 'shop under ₹499' -%}nav-under-499.svg
+{%- when 'shop under ₹999' -%}nav-under-999.svg
+{%- when 'exclusive combo sale' -%}exclusive-combo-sale-url
+{%- endcase -%}
+{%- endcapture -%}
+{% if icon_image != '' %}
+  {% unless loading %}{% assign loading = 'lazy' %}{% endunless %}
+  {%- if icons == 'exclusive combo sale' -%}
+    <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/bottelAsset_1_4x_f5438082-18bb-4725-9c04-370f3b6ac291.png?v=1745409297" alt="{{ icons }}" loading="{{ loading }}" width="28" height="28">
+  {%- else -%}
+    {{- images[icon_image] | image_url: width: 28, height: 28 | image_tag: loading: loading, alt: icons -}}
+  {%- endif -%}
+{%- endif -%}

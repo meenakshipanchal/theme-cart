@@ -1,0 +1,37 @@
+{{ 'metaobject-product-template.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign product_object = product.metafields.custom.product_template.value
+%}
+
+{% for metaobject in product_object.blocks.value %}
+  {% case metaobject.system.type %}
+    {% when 'impact_image' %}
+      {% render 'metaobject-impaact-product-template', metaobject: metaobject %}
+    {% when 'customer_iimages_ghee' %}
+      <div style="margin-top: 20px; margin-bottom: 20px" class="page-width product-review-images-gallery">
+        {% assign customer_images = metaobject.customer_images_ghee.value %}
+        {% if customer_images %}
+          <!-- Your code to handle customer_images goes here -->
+        {% endif %}
+      </div>
+  {% endcase %}
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Ghee Again Metaobject",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "hiden",
+      "label": "Hide",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,201 @@
+<script>
+// Function to create and show the banner popup
+function showSaleBanner() {
+    // Check if banner already exists to avoid duplicates
+    if (document.getElementById('saleBannerOverlay')) {
+        return;
+    }
+    
+    // Create banner elements
+    const bannerOverlay = document.createElement('div');
+    const bannerContent = document.createElement('div');
+    const bannerImage = document.createElement('img');
+    const closeButton = document.createElement('button');
+    
+    // Add ID to prevent duplicates
+    bannerOverlay.id = 'saleBannerOverlay';
+    
+    // Style the banner overlay
+    bannerOverlay.style.position = 'fixed';
+    bannerOverlay.style.top = '0';
+    bannerOverlay.style.left = '0';
+    bannerOverlay.style.width = '100%';
+    bannerOverlay.style.height = '100%';
+    bannerOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    bannerOverlay.style.zIndex = '9999';
+    bannerOverlay.style.display = 'flex';
+    bannerOverlay.style.justifyContent = 'center';
+    bannerOverlay.style.alignItems = 'flex-start';
+    bannerOverlay.style.paddingTop = '80px';
+    bannerOverlay.style.opacity = '0';
+    bannerOverlay.style.transition = 'opacity 0.3s ease';
+
+    // Style the banner content container
+    bannerContent.style.position = 'relative';
+    bannerContent.style.maxWidth = '500px'; // Fixed width for better control
+    bannerContent.style.maxHeight = '70vh'; // 70% of viewport height
+    bannerContent.style.transform = 'scale(0.8)';
+    bannerContent.style.transition = 'transform 0.3s ease';
+    
+    // Responsive sizing for different screens
+    if (window.innerWidth <= 768) {
+        // Mobile screens
+        bannerContent.style.maxWidth = '90%';
+        bannerContent.style.maxHeight = '80vh';
+    } else if (window.innerWidth <= 1024) {
+        // Tablet screens
+        bannerContent.style.maxWidth = '400px';
+        bannerContent.style.maxHeight = '60vh';
+    } else {
+        // Desktop/Laptop screens
+        bannerContent.style.maxWidth = '450px';
+        bannerContent.style.maxHeight = '50vh';
+    }
+
+    // Style the banner image
+    bannerImage.src = 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Asset_9b3p2.png?v=1758197144';
+    bannerImage.alt = 'Sale Banner';
+    bannerImage.style.width = '100%';
+    bannerImage.style.height = 'auto';
+    bannerImage.style.borderRadius = '10px';
+    bannerImage.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+    bannerImage.style.display = 'block';
+    bannerImage.style.cursor = 'pointer';
+
+    // Style the close button (white cross)
+    closeButton.innerHTML = '✕';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '15px';
+    closeButton.style.right = '15px';
+    closeButton.style.border = 'none';
+    closeButton.style.background = 'rgba(0, 0, 0, 0.5)';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '24px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.width = '40px';
+    closeButton.style.height = '40px';
+    closeButton.style.borderRadius = '50%';
+    closeButton.style.display = 'flex';
+    closeButton.style.alignItems = 'center';
+    closeButton.style.justifyContent = 'center';
+    closeButton.style.transition = 'all 0.2s ease';
+    closeButton.style.fontWeight = 'bold';
+
+    // Add hover effect to close button
+    closeButton.onmouseover = function() {
+        closeButton.style.background = 'rgba(0, 0, 0, 0.8)';
+        closeButton.style.transform = 'scale(1.1)';
+    };
+    closeButton.onmouseout = function() {
+        closeButton.style.background = 'rgba(0, 0, 0, 0.5)';
+        closeButton.style.transform = 'scale(1)';
+    };
+
+    // Add close functionality
+    closeButton.onclick = function() {
+        // Animate out
+        bannerOverlay.style.opacity = '0';
+        bannerContent.style.transform = 'scale(0.8)';
+        
+        setTimeout(function() {
+            if (document.body.contains(bannerOverlay)) {
+                document.body.removeChild(bannerOverlay);
+            }
+        }, 300);
+        
+        // Set timestamp when banner was closed
+        localStorage.setItem('lastBannerTime', Date.now());
+    };
+
+    // Close on overlay click (clicking outside the banner)
+    bannerOverlay.onclick = function(e) {
+        if (e.target === bannerOverlay) {
+            closeButton.click();
+        }
+    };
+
+    // Prevent closing when clicking on banner content
+    bannerContent.onclick = function(e) {
+        e.stopPropagation();
+    };
+
+    // Make banner image clickable (optional - you can add redirect URL here)
+    bannerImage.onclick = function() {
+        // Uncomment and modify the line below if you want to redirect somewhere
+        // window.open('/shop', '_blank');
+    };
+
+    // Append elements
+    bannerContent.appendChild(bannerImage);
+    bannerContent.appendChild(closeButton);
+    bannerOverlay.appendChild(bannerContent);
+    document.body.appendChild(bannerOverlay);
+
+    // Animate in
+    setTimeout(function() {
+        bannerOverlay.style.opacity = '1';
+        bannerContent.style.transform = 'scale(1)';
+    }, 50);
+}
+
+// Function to check if banner should be shown
+function shouldShowBanner() {
+    const lastBannerTime = localStorage.getItem('lastBannerTime');
+    const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    // If banner was never closed, show it
+    if (!lastBannerTime) {
+        return true;
+    }
+    
+    // If banner was closed, check if 30 minutes have passed
+    const timeDifference = Date.now() - parseInt(lastBannerTime);
+    return timeDifference >= thirtyMinutes;
+}
+
+// Function to show banner after delay
+function showBannerWithDelay() {
+    if (shouldShowBanner()) {
+        setTimeout(function() {
+            showSaleBanner();
+        }, 5000); // Show after 5 seconds
+    }
+}
+
+// No need for session initialization anymore
+function initializeSession() {
+    // Do nothing - we rely only on lastBannerTime now
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSession();
+    showBannerWithDelay();
+});
+
+// If DOM is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSession();
+        showBannerWithDelay();
+    });
+} else {
+    initializeSession();
+    showBannerWithDelay();
+}
+
+// Set interval to check every 5 minutes if banner should be shown again
+setInterval(function() {
+    if (shouldShowBanner()) {
+        showSaleBanner();
+    }
+}, 300000); // Check every 5 minutes
+
+// Close banner with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('saleBannerOverlay')) {
+        const closeBtn = document.querySelector('#saleBannerOverlay button');
+        if (closeBtn) closeBtn.click();
+    }
+});
+</script>

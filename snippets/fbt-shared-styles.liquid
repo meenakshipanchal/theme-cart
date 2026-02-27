@@ -1,0 +1,166 @@
+<style>
+  /* Shared FBT Recommendations Styles */
+  .fbt-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fbt-section-heading svg {
+    width: 18px;
+    height: 18px;
+  }
+  .fbt-section-wrapper {
+    width: 100%;
+    padding: 12px 15px 8px;
+    border-top: 1px solid #e9ecef;
+    margin-top: 8px;
+  }
+  .fbt-section-wrapper h3 {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 600;
+    color: #235A49;
+    margin: 0 0 10px 0;
+    padding-top: 5px;
+  }
+  .fbt-section-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 5px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .fbt-section-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .fbt-section-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+    width: 300px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .fbt-section-rank-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2px 6px;
+    border-radius: 0 0 8px 0;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    background: #235A49;
+    z-index: 10;
+    letter-spacing: 0.3px;
+  }
+  .fbt-section-discount-tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #16a34a;
+    color: white;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 0 10px 0 8px;
+    z-index: 5;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .fbt-section-image img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .fbt-section-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    min-height: 70px;
+  }
+  .fbt-section-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.3;
+    max-height: 38px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fbt-section-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .fbt-section-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .fbt-section-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: #235A49;
+  }
+  .fbt-section-btn {
+    background-color: #235A49;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    min-width: 60px;
+    min-height: 30px;
+    z-index: 100;
+  }
+  .fbt-section-btn .btn-text { }
+  .fbt-section-btn .btn-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  .fbt-section-btn.loading .btn-text {
+    display: none;
+  }
+  .fbt-section-btn.loading .btn-loader {
+    display: flex;
+  }
+  .fbt-section-btn.loading,
+  .fbt-section-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .fbt-section-loading,
+  .fbt-section-message {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    width: 100%;
+  }
+  @media (max-width: 767px) {
+    .fbt-section-card {
+      width: 260px;
+    }
+    .fbt-section-name {
+      font-size: 13px;
+    }
+    .fbt-section-wrapper h3 {
+      font-size: 15px;
+    }
+  }
+</style>

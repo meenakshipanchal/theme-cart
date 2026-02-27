@@ -1,0 +1,20 @@
+{{ 'main-bundle-product.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+<script src="{{ 'vue.min.js' | asset_url }}" defer></script>
+{% liquid
+  if product.metafields.custom.bundle != blank
+    assign bundle = product.metafields.custom.bundle
+    render 'product-bundle', kitData: bundle
+  endif
+%}
+<script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+  {
+    "name": "Main Bundle",
+    "settings": []
+  }
+{% endschema %}

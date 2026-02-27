@@ -1,0 +1,126 @@
+<!-- 🔗 Share Button with Tracking -->
+<button
+  class="share-button"
+  type="button"
+  data-title="{{ product.title | escape }}"
+  data-url="{{ shop.url }}{{ product.url }}"
+  data-product-id="{{ product.id }}"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="70" viewBox="0 0 30 30">
+    <path d="M 23 3 A 4 4 0 0 0 19 7 A 4 4 0 0 0 19.09375 7.8359375 L 10.011719 12.376953 A 4 4 0 0 0 7 11 A 4 4 0 0 0 3 15 A 4 4 0 0 0 7 19 A 4 4 0 0 0 10.013672 17.625 L 19.089844 22.164062 A 4 4 0 0 0 19 23 A 4 4 0 0 0 23 27 A 4 4 0 0 0 27 23 A 4 4 0 0 0 23 19 A 4 4 0 0 0 19.986328 20.375 L 10.910156 15.835938 A 4 4 0 0 0 11 15 A 4 4 0 0 0 10.90625 14.166016 L 19.988281 9.625 A 4 4 0 0 0 23 11 A 4 4 0 0 0 27 7 A 4 4 0 0 0 23 3 z"></path>
+  </svg>
+</button>
+
+<style>
+  .share-button {
+    background: #f2f2f2;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-button:hover {
+    background: #235A49;
+  }
+
+  .share-button:hover svg {
+    stroke: #fff;
+  }
+
+  @media (max-width: 600px) {
+    .share-button {
+      width: 34px;
+      height: 34px;
+    }
+    .share-button svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const shareButton = document.querySelector('.share-button');
+    if (shareButton) {
+      shareButton.addEventListener('click', async () => {
+        const title = shareButton.getAttribute('data-title');
+        const url = shareButton.getAttribute('data-url');
+        const productId = shareButton.getAttribute('data-product-id');
+
+        // 📊 TRACKING: Google Analytics (GA4)
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'share', {
+            method: 'Web Share API',
+            content_type: 'product',
+            item_id: productId,
+            item_name: title,
+            event_category: 'engagement',
+            event_label: title
+          });
+        }
+
+        // 📊 TRACKING: Facebook Pixel
+        if (typeof fbq !== 'undefined') {
+          fbq('track', 'Share', {
+            content_name: title,
+            content_type: 'product',
+            content_ids: [productId]
+          });
+        }
+
+        // 📊 TRACKING: Shopify Analytics (if available)
+        if (window.ShopifyAnalytics) {
+          window.ShopifyAnalytics.lib.track('Product Shared', {
+            productId: productId,
+            productTitle: title,
+            productUrl: url
+          });
+        }
+
+        // Share functionality
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: title,
+              text: `Check out this product: ${title}`,
+              url: url,
+            });
+            
+            // Track successful share
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'share_success', {
+                method: 'Web Share API',
+                content_type: 'product',
+                item_id: productId
+              });
+            }
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.log('Share cancelled or failed:', err);
+            }
+          }
+        } else {
+          // Fallback: copy link
+          navigator.clipboard.writeText(url);
+          alert('Link copied to clipboard!');
+          
+          // Track fallback method
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'share', {
+              method: 'Clipboard Copy',
+              content_type: 'product',
+              item_id: productId
+            });
+          }
+        }
+      });
+    }
+  });
+</script>

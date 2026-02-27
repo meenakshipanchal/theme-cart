@@ -1,0 +1,58 @@
+
+.contact img {
+  max-width: 100%;
+}
+
+.contact .form__message {
+  align-items: flex-start;
+}
+
+.contact .icon-success {
+  margin-top: 0.2rem;
+}
+
+.contact .field {
+  margin-bottom: 1.5rem;
+}
+.page-content {
+  margin-top: 2.5rem;
+}
+@media screen and (min-width: 750px) {
+  .contact { flex: 0 0 45%; margin-right: 5rem; }
+  .page-content { margin-top: 5rem; }
+  .contact .field {
+    margin-bottom: 2rem;
+  }
+  .contact-page { display: flex; }
+}
+
+.contact__button {
+  margin-top: 2rem; }
+.contact__button button {
+  border-radius: 2.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .contact__button {
+    margin-top: 2.5rem;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .contact__fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 2rem;
+  }
+}
+.textarea-field:after {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 0 0 var(--inputs-border-width) rgba(var(--color-foreground),var(--inputs-border-opacity)) !important;
+}
+.contact__fields .field:after {
+  border-radius: 35px !important;
+  box-shadow: 0 0 0 var(--inputs-border-width) rgba(var(--color-foreground),var(--inputs-border-opacity)) !important;
+}
+.field__input:focus, .select__select:focus, .customer .field input:focus, .customer select:focus, .localization-form__select:focus.localization-form__select:after {
+  box-shadow: none !important;
+}

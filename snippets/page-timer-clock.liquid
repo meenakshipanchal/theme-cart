@@ -1,0 +1,287 @@
+{%- comment -%}
+  ============================================
+  PAGE TIMER CLOCK - Countdown Banner
+  ============================================
+  Displays urgency countdown timer with circular progress
+  Target Date: 2026-02-03T20:00:00+05:30
+{%- endcomment -%}
+
+<!-- ==================== HTML ==================== -->
+<div class="countdown-outer">
+  <div class="countdown-container">
+
+    <!-- Left: Text Content -->
+    <div class="countdown-left">
+      <h3>BY POPULAR DEMAND: SURPRISE: 24-HOUR BONUS.</h3>
+      <h3 class="last-day-text">Sale Extended!! FLAT 30% OFF</h3>
+    </div>
+
+    <!-- Right: Timer Circles -->
+    <div class="countdown-right">
+      <div class="timer-container">
+
+        <!-- Days -->
+        <div class="timer" id="days-timer">
+          <div class="circle">
+            <svg><circle cx="30" cy="30" r="25"></circle><circle cx="30" cy="30" r="25" id="days-circle"></circle></svg>
+            <div class="timer-text"><span id="days">01</span><small>DAYS</small></div>
+          </div>
+        </div>
+
+        <!-- Hours -->
+        <div class="timer" id="hours-timer">
+          <div class="circle">
+            <svg><circle cx="30" cy="30" r="25"></circle><circle cx="30" cy="30" r="25" id="hours-circle"></circle></svg>
+            <div class="timer-text"><span id="hours">11</span><small>HR</small></div>
+          </div>
+        </div>
+
+        <!-- Minutes -->
+        <div class="timer" id="minutes-timer">
+          <div class="circle">
+            <svg><circle cx="30" cy="30" r="25"></circle><circle cx="30" cy="30" r="25" id="minutes-circle"></circle></svg>
+            <div class="timer-text"><span id="minutes">59</span><small>MIN</small></div>
+          </div>
+        </div>
+
+        <!-- Seconds -->
+        <div class="timer" id="seconds-timer">
+          <div class="circle">
+            <svg><circle cx="30" cy="30" r="25"></circle><circle cx="30" cy="30" r="25" id="seconds-circle"></circle></svg>
+            <div class="timer-text"><span id="seconds">59</span><small>SEC</small></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ==================== STYLES ==================== -->
+<style>
+  /* === Container === */
+  .countdown-outer {
+    background: #26463c;
+  }
+
+  .countdown-container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 20px;
+    text-align: center;
+    color: #fff;
+    margin: auto;
+  }
+
+  /* === Left Section === */
+  .countdown-left {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .countdown-left h3 {
+    margin: 0;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  /* === Right Section === */
+  .countdown-right {
+    display: flex;
+    align-items: center;
+  }
+
+  /* === Timer Container === */
+  .timer-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* === Individual Timer === */
+  .timer {
+    position: relative;
+    width: 60px;
+    height: 60px;
+  }
+
+  .timer .circle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .timer svg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .timer circle {
+    fill: none;
+    stroke-width: 6;
+    stroke: #2e2f3a;
+  }
+
+  .timer circle:nth-child(2) {
+    stroke-dasharray: 157.08;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+
+  /* === Circle Colors === */
+  #days-circle    { stroke: #8e72dc; }
+  #hours-circle   { stroke: #33dd8a; }
+  #minutes-circle { stroke: #f0b43e; }
+  #seconds-circle { stroke: #f05555; }
+
+  /* === Timer Text === */
+  .timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+  }
+
+  .timer-text span {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .timer-text small {
+    display: block;
+    font-size: 8px;
+    color: #ccc;
+    line-height: 1;
+  }
+
+  /* === Desktop === */
+  @media (min-width: 750px) {
+    .countdown-container {
+      display: flex;
+      justify-content: space-between;
+      max-width: 960px;
+      padding: 15px;
+    }
+    .countdown-container h3 {
+      text-align: left;
+      margin-top: 5px;
+    }
+  }
+
+  /* === Mobile === */
+  @media (max-width: 750px) {
+    .countdown-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .countdown-right {
+      justify-content: center;
+    }
+    .timer-container {
+      margin: 10px 0;
+    }
+    .countdown-container h3 {
+      font-size: 1.5rem;
+      letter-spacing: 0;
+    }
+  }
+
+  /* === Urgency Animation === */
+  .countdown-container h3 span {
+    display: inline-block;
+    color: #ff6b35;
+    font-weight: bold;
+    animation: urgentPulse 1.2s ease-in-out infinite;
+    text-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+  }
+
+  @keyframes urgentPulse {
+    0%   { opacity: 1;   transform: scale(1);    color: #ff6b35; }
+    50%  { opacity: 0.7; transform: scale(1.05); color: #ff4500; text-shadow: 0 0 15px rgba(255, 69, 0, 0.8); }
+    100% { opacity: 1;   transform: scale(1);    color: #ff6b35; }
+  }
+
+  .countdown-container h3 span:hover {
+    animation: urgentShake 0.5s ease-in-out infinite;
+  }
+
+  @keyframes urgentShake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-2px); }
+    75%      { transform: translateX(2px); }
+  }
+</style>
+
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+  (function() {
+    // Target Date - Change this when needed
+    const targetDate = new Date('2026-02-04T23:00:00+05:30').getTime();
+    const CIRCUMFERENCE = 157.08;
+
+    // DOM Elements
+    const elements = {
+      days:    document.getElementById('days'),
+      hours:   document.getElementById('hours'),
+      minutes: document.getElementById('minutes'),
+      seconds: document.getElementById('seconds'),
+      daysCircle:    document.getElementById('days-circle'),
+      hoursCircle:   document.getElementById('hours-circle'),
+      minutesCircle: document.getElementById('minutes-circle'),
+      secondsCircle: document.getElementById('seconds-circle')
+    };
+
+    // Update countdown
+    function countdown() {
+      const now = Date.now();
+      const timeRemaining = targetDate - now;
+
+      // Timer expired
+      if (timeRemaining <= 0) {
+        clearInterval(timer);
+        elements.days.textContent = '00';
+        elements.hours.textContent = '00';
+        elements.minutes.textContent = '00';
+        elements.seconds.textContent = '00';
+        elements.daysCircle.style.strokeDashoffset = CIRCUMFERENCE;
+        elements.hoursCircle.style.strokeDashoffset = CIRCUMFERENCE;
+        elements.minutesCircle.style.strokeDashoffset = CIRCUMFERENCE;
+        elements.secondsCircle.style.strokeDashoffset = CIRCUMFERENCE;
+        return;
+      }
+
+      // Calculate time
+      const days    = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+      const hours   = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+      // Update text
+      elements.days.textContent    = String(days).padStart(2, '0');
+      elements.hours.textContent   = String(hours).padStart(2, '0');
+      elements.minutes.textContent = String(minutes).padStart(2, '0');
+      elements.seconds.textContent = String(seconds).padStart(2, '0');
+
+      // Update circles
+      elements.daysCircle.style.strokeDashoffset    = CIRCUMFERENCE - (days / 365 * CIRCUMFERENCE);
+      elements.hoursCircle.style.strokeDashoffset   = CIRCUMFERENCE - (hours / 24 * CIRCUMFERENCE);
+      elements.minutesCircle.style.strokeDashoffset = CIRCUMFERENCE - (minutes / 60 * CIRCUMFERENCE);
+      elements.secondsCircle.style.strokeDashoffset = CIRCUMFERENCE - (seconds / 60 * CIRCUMFERENCE);
+    }
+
+    // Start timer
+    const timer = setInterval(countdown, 1000);
+    countdown(); // Initial call
+  })();
+</script>

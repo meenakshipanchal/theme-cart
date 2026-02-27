@@ -1,0 +1,92 @@
+{{ 'metaobject-collection.css' | asset_url | stylesheet_tag }}
+{{ 'variant-card.css' | asset_url | stylesheet_tag }}
+{{ 'quick-add.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'quick-add.js' | asset_url }}" defer></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer></script>
+
+{% render 'universal-menu',
+  menu_type: 'collection',
+  section_settings: section.settings,
+  section_id: section.id
+%}
+
+{% schema %}
+{
+  "name": "Collection Menu (Opti)",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Headings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_headings",
+      "label": "Show section headings",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "main_heading",
+      "label": "Main Heading",
+      "default": "Welcome To Anveshan!",
+      "info": "Bold heading displayed at the top"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "You're One Step Closer to Purity",
+      "info": "Regular weight heading displayed below main heading"
+    },
+    {
+      "type": "header",
+      "content": "Product Card Settings"
+    },
+    {
+      "type": "select",
+      "id": "quick_add",
+      "label": "Quick add",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "standard", "label": "Button" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        { "value": "adapt", "label": "Adapt to image" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "square", "label": "Square" }
+      ],
+      "default": "square",
+      "label": "Image ratio"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show product rating",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Menu (Optimized)"
+    }
+  ]
+}
+{% endschema %}

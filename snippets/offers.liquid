@@ -1,0 +1,65 @@
+{% liquid
+  assign discount_list = shop.metaobjects.cart_discount_list.values
+  assign cart_price = cart.total_price | divided_by: 100
+  assign cart_qty = cart.item_count | times: 1
+  assign enable_discount = false
+%}
+{% for discount in discount_list %}
+  {% liquid
+    assign condition = discount.conditions | times: 1
+    assign active = false
+    if cart_qty >= condition
+      assign active = true
+    endif
+    if cart_price > condition and condition > 50
+      assign active = true
+    endif
+  %}
+  {% if active and discount.acttive %}
+    {% assign enable_discount = true %}
+    {% capture discounts %}
+        {{ discounts }}
+        <li>
+          <div class="offer-discount">
+            <h3>{% if discount.percentage %}<span>Buy </span> {{ condition }} <span>Get </span> {{ discount.percentage }}% <span>off</span>
+            {% else %}<span>Flat </span> ₹{{ discount.amount }} <span>off</span>{% endif %}</h3>
+            {{ discount.description | metafield_tag }}
+            <div class="copy-button">
+              <input id="copyvalue_{{- forloop.index -}}" type="text" readonly value="{{ discount.code }}" />
+              <button onclick="copyIt('#copyvalue_{{- forloop.index -}}','#copybtn_{{- forloop.index -}}')"  class="copybtn" id="copybtn_{{- forloop.index -}}">COPY</button>
+            </div>
+          </div>
+        </li>
+        {% endcapture %}
+  {% endif %}
+{% endfor %}
+{% if enable_discount %}
+  <div class="recommended-product">
+    <h3>Offers for you</h3>
+    <ul class="offers recommended-products">{{ discounts }}</ul>
+  </div>
+  <style>
+    ul.offers li { flex: 0 0 70% !important; }
+    .offer-discount { flex-direction: column; gap: 0; padding: 10px 15px 15px; border-radius: 5px; background: #fff; position: relative; box-shadow: 0 4px 6px 0 rgba(220, 220, 220, 0.2); }
+    .offer-discount h3 { margin: 0 0 3px !important; align-items: center; }
+    .offer-discount h3 span { font-size: 0.8em; }
+    .offer-discount svg { margin-right: 8px; }
+    .offer-discount p { margin: 0; font-size: 12px; height: 20px; overflow: hidden; }
+    .copy-button { margin: 12px 0 -5px 0; height: 35px; border-radius: 4px 4px 15px; padding: 3px 5px; border: 1px dotted #e1e1e1; display: flex; }
+    .copy-button input { width: 100%; height: 100%; border: none; outline: none; font-size: 13px; }
+    .copy-button button { padding: 3px 13px; background-color: #136b57; color: #fff; border: 1px solid transparent; font-size: 12px; line-height: 1.5; height: fit-content; border-radius: 3px 3px 12px; }
+    .offer-discount::after, .offer-discount::before { position: absolute; content: ""; background-color: #f7f7f7; height: 20px; width: 20px; border-radius: 40px; z-index: 1; top: 50%; transform: translateY(-50%); }
+    .offer-discount::after { right: -9px; }
+    .offer-discount::before { left: -9px; }
+  </style>
+  <script>
+    function copyIt(_id,_txt){
+      let copyInput = document.querySelector(_id);
+      copyInput.select();
+      document.execCommand("copy");
+      console.log(_txt);
+      document.querySelector(_txt).textContent = "COPIED";
+      setTimeout(() => { document.querySelector(_txt).textContent = "COPY" }, 1000);
+    }
+  </script>
+{% endif %}

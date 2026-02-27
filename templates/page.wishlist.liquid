@@ -1,0 +1,408 @@
+{% comment %} {{ 'section-main-page.css' | asset_url | stylesheet_tag }}
+
+<div class="page-width page-width--narrow section-{{ section.id }}-padding">
+  <h1 class="main-page-title page-title h0">
+    {{ page.title | escape }}
+  </h1>
+  
+  <div class="wishlist-container">
+    <div class="wishlist-header">
+      <div class="wishlist-count-display">
+        <span id="wishlist-total-count">0</span> items in your wishlist
+      </div>
+      <button type="button" class="btn btn-outline" id="clear-all-wishlist">
+        Clear All
+      </button>
+    </div>
+
+    <div id="wishlist-empty-state" class="wishlist-empty-state">
+      <div class="empty-wishlist">
+        <svg width="80" height="80" viewBox="0 0 24 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="#ccc" stroke-width="2" fill="none"/>
+        </svg>
+        <h2>Your wishlist is empty</h2>
+        <p>Start adding products you love to see them here!</p>
+        <a href="{{ routes.collections_url }}" class="btn">Continue Shopping</a>
+      </div>
+    </div>
+
+    <div id="wishlist-items-grid" class="wishlist-grid">
+      <!-- Wishlist items will be populated here -->
+    </div>
+  </div>
+
+  <!-- Demo Products for Testing -->
+  <div class="demo-section">
+    <h3>Demo Products (For Testing)</h3>
+    <p>These are sample products to test the wishlist functionality:</p>
+    <div class="demo-products">
+      <div class="demo-product">
+        <img src="https://via.placeholder.com/200x200/f0f0f0/666?text=Product+1" alt="Demo Product 1">
+        <h4>Demo Product 1</h4>
+        <p>$29.99</p>
+        <button type="button" class="btn demo-add-to-wishlist" data-product='{"id":"demo1","title":"Demo Product 1","price":"2999","image":"https://via.placeholder.com/200x200/f0f0f0/666?text=Product+1","url":"#"}'>
+          Add to Wishlist
+        </button>
+      </div>
+      <div class="demo-product">
+        <img src="https://via.placeholder.com/200x200/f0f0f0/666?text=Product+2" alt="Demo Product 2">
+        <h4>Demo Product 2</h4>
+        <p>$49.99</p>
+        <button type="button" class="btn demo-add-to-wishlist" data-product='{"id":"demo2","title":"Demo Product 2","price":"4999","image":"https://via.placeholder.com/200x200/f0f0f0/666?text=Product+2","url":"#"}'>
+          Add to Wishlist
+        </button>
+      </div>
+      <div class="demo-product">
+        <img src="https://via.placeholder.com/200x200/f0f0f0/666?text=Product+3" alt="Demo Product 3">
+        <h4>Demo Product 3</h4>
+        <p>$19.99</p>
+        <button type="button" class="btn demo-add-to-wishlist" data-product='{"id":"demo3","title":"Demo Product 3","price":"1999","image":"https://via.placeholder.com/200x200/f0f0f0/666?text=Product+3","url":"#"}'>
+          Add to Wishlist
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rte">
+    {{ page.content }}
+  </div>
+</div>
+
+<style>
+.wishlist-container {
+  margin: 2rem 0;
+}
+
+.wishlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wishlist-count-display {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #000;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.btn-outline:hover {
+  background: #000;
+  color: white;
+}
+
+.wishlist-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-wishlist svg {
+  margin-bottom: 2rem;
+  opacity: 0.3;
+}
+
+.empty-wishlist h2 {
+  font-size: 1.5rem;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.empty-wishlist p {
+  color: #999;
+  margin: 0 0 2rem 0;
+}
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.wishlist-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.wishlist-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.wishlist-item-content {
+  padding: 1.5rem;
+}
+
+.wishlist-item h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.wishlist-item .price {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e74c3c;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.wishlist-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wishlist-remove:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.wishlist-remove svg {
+  width: 16px;
+  height: 16px;
+  color: #666;
+}
+
+.wishlist-remove:hover svg {
+  color: #e74c3c;
+}
+
+/* Demo Section Styles */
+.demo-section {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.demo-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.demo-product {
+  text-align: center;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.demo-product img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.demo-product h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.demo-product p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e74c3c;
+  margin: 0 0 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .wishlist-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-products {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Simple wishlist management
+  const STORAGE_KEY = 'demo_wishlist';
+  
+  function getWishlist() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  }
+  
+  function saveWishlist(wishlist) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
+    updateDisplay();
+    updateHeaderCount();
+  }
+  
+  function updateHeaderCount() {
+    const wishlist = getWishlist();
+    const headerCount = document.getElementById('header-wishlist-count');
+    if (headerCount) {
+      headerCount.textContent = wishlist.length;
+      if (wishlist.length > 0) {
+        headerCount.classList.add('has-items');
+      } else {
+        headerCount.classList.remove('has-items');
+      }
+    }
+  }
+  
+  function updateDisplay() {
+    const wishlist = getWishlist();
+    const countElement = document.getElementById('wishlist-total-count');
+    const emptyState = document.getElementById('wishlist-empty-state');
+    const itemsGrid = document.getElementById('wishlist-items-grid');
+    
+    if (countElement) {
+      countElement.textContent = wishlist.length;
+    }
+    
+    if (wishlist.length === 0) {
+      emptyState.style.display = 'block';
+      itemsGrid.style.display = 'none';
+    } else {
+      emptyState.style.display = 'none';
+      itemsGrid.style.display = 'grid';
+      
+      itemsGrid.innerHTML = wishlist.map(item => `
+        <div class="wishlist-item" data-id="${item.id}">
+          <button type="button" class="wishlist-remove" onclick="removeFromWishlist('${item.id}')">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <img src="${item.image}" alt="${item.title}">
+          <div class="wishlist-item-content">
+            <h3>${item.title}</h3>
+            <div class="price">$${(item.price / 100).toFixed(2)}</div>
+            <button type="button" class="btn">View Product</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // Add to wishlist function
+  window.addToWishlist = function(productData) {
+    const wishlist = getWishlist();
+    const exists = wishlist.find(item => item.id === productData.id);
+    
+    if (!exists) {
+      wishlist.push(productData);
+      saveWishlist(wishlist);
+      showNotification(`${productData.title} added to wishlist!`);
+    } else {
+      showNotification(`${productData.title} is already in wishlist!`);
+    }
+  };
+  
+  // Remove from wishlist function
+  window.removeFromWishlist = function(productId) {
+    const wishlist = getWishlist().filter(item => item.id !== productId);
+    saveWishlist(wishlist);
+    showNotification('Item removed from wishlist');
+  };
+  
+  // Clear all wishlist
+  document.getElementById('clear-all-wishlist')?.addEventListener('click', function() {
+    if (confirm('Are you sure you want to clear your entire wishlist?')) {
+      saveWishlist([]);
+      showNotification('Wishlist cleared');
+    }
+  });
+  
+  // Demo add to wishlist buttons
+  document.querySelectorAll('.demo-add-to-wishlist').forEach(button => {
+    button.addEventListener('click', function() {
+      const productData = JSON.parse(this.dataset.product);
+      addToWishlist(productData);
+    });
+  });
+  
+  function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 4px;
+      z-index: 10000;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
+  
+  // Initialize display
+  updateDisplay();
+});
+</script>
+
+  {% endcomment %}

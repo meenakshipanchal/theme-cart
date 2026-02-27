@@ -1,0 +1,2001 @@
+{% comment %}
+  <div id="anveshan-coins-widget" class="anveshan-widget">
+    <div class="coins-header">
+      <h3>🪙 Your Anveshan Coins</h3>
+      <div class="coins-balance">
+        <span class="current-balance">Loading...</span> coins available
+      </div>
+    </div>
+
+    <div class="redeemable-info">
+      Use up to <span class="max-redeemable">0</span> coins (25% max)
+    </div>
+
+    <div class="coins-input-section" style="display: none;">
+      <div class="input-group">
+        <label for="coins-to-redeem">Use Coins:</label>
+        <input type="number" id="coins-to-redeem" max="0" min="0" value="0" placeholder="0">
+        <button type="button" id="apply-coins-btn" class="btn-primary">Apply</button>
+        <button type="button" id="remove-coins-btn" class="btn-secondary" style="display: none;">Remove</button>
+      </div>
+    </div>
+
+    <div class="coins-discount" style="display: none;">
+      <div class="discount-applied">
+        ✅ Coin Discount: -₹<span id="coins-discount-amount">0</span>
+      </div>
+    </div>
+
+    <div class="coins-loading" style="display: none;">
+      Processing coins...
+    </div>
+  </div>
+
+  <style>
+  .anveshan-widget {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .coins-header h3 {
+    margin: 0 0 8px 0;
+    color: #2c5f41;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .coins-balance {
+    font-size: 16px;
+    color: #28a745;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .current-balance {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .redeemable-info {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-style: italic;
+  }
+
+  .coins-input-section {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .input-group label {
+    font-size: 14px;
+    color: #2c5f41;
+    font-weight: 500;
+    min-width: 80px;
+  }
+
+  .input-group input {
+    width: 90px;
+    padding: 8px 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: #2c5f41;
+    box-shadow: 0 0 0 3px rgba(44, 95, 65, 0.1);
+  }
+
+  .btn-primary {
+    background: #2c5f41;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #1e3f2b;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #c82333;
+  }
+
+  .coins-discount {
+    margin-top: 15px;
+    padding: 12px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+  }
+
+  .discount-applied {
+    color: #155724;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .coins-loading {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 10px;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .input-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .input-group label {
+      min-width: auto;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      text-align: left;
+    }
+
+    .btn-primary, .btn-secondary {
+      width: 100%;
+      margin-top: 8px;
+    }
+  }
+  </style>
+{% endcomment %}
+
+{% comment %} main working  {% endcomment %}
+
+<!-- Simple Anveshan FreeCash Widget -->
+{% comment %}
+  <div id="anveshan-freecash-widget" style="margin: 15px 20px; display: none;">
+    <div
+      style="
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: 2px solid #235A49;
+        border-radius: 12px;
+        padding: 20px;
+        font-family: Roboto, sans-serif;
+      "
+    >
+      <!-- Header -->
+      <div style="display: flex; align-items: center; margin-bottom: 15px;">
+        <span style="font-size: 24px; margin-right: 10px;">💰</span>
+        <h3 style="margin: 0; color: #235A49; font-size: 18px; font-weight: 600;">Anveshan FreeCash</h3>
+      </div>
+
+      <!-- Balance Display -->
+      <div
+        style="
+          background: white;
+          padding: 15px;
+          border-radius: 8px;
+          margin-bottom: 15px;
+          border-left: 4px solid #235A49;
+        "
+      >
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #666; font-size: 14px;">Available Balance:</span>
+          <span id="freecash-balance" style="font-weight: 600; color: #235A49; font-size: 16px;">₹0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #666; font-size: 14px;">You can save:</span>
+          <span id="freecash-discount" style="font-weight: 600; color: #28a745; font-size: 16px;">₹0</span>
+        </div>
+      </div>
+
+      <!-- Simple Enable/Disable Checkbox -->
+      <div id="freecash-enable-section" style="display: none;">
+        <label
+          style="
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #28a745;
+            margin-bottom: 15px;
+          "
+        >
+          <input
+            type="checkbox"
+            id="enable-freecash"
+            style="
+              width: 20px;
+              height: 20px;
+              margin-right: 12px;
+              accent-color: #28a745;
+            "
+          >
+          <div style="flex: 1;">
+            <div style="font-weight: 600; color: #28a745; font-size: 16px;">
+              Use FreeCash & Save <span id="save-amount">₹0</span>
+            </div>
+            <div style="color: #666; font-size: 14px; margin-top: 4px;">Apply your FreeCash discount at checkout</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Applied Status -->
+      <div
+        id="freecash-applied"
+        style="
+          display: none;
+          background: #d4edda;
+          border: 1px solid #c3e6cb;
+          border-radius: 6px;
+          padding: 15px;
+          text-align: center;
+        "
+      >
+        <div style="color: #155724; font-weight: 600; font-size: 16px;">
+          ✅ FreeCash Applied: <span id="applied-amount">₹0</span>
+        </div>
+        <div style="color: #155724; font-size: 14px; margin-top: 4px;">Discount will be applied at checkout</div>
+      </div>
+
+      <!-- Loading State -->
+      {% comment %} <div id="freecash-loading" style="display: block; text-align: center; padding: 20px;">
+        <div
+          style="
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #235A49;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          "
+        ></div>
+        {% comment %} <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Loading FreeCash...</p> {% endcomment %}
+      </div> {% endcomment %}
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+   class AnveshanFreeCash {
+    constructor() {
+      this.API_BASE = 'https://puritycoins.anveshan.farm/api/v1/user';
+      this.userPhone = null;
+      this.currentBalance = 0;
+      this.maxRedeemable = 0;
+      this.isEnabled = false;
+      this.cartTotal = 0;
+      this.isInitializing = false;
+
+      this.init();
+    }
+
+    async init() {
+      console.log('🪙 Anveshan FreeCash: Starting...');
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setup());
+      } else {
+        this.setup();
+      }
+
+      // Listen for cart updates
+      this.setupCartListeners();
+    }
+
+    setupCartListeners() {
+      // Listen for Shopify cart updates
+      document.addEventListener('cart:updated', () => {
+        console.log('🔄 Cart updated event detected');
+        setTimeout(() => this.reinitialize(), 500);
+      });
+
+      // Listen for cart drawer opening/closing
+      document.addEventListener('cart:open', () => {
+        console.log('🛒 Cart drawer opened');
+        setTimeout(() => this.reinitialize(), 200);
+      });
+
+      // MutationObserver for cart drawer changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList') {
+            // Check if cart items container was modified
+            const cartItemsContainer = document.querySelector('#CartDrawer-CartItems');
+            const freecashWidget = document.querySelector('#anveshan-freecash-widget');
+
+            if (cartItemsContainer && mutation.target === cartItemsContainer) {
+              console.log('🔄 Cart items container updated');
+              setTimeout(() => this.reinitialize(), 300);
+            }
+
+            // If cart drawer exists but widget doesn't, reinitialize
+            if (cartItemsContainer && !freecashWidget) {
+              console.log('🔄 Widget missing after cart update, reinitializing...');
+              setTimeout(() => this.reinitialize(), 500);
+            }
+          }
+        });
+      });
+
+      // Observe multiple containers
+      const observeTargets = [
+        'cart-drawer-items',
+        '#CartDrawer-CartItems',
+        'cart-drawer',
+        '#CartDrawer'
+      ];
+
+      observeTargets.forEach(selector => {
+        const target = document.querySelector(selector);
+        if (target) {
+          observer.observe(target, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'style']
+          });
+          console.log('👀 Observing:', selector);
+        }
+      });
+
+      // Intercept fetch calls to cart endpoints
+      this.interceptCartRequests();
+    }
+
+    interceptCartRequests() {
+      const originalFetch = window.fetch;
+      window.fetch = (...args) => {
+        const url = args[0];
+
+        if (typeof url === 'string' &&
+            (url.includes('/cart/add') ||
+             url.includes('/cart/update') ||
+             url.includes('/cart/change'))) {
+
+          console.log('🛒 Cart API call intercepted:', url);
+
+          return originalFetch(...args).then(response => {
+            // Wait for cart to update, then reinitialize
+            setTimeout(() => this.reinitialize(), 800);
+            return response;
+          });
+        }
+
+        return originalFetch(...args);
+      };
+    }
+
+    async reinitialize() {
+      if (this.isInitializing) {
+        console.log('⏳ Already initializing, skipping...');
+        return;
+      }
+
+      // Debounce rapid reinitializations
+      clearTimeout(this.reinitTimeout);
+      this.reinitTimeout = setTimeout(async () => {
+        await this.performReinitialize();
+      }, 200);
+    }
+
+    async performReinitialize() {
+      if (this.isInitializing) return;
+
+      this.isInitializing = true;
+      console.log('🔄 Reinitializing FreeCash widget...');
+
+      try {
+        // Check if cart drawer is open and has items
+        const cartDrawer = document.querySelector('#CartDrawer-CartItems');
+        const cartItemCount = document.querySelector('#cart-item-count');
+
+        if (!cartDrawer) {
+          console.log('❌ Cart drawer not found, skipping reinit');
+          this.isInitializing = false;
+          return;
+        }
+
+        // Check if cart has items - improved detection
+        let hasItems = false;
+
+        // Method 1: Check cart item count element
+        if (cartItemCount && parseInt(cartItemCount.textContent) > 0) {
+          hasItems = true;
+        }
+
+        // Method 2: Check if cart drawer has actual cart items
+        if (!hasItems) {
+          const cartItems = cartDrawer.querySelectorAll('.cart-item, [data-index]');
+          hasItems = cartItems.length > 0;
+        }
+
+        // Method 3: Check global cart object
+        if (!hasItems && window.cart && window.cart.item_count > 0) {
+          hasItems = true;
+        }
+
+        // Method 4: Check for any product in cart via DOM
+        if (!hasItems) {
+          const productElements = cartDrawer.querySelectorAll('[data-variant-id], [data-product-id]');
+          hasItems = productElements.length > 0;
+        }
+
+        console.log('🔍 Cart detection results:', {
+          cartItemCountText: cartItemCount ? cartItemCount.textContent : 'not found',
+          cartItemsInDOM: cartDrawer.querySelectorAll('.cart-item, [data-index]').length,
+          globalCartCount: window.cart ? window.cart.item_count : 'no global cart',
+          productElements: cartDrawer.querySelectorAll('[data-variant-id], [data-product-id]').length,
+          finalHasItems: hasItems
+        });
+
+        if (!hasItems) {
+          console.log('🛒 Cart appears empty, hiding widget');
+          this.hideWidget();
+          this.isInitializing = false;
+          return;
+        }
+
+        // Ensure widget exists and is in correct position
+        this.ensureWidgetExists();
+
+        // Update display with fresh data
+        this.updateDisplay();
+
+        // Show widget if user has phone
+        if (this.userPhone) {
+          this.showWidget();
+          this.setupEventListeners(); // Re-setup event listeners
+        }
+
+        console.log('✅ FreeCash widget reinitialized');
+      } catch (error) {
+        console.error('❌ Reinitialize failed:', error);
+      } finally {
+        this.isInitializing = false;
+      }
+    }
+
+    ensureWidgetExists() {
+      let widgetContainer = document.querySelector('#freecash-widget-container');
+      let widget = document.querySelector('#anveshan-freecash-widget');
+
+      // If container missing, find a good place to put it
+      if (!widgetContainer) {
+        console.log('🔧 Creating missing widget container');
+
+        const cartItemsContainer = document.querySelector('#CartDrawer-CartItems');
+        if (cartItemsContainer) {
+          widgetContainer = document.createElement('div');
+          widgetContainer.id = 'freecash-widget-container';
+          widgetContainer.style.cssText = 'margin: 15px 20px;';
+
+          // Insert before cart footer
+          const cartFooter = cartItemsContainer.querySelector('.drawer__footer');
+          if (cartFooter) {
+            cartItemsContainer.insertBefore(widgetContainer, cartFooter);
+          } else {
+            cartItemsContainer.appendChild(widgetContainer);
+          }
+        }
+      }
+
+      // If widget missing from container, add it
+      if (widgetContainer && !widget) {
+        console.log('🔧 Recreating missing widget');
+        widgetContainer.innerHTML = this.getWidgetHTML();
+      }
+    }
+
+    getWidgetHTML() {
+      return `
+        <div id="anveshan-freecash-widget" style="display: none;">
+          <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #235A49; border-radius: 12px; padding: 20px; font-family: Roboto, sans-serif;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+              <span style="font-size: 24px; margin-right: 10px;">💰</span>
+              <h3 style="margin: 0; color: #235A49; font-size: 18px; font-weight: 600;">Anveshan FreeCash</h3>
+            </div>
+
+            <!-- Balance Display -->
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #235A49;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: #666; font-size: 14px;">Available Balance:</span>
+                <span id="freecash-balance" style="font-weight: 600; color: #235A49; font-size: 16px;">₹0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #666; font-size: 14px;">You can save:</span>
+                <span id="freecash-discount" style="font-weight: 600; color: #28a745; font-size: 16px;">₹0</span>
+              </div>
+            </div>
+
+            <!-- Enable/Disable Checkbox -->
+            <div id="freecash-enable-section" style="display: none;">
+              <label style="display: flex; align-items: center; cursor: pointer; background: white; padding: 15px; border-radius: 8px; border: 2px solid #28a745; margin-bottom: 15px;">
+                <input type="checkbox" id="enable-freecash" style="width: 20px; height: 20px; margin-right: 12px; accent-color: #28a745;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: #28a745; font-size: 16px;">Use FreeCash & Save <span id="save-amount">₹0</span></div>
+                  <div style="color: #666; font-size: 14px; margin-top: 4px;">Apply your FreeCash discount at checkout</div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Applied Status -->
+            <div id="freecash-applied" style="display: none; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; text-align: center;">
+              <div style="color: #155724; font-weight: 600; font-size: 16px;">✅ FreeCash Applied: <span id="applied-amount">₹0</span></div>
+              <div style="color: #155724; font-size: 14px; margin-top: 4px;">Discount will be applied at checkout</div>
+            </div>
+
+            <!-- Loading State -->
+            {% comment %} <div id="freecash-loading" style="display: block; text-align: center; padding: 20px;">
+              <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #235A49; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+              {% comment %} <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Loading FreeCash...</p> {% endcomment %}
+            </div> {% endcomment %}
+          </div>
+        </div>
+      `;
+    }
+
+    async setup() {
+      this.userPhone = this.getUserPhone();
+
+      if (this.userPhone) {
+        console.log('📱 Phone detected:', this.userPhone);
+        await this.loadUserBalance();
+        this.setupEventListeners();
+        this.showWidget();
+      } else {
+        console.log('❌ No phone found');
+        this.hideWidget();
+      }
+    }
+
+    getUserPhone() {
+      // Method 1: Get from Shopify customer
+      if (window.customer && window.customer.phone) {
+        const phone = this.cleanPhone(window.customer.phone);
+        console.log('📱 Phone from Shopify customer:', phone);
+        return phone;
+      }
+
+      // Method 2: Get from localStorage
+      const savedPhone = localStorage.getItem('anveshan_user_phone');
+      if (savedPhone) {
+        console.log('📱 Phone from localStorage:', savedPhone);
+        return savedPhone;
+      }
+
+      // Method 3: Try to extract from page meta or hidden inputs
+      const phoneInputs = document.querySelectorAll('input[name*="phone"], input[data-customer-phone], [data-phone]');
+      for (let input of phoneInputs) {
+        if (input.value && input.value.length >= 10) {
+          const phone = this.cleanPhone(input.value);
+          console.log('📱 Phone from input:', phone);
+          return phone;
+
+        }
+      }
+
+      console.log('❌ No phone number found');
+      return null;
+    }
+
+    cleanPhone(phone) {
+      if (!phone) return null;
+      let cleaned = phone.replace(/\D/g, '');
+      if (cleaned.length === 10) {
+        cleaned = '+91' + cleaned;
+      } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+        cleaned = '+' + cleaned;
+      } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+        cleaned = '+91' + cleaned.slice(1);
+      }
+      if (!cleaned.startsWith('+')) cleaned = '+' + cleaned;
+      return cleaned;
+    }
+
+    async loadUserBalance() {
+      try {
+        this.showLoading();
+
+        const response = await fetch(`${this.API_BASE}/${this.userPhone}/wallet`);
+        const data = await response.json();
+
+        if (data.success) {
+          this.currentBalance = data.wallet.currentBalance;
+          this.maxRedeemable = data.wallet.redeemableAmount;
+
+          console.log('💰 Balance loaded:', this.currentBalance);
+          console.log('💎 Max redeemable:', this.maxRedeemable);
+
+          this.updateDisplay();
+        } else {
+          await this.handleNewUser();
+        }
+      } catch (error) {
+        console.error('❌ Failed to load balance:', error);
+        this.hideWidget();
+      } finally {
+        this.hideLoading();
+      }
+    }
+
+    async handleNewUser() {
+      try {
+        const response = await fetch(`${this.API_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: this.userPhone,
+            userInfo: {
+              name: window.customer?.first_name + ' ' + window.customer?.last_name || 'Customer',
+              email: window.customer?.email || '',
+            },
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          this.currentBalance = data.data.currentBalance;
+          this.maxRedeemable = data.data.redeemableAmount;
+
+          if (data.data.isNewUser) {
+            this.showWelcomeMessage(data.data.signupBonus);
+          }
+
+          this.updateDisplay();
+        }
+      } catch (error) {
+        console.error('❌ New user processing failed:', error);
+        this.hideWidget();
+      }
+    }
+
+    updateDisplay() {
+      // Get cart total with real-time sync
+      this.cartTotal = this.getCartTotal();
+
+      // Use the maxRedeemable from backend (already calculated correctly)
+      // Just ensure we don't exceed cart total
+      const discountAmount = Math.min(this.maxRedeemable, this.cartTotal);
+
+      console.log('💰 FreeCash Display Update:', {
+        currentBalance: this.currentBalance,
+        maxRedeemable: this.maxRedeemable,
+        cartTotal: this.cartTotal,
+        finalDiscount: discountAmount
+      });
+
+      // Update UI
+      const balanceEl = document.getElementById('freecash-balance');
+      const discountEl = document.getElementById('freecash-discount');
+      const saveAmountEl = document.getElementById('save-amount');
+
+      if (balanceEl) balanceEl.textContent = `₹${this.currentBalance}`;
+      if (discountEl) discountEl.textContent = `₹${discountAmount}`;
+      if (saveAmountEl) saveAmountEl.textContent = `₹${discountAmount}`;
+
+      // Show/hide enable section
+      const enableSection = document.getElementById('freecash-enable-section');
+      if (enableSection) {
+        enableSection.style.display = discountAmount > 0 ? 'block' : 'none';
+      }
+
+      // Update checkbox state if already enabled
+      const checkbox = document.getElementById('enable-freecash');
+      if (checkbox && this.isEnabled) {
+        checkbox.checked = true;
+        this.enableFreeCash(); // Reapply with new amount
+      }
+    }
+
+    setupEventListeners() {
+      // Use event delegation to handle dynamically created elements
+      document.addEventListener('change', (e) => {
+        if (e.target && e.target.id === 'enable-freecash') {
+          if (e.target.checked) {
+            this.enableFreeCash();
+          } else {
+            this.disableFreeCash();
+          }
+        }
+      });
+
+      // Also set up direct listener if element exists
+      setTimeout(() => {
+        const checkbox = document.getElementById('enable-freecash');
+        if (checkbox && !checkbox.dataset.listenerAdded) {
+          checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              this.enableFreeCash();
+            } else {
+              this.disableFreeCash();
+            }
+          });
+          checkbox.dataset.listenerAdded = 'true';
+        }
+      }, 100);
+    }
+
+    enableFreeCash() {
+      this.isEnabled = true;
+
+      // Use backend's maxRedeemable, just ensure it doesn't exceed cart total
+      const discountAmount = Math.min(this.maxRedeemable, this.getCartTotal());
+
+      console.log('✅ FreeCash enabled:', {
+        maxRedeemable: this.maxRedeemable,
+        cartTotal: this.getCartTotal(),
+        appliedDiscount: discountAmount
+      });
+
+      // Update UI
+      const enableSection = document.getElementById('freecash-enable-section');
+      const appliedSection = document.getElementById('freecash-applied');
+      const appliedAmount = document.getElementById('applied-amount');
+
+      if (enableSection) enableSection.style.display = 'none';
+      if (appliedSection) appliedSection.style.display = 'block';
+      if (appliedAmount) appliedAmount.textContent = `₹${discountAmount}`;
+
+      // Set checkout cookies
+      this.setCheckoutCookies(discountAmount);
+
+      // Update cart total display
+      this.updateCartTotalDisplay(discountAmount);
+    }
+
+    disableFreeCash() {
+      this.isEnabled = false;
+
+      // Update UI
+      const enableSection = document.getElementById('freecash-enable-section');
+      const appliedSection = document.getElementById('freecash-applied');
+
+      if (appliedSection) appliedSection.style.display = 'none';
+      if (enableSection) enableSection.style.display = 'block';
+
+      // Clear cookies
+      this.clearCheckoutCookies();
+
+      // Reset cart total display
+      this.updateCartTotalDisplay(0);
+
+      console.log('❌ FreeCash disabled');
+    }
+
+    setCheckoutCookies(discountAmount) {
+      const cookieData = {
+        anveshan_freecash_enabled: 'true',
+        anveshan_discount_amount: discountAmount.toString(),
+        anveshan_user_phone: this.userPhone,
+        anveshan_original_total: this.getCartTotal().toString(),
+      };
+
+      Object.keys(cookieData).forEach((key) => {
+        document.cookie = `${key}=${cookieData[key]}; path=/; max-age=3600`;
+      });
+
+      localStorage.setItem('anveshan_checkout_data', JSON.stringify(cookieData));
+    }
+
+    clearCheckoutCookies() {
+      const cookieNames = [
+        'anveshan_freecash_enabled',
+        'anveshan_discount_amount',
+        'anveshan_user_phone',
+        'anveshan_original_total',
+      ];
+
+      cookieNames.forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      });
+
+      localStorage.removeItem('anveshan_checkout_data');
+    }
+
+    updateCartTotalDisplay(discountAmount) {
+      // Update the cart total shown to user
+      const totalElement = document.querySelector('.totals__total-value');
+      if (totalElement) {
+        const originalTotal = this.getCartTotal();
+        const newTotal = Math.round((originalTotal - discountAmount) * 100) / 100;
+
+        // Store original text if not stored (before any FreeCash modification)
+        if (!totalElement.dataset.originalTotal) {
+          const originalText = totalElement.textContent || totalElement.innerHTML;
+          // Clean any existing FreeCash modifications
+          const cleanText = originalText.replace(/\s*\(₹[\d,]+(?:\.\d{1,2})?\s*off\)/g, '');
+          totalElement.dataset.originalTotal = cleanText;
+          console.log('💾 Storing original total text:', cleanText);
+        }
+
+        if (discountAmount > 0) {
+          // Show discounted total with FreeCash indicator
+          const formattedNewTotal = Math.round(newTotal).toLocaleString('en-IN');
+          const formattedDiscount = Math.round(discountAmount).toLocaleString('en-IN');
+          totalElement.innerHTML = `₹${formattedNewTotal} <span style="font-size:14px;color:#28a745;margin-left:8px;">(₹${formattedDiscount} Free cash Applied)</span>`;
+          console.log('💰 Updated cart display:', `₹${formattedNewTotal} (₹${formattedDiscount} off)`);
+        } else {
+          // Restore original total
+          totalElement.innerHTML = totalElement.dataset.originalTotal;
+          console.log('💰 Restored original cart display');
+        }
+      }
+    }
+
+    getCartTotal() {
+      // Method 1: Parse from cart total display (most reliable for UI)
+      const totalSelectors = [
+        '.totals__total-value',
+        '[data-cart-total]',
+        '.cart-total',
+        '#cart-total',
+        '.total-price'
+      ];
+
+      for (const selector of totalSelectors) {
+        const element = document.querySelector(selector);
+        if (element) {
+          const text = element.textContent || element.innerHTML;
+
+          // Get the original total before any discount is applied
+          const originalText = element.dataset.originalTotal || text;
+
+          // Match currency amounts, handle both ₹2,312 and ₹2,312.50 and ₹2,312 (₹25 off) formats
+          const match = originalText.match(/₹?([\d,]+(?:\.\d{1,2})?)/);
+          if (match) {
+            const amount = Math.round(parseFloat(match[1].replace(/,/g, '')) * 100) / 100;
+            if (amount > 0) {
+              console.log(`💰 Cart total from ${selector}:`, amount);
+              console.log(`💰 Original text:`, originalText);
+              console.log(`💰 Parsed amount:`, amount);
+
+              // Check if amount looks like discounted amount vs real total
+              if (originalText.includes('off') && amount < 5000) {
+                console.log('⚠️ Detected discounted amount, trying to get real total...');
+
+                // Try to get real total from Shopify cart object
+                if (window.cart && window.cart.total_price) {
+                  const realAmount = Math.round(window.cart.total_price) / 100;
+                  console.log(`💰 Real cart total from Shopify:`, realAmount);
+                  return realAmount;
+                }
+              }
+
+              return amount;
+            }
+          }
+        }
+      }
+
+      // Method 2: Shopify cart object
+      if (window.cart && window.cart.total_price) {
+        const amount = Math.round(window.cart.total_price) / 100;
+        console.log('💰 Cart total from window.cart:', amount);
+        return amount;
+      }
+
+      // Method 3: Try to fetch fresh cart data
+      if (!this.cartFetching) {
+        this.cartFetching = true;
+        fetch('/cart.js')
+          .then(r => r.json())
+          .then(cart => {
+            this.cartTotal = Math.round(cart.total_price) / 100;
+            window.cart = cart; // Update global cart object
+            console.log('💰 Fresh cart total fetched:', this.cartTotal);
+            this.updateDisplay();
+          })
+          .catch(err => console.error('❌ Failed to fetch cart:', err))
+          .finally(() => {
+            this.cartFetching = false;
+          });
+      }
+
+      // Return cached value or fallback
+      return this.cartTotal || 0;
+    }
+
+    showWidget() {
+      const widget = document.querySelector('#anveshan-freecash-widget');
+      if (widget) widget.style.display = 'block';
+    }
+
+    hideWidget() {
+      const widget = document.querySelector('#anveshan-freecash-widget');
+      if (widget) widget.style.display = 'none';
+    }
+
+    showLoading() {
+      const loading = document.getElementById('freecash-loading');
+      const enableSection = document.getElementById('freecash-enable-section');
+
+      if (loading) loading.style.display = 'block';
+      if (enableSection) enableSection.style.display = 'none';
+    }
+
+    hideLoading() {
+      const loading = document.getElementById('freecash-loading');
+      if (loading) loading.style.display = 'none';
+    }
+
+    showWelcomeMessage(bonus) {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #235A49, #2d6e5b);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        z-index: 10001;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        max-width: 400px;
+        width: 90%;
+      `;
+
+      modal.innerHTML = `
+        <div style="font-size: 48px; margin-bottom: 15px;">🎉</div>
+        <h3 style="margin: 0 0 10px 0; font-size: 24px;">Welcome to Anveshan!</h3>
+        <p style="margin: 0 0 20px 0; font-size: 16px; opacity: 0.9;">
+          You've received ₹${bonus} FreeCash as welcome bonus!
+        </p>
+        <button onclick="this.parentElement.remove()" style="
+          background: white;
+          color: #235A49;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 25px;
+          font-weight: 600;
+          cursor: pointer;
+        ">
+          Start Shopping
+        </button>
+      `;
+
+      document.body.appendChild(modal);
+
+      setTimeout(() => {
+        if (document.body.contains(modal)) {
+          document.body.removeChild(modal);
+        }
+      }, 5000);
+    }
+  }
+
+  // Auto-initialize
+  window.anveshanFreeCash = new AnveshanFreeCash();
+  </script>
+{% endcomment %}
+
+<!-- ============================================ -->
+<!-- ANVESHAN FREECASH - PRODUCTION VERSION -->
+<!-- ✅ No DOM price override -->
+<!-- ✅ Real-time Price Summary updates -->
+<!-- ✅ Professional UI -->
+<!-- ============================================ -->
+{% comment %} main one jo last main script k {% endcomment %}
+{% comment %} <div id="anveshan-freecash-widget" style="margin: 15px 20px; display: none;">
+  <div
+    style="
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #235A49;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: Roboto, sans-serif;
+    "
+  >
+    <!-- Header -->
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+      <span style="font-size: 24px; margin-right: 10px;">💰</span>
+      <h3 style="margin: 0; color: #235A49; font-size: 18px; font-weight: 600;">Anveshan FreeCash</h3>
+    </div>
+
+    <!-- Balance Display -->
+    <div
+      style="
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border-left: 4px solid #235A49;
+      "
+    >
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: #666; font-size: 14px;">Available Balance:</span>
+        <span id="freecash-balance" style="font-weight: 600; color: #235A49; font-size: 16px;">₹0</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: #666; font-size: 14px;">You can use:</span>
+        <span id="freecash-usable" style="font-weight: 600; color: #28a745; font-size: 16px;">₹0</span>
+      </div>
+    </div>
+
+    <!-- Enable Checkbox -->
+    <div id="freecash-enable-section" style="display: none;">
+      <label
+        style="
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          background: white;
+          padding: 15px;
+          border-radius: 8px;
+          border: 2px solid #28a745;
+        "
+      >
+        <input
+          type="checkbox"
+          id="enable-freecash"
+          style="
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #28a745;
+            cursor: pointer;
+          "
+        >
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: #28a745; font-size: 16px;">
+            Use FreeCash & Save ₹<span id="save-amount">0</span>
+          </div>
+          <div style="color: #666; font-size: 14px; margin-top: 4px;">Apply discount at checkout</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Applied Status -->
+    <div
+      id="freecash-applied"
+      style="
+        display: none;
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        padding: 15px;
+        text-align: center;
+      "
+    >
+      <div style="color: #155724; font-weight: 600; font-size: 16px;">
+        ✅ FreeCash Applied: ₹<span id="applied-amount">0</span>
+      </div>
+      <div style="color: #155724; font-size: 14px; margin-top: 4px;">Will be deducted at checkout</div>
+    </div>
+  </div>
+</div> {% endcomment %}
+{% comment %} better design  {% endcomment %}
+ <div id="anveshan-freecash-widget" style="margin: 15px 20px; display: none;">
+  <div
+    style="
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border: 2px solid #235A49;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-family: Roboto, sans-serif;
+      box-shadow: 0 2px 8px rgba(35, 90, 73, 0.1);
+      transition: all 0.3s ease;
+    "
+  >
+    <!-- Collapsed View -->
+    <div id="freecash-collapsed" style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <!-- Checkbox -->
+      <label style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0;">
+        <input
+          type="checkbox"
+          id="enable-freecash"
+          style="
+            width: 20px;
+            height: 20px;
+            accent-color: #28a745;
+            cursor: pointer;
+            margin: 0;
+          "
+        >
+      </label>
+      
+      <!-- Main Content -->
+      <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">🪙</span>
+        <div>
+          {% comment %} <div style="font-size: 13px; color: #666; line-height: 1.2;">You got</div> {% endcomment %}
+          <div style="font-size: 16px; font-weight: 700; color: #235A49; line-height: 1.2;">
+           FREE <span id="save-amount"></span> Anveshan Purity Coins
+          </div>
+        </div>
+      </div>
+      
+      <!-- Arrow Button -->
+      <button
+        id="toggle-freecash"
+        style="
+          background: linear-gradient(135deg, #235A49, #2d7a60);
+          border: none;
+          cursor: pointer;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          color: white;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 6px rgba(35, 90, 73, 0.2);
+          flex-shrink: 0;
+        "
+        onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(35, 90, 73, 0.3)';"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 6px rgba(35, 90, 73, 0.2)';"
+      >
+        ▲
+      </button>
+    </div>
+
+    <!-- Expanded View -->
+    <div id="freecash-expanded" style="display: none;">
+      <!-- Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e9ecef;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 28px;">💰</span>
+          <h3 style="margin: 0; color: #235A49; font-size: 19px; font-weight: 700;">Anveshan Purity Coins</h3>
+        </div>
+        <button
+          id="close-freecash"
+          style="
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #235A49;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='#e9ecef';"
+          onmouseout="this.style.background='#f8f9fa';"
+        >
+          ▼
+        </button>
+      </div>
+
+      <!-- Balance Display -->
+      <div
+        style="
+          background: linear-gradient(135deg, #ffffff, #f0f8f5);
+          padding: 16px;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          border: 2px solid #d4edda;
+          box-shadow: 0 2px 6px rgba(40, 167, 69, 0.1);
+        "
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="color: #666; font-size: 14px; font-weight: 500;">💳 Total Balance</span>
+          <span id="freecash-balance" style="font-weight: 700; color: #235A49; font-size: 18px;">₹600</span>
+        </div>
+        <div style="height: 1px; background: #e9ecef; margin: 10px 0;"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #666; font-size: 14px; font-weight: 500;">✨ You can use</span>
+          <span id="freecash-usable" style="font-weight: 700; color: #28a745; font-size: 20px;">₹150</span>
+        </div>
+      </div>
+
+      <!-- Enable Checkbox -->
+      <div id="freecash-enable-section">
+        <label
+          style="
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #28a745;
+            transition: all 0.3s ease;
+            gap: 14px;
+          "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(40, 167, 69, 0.2)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+        >
+          <input
+            type="checkbox"
+            id="enable-freecash-expanded"
+            style="
+              width: 22px;
+              height: 22px;
+              accent-color: #28a745;
+              cursor: pointer;
+              flex-shrink: 0;
+            "
+          >
+          <div style="flex: 1;">
+            <div style="font-weight: 700; color: #155724; font-size: 17px;">
+              🎉 Use Coins & Save ₹<span id="save-amount"></span>
+            </div>
+            <div style="color: #155724; font-size: 13px; margin-top: 4px; opacity: 0.9;">
+              Instant discount applied at checkout
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggle-freecash');
+    const closeBtn = document.getElementById('close-freecash');
+    const collapsed = document.getElementById('freecash-collapsed');
+    const expanded = document.getElementById('freecash-expanded');
+    const checkboxCollapsed = document.getElementById('enable-freecash');
+    const checkboxExpanded = document.getElementById('enable-freecash-expanded');
+
+    // Toggle expand
+    toggleBtn.addEventListener('click', function() {
+      collapsed.style.display = 'none';
+      expanded.style.display = 'block';
+      this.innerHTML = '▼';
+    });
+
+    // Toggle collapse
+    closeBtn.addEventListener('click', function() {
+      expanded.style.display = 'none';
+      collapsed.style.display = 'flex';
+      toggleBtn.innerHTML = '▲';
+    });
+
+    // Sync checkboxes - both directions
+    checkboxExpanded.addEventListener('change', function() {
+      checkboxCollapsed.checked = this.checked;
+    });
+
+    checkboxCollapsed.addEventListener('change', function() {
+      checkboxExpanded.checked = this.checked;
+    });
+  });
+</script>  
+<script>
+  (function () {
+    'use strict';
+
+    class AnveshanFreeCashProduction {
+      constructor() {
+        // Configuration
+        this.API_BASE = 'https://puritycoins.anveshan.farm/api/v1/user';
+
+        // State
+        this.userPhone = null;
+        this.currentBalance = 0;
+        this.maxRedeemable = 0;
+        this.usableAmount = 0;
+        this.isEnabled = false;
+        this.appliedDiscount = 0;
+
+        // Control flags
+        this.isInitializing = false;
+        this.debounceTimer = null;
+        this.healthCheckInterval = null;
+
+        console.log('🪙 Anveshan FreeCash Production: Starting...');
+        this.init();
+      }
+
+      async init() {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => this.setup());
+        } else {
+          await this.setup();
+        }
+
+        this.setupCartListeners();
+        this.startHealthCheck();
+      }
+
+      async setup() {
+        this.userPhone = this.getUserPhone();
+
+        if (this.userPhone) {
+          console.log('📱 Phone:', this.userPhone);
+          await this.loadUserBalance();
+          this.attachEventListeners();
+          this.showWidget();
+        } else {
+          console.log('❌ No phone found');
+          this.hideWidget();
+        }
+      }
+
+      getUserPhone() {
+        // Method 1: Shopify customer
+        if (window.customer && window.customer.phone) {
+          return this.cleanPhone(window.customer.phone);
+        }
+
+        // Method 2: localStorage
+        const savedPhone = localStorage.getItem('anveshan_user_phone');
+        if (savedPhone) return savedPhone;
+
+        return null;
+      }
+
+      cleanPhone(phone) {
+        if (!phone) return null;
+        let cleaned = phone.replace(/\D/g, '');
+        if (cleaned.length === 10) {
+          cleaned = '+91' + cleaned;
+        }
+        return cleaned;
+      }
+
+      async loadUserBalance() {
+        try {
+          const response = await fetch(`${this.API_BASE}/${this.userPhone}/wallet`);
+          const data = await response.json();
+
+          if (data.success) {
+            this.currentBalance = data.wallet.currentBalance;
+            this.maxRedeemable = data.wallet.redeemableAmount;
+
+            console.log('💰 Balance:', this.currentBalance);
+            console.log('💎 Max redeemable:', this.maxRedeemable);
+
+            this.updateDisplay();
+          } else {
+            await this.handleNewUser();
+          }
+        } catch (error) {
+          console.error('❌ Failed to load balance:', error);
+          this.hideWidget();
+        }
+      }
+
+      async handleNewUser() {
+        try {
+          const response = await fetch(`${this.API_BASE}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: this.userPhone,
+              userInfo: {
+                name: (window.customer?.first_name || '') + ' ' + (window.customer?.last_name || ''),
+                email: window.customer?.email || '',
+              },
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.currentBalance = data.data.currentBalance;
+            this.maxRedeemable = data.data.redeemableAmount;
+
+            if (data.data.isNewUser) {
+              this.showWelcomeMessage(data.data.signupBonus);
+            }
+
+            this.updateDisplay();
+          }
+        } catch (error) {
+          console.error('❌ New user failed:', error);
+        }
+      }
+
+      updateDisplay() {
+        const cartTotal = this.getCartTotal();
+
+        // Calculate usable amount (min of maxRedeemable or cart total)
+        this.usableAmount = Math.min(this.maxRedeemable, cartTotal);
+
+        console.log('💰 Display update:', {
+          balance: this.currentBalance,
+          maxRedeemable: this.maxRedeemable,
+          cartTotal: cartTotal,
+          usable: this.usableAmount,
+        });
+
+        // Update UI
+        const balanceEl = document.getElementById('freecash-balance');
+        const usableEl = document.getElementById('freecash-usable');
+        const saveAmountEl = document.getElementById('save-amount');
+
+        if (balanceEl) balanceEl.textContent = `₹${this.currentBalance}`;
+        if (usableEl) usableEl.textContent = `₹${this.usableAmount}`;
+        if (saveAmountEl) saveAmountEl.textContent = this.usableAmount;
+
+        // Show/hide enable section
+        const enableSection = document.getElementById('freecash-enable-section');
+        if (enableSection) {
+          enableSection.style.display = this.usableAmount > 0 ? 'block' : 'none';
+        }
+
+        // Restore state if was enabled
+        if (this.isEnabled) {
+          const checkbox = document.getElementById('enable-freecash');
+          if (checkbox) checkbox.checked = true;
+          this.applyFreeCash();
+        }
+      }
+
+      attachEventListeners() {
+        const checkbox = document.getElementById('enable-freecash');
+        if (checkbox && !checkbox.dataset.listenerAttached) {
+          checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              this.enableFreeCash();
+            } else {
+              this.disableFreeCash();
+            }
+          });
+          checkbox.dataset.listenerAttached = 'true';
+          console.log('✅ Checkbox listener attached');
+        }
+      }
+
+      enableFreeCash() {
+        this.isEnabled = true;
+        this.applyFreeCash();
+      }
+
+      disableFreeCash() {
+        this.isEnabled = false;
+        this.appliedDiscount = 0;
+
+        // Update UI
+        const enableSection = document.getElementById('freecash-enable-section');
+        const appliedSection = document.getElementById('freecash-applied');
+
+        if (appliedSection) appliedSection.style.display = 'none';
+        if (enableSection) enableSection.style.display = 'block';
+
+        // Update Price Summary
+        this.updatePriceSummary();
+
+        // Clear checkout data
+        this.clearCheckoutData();
+
+        console.log('❌ FreeCash disabled');
+      }
+
+      applyFreeCash() {
+        this.appliedDiscount = this.usableAmount;
+
+        console.log('✅ Applying FreeCash:', this.appliedDiscount);
+
+        // Update UI
+        const enableSection = document.getElementById('freecash-enable-section');
+        const appliedSection = document.getElementById('freecash-applied');
+        const appliedAmount = document.getElementById('applied-amount');
+
+        if (enableSection) enableSection.style.display = 'none';
+        if (appliedSection) appliedSection.style.display = 'block';
+        if (appliedAmount) appliedAmount.textContent = this.appliedDiscount;
+
+        // Update Price Summary
+        this.updatePriceSummary();
+
+        // Save checkout data
+        this.saveCheckoutData();
+      }
+
+      updatePriceSummary() {
+        // Find or create FreeCash line in Price Summary
+        const cartSummary = document.getElementById('cartSummary');
+        if (!cartSummary) return;
+
+        let freeCashLine = document.getElementById('freecash-summary-line');
+
+        if (this.isEnabled && this.appliedDiscount > 0) {
+          // Create or update FreeCash line
+          if (!freeCashLine) {
+            freeCashLine = document.createElement('div');
+            freeCashLine.id = 'freecash-summary-line';
+            freeCashLine.style.cssText =
+              'display: flex; justify-content: space-between; color: #28a745; font-weight: 500; margin-bottom: 8px;';
+            freeCashLine.innerHTML = `
+            <span>FreeCash Applied</span>
+            <span id="freecash-summary-amount">₹${this.appliedDiscount}</span>
+          `;
+
+            // Insert AFTER "Items Discount" line (2nd line in Price Summary)
+            const allDivs = cartSummary.querySelectorAll('div');
+            if (allDivs.length >= 2) {
+              // Insert after Items Discount (index 1)
+              allDivs[1].insertAdjacentElement('afterend', freeCashLine);
+            } else {
+              // Fallback: insert before "To Pay"
+              const toPayLine = cartSummary.querySelector('div[style*="font-weight:600"]');
+              if (toPayLine) {
+                cartSummary.insertBefore(freeCashLine, toPayLine);
+              } else {
+                cartSummary.appendChild(freeCashLine);
+              }
+            }
+          } else {
+            // Update existing line
+            const amountEl = document.getElementById('freecash-summary-amount');
+            if (amountEl) amountEl.textContent = `₹${this.appliedDiscount}`;
+          }
+
+          // Update "To Pay" amount only (don't modify Items Discount)
+          this.updateToPayAmount();
+        } else {
+          // Remove FreeCash line if disabled
+          if (freeCashLine) {
+            freeCashLine.remove();
+          }
+          this.updateToPayAmount();
+        }
+      }
+
+      updateToPayAmount() {
+        const totalAmountEl = document.getElementById('totalAmount');
+        if (!totalAmountEl) return;
+
+        // Get original amount from data attribute
+        const originalAmount = totalAmountEl.dataset.total;
+        if (!originalAmount) return;
+
+        // Parse original amount (remove ₹ and commas)
+        // This is: Order Total - Items Discount - 2% Prepaid Discount
+        const originalValue = parseFloat(originalAmount.replace(/[₹,]/g, ''));
+
+        // Calculate new "To Pay" = Original To Pay - FreeCash
+        const newTotal = Math.max(0, originalValue - this.appliedDiscount);
+
+        // Format and update
+        const formattedTotal = `₹${Math.round(newTotal).toLocaleString('en-IN')}`;
+        totalAmountEl.textContent = formattedTotal;
+
+        // ALSO UPDATE THE CART FOOTER TOTAL (near checkout button)
+        this.updateCartFooterTotal();
+
+        console.log('💰 To Pay updated:', {
+          original: originalValue,
+          discount: this.appliedDiscount,
+          newTotal: newTotal,
+        });
+      }
+
+      updateCartFooterTotal() {
+        // Find the cart total display near checkout button (usually ₹5,723)
+        const cartFooterSelectors = [
+          '.totals__total-value',
+          '.cart__footer .totals__total-value',
+          '.cart__ctas .totals__total-value',
+          '[data-cart-total]',
+        ];
+
+        for (const selector of cartFooterSelectors) {
+          const element = document.querySelector(selector);
+
+          // Make sure we don't update the same element twice
+          if (element && element !== document.getElementById('totalAmount')) {
+            // Store original value if not stored
+            if (!element.dataset.originalTotal) {
+              const originalText = element.textContent || element.innerHTML;
+              // Clean any existing modifications
+              const cleanText = originalText.replace(/\s*\(.*?\)/g, '').trim();
+              element.dataset.originalTotal = cleanText;
+              console.log('💾 Stored original cart footer total:', cleanText);
+            }
+
+            // Update the display
+            if (this.isEnabled && this.appliedDiscount > 0) {
+              // Bottom total = SP Total - FreeCash
+              // Get SP total from cart (this is Order Total - Items Discount)
+              const spTotal = this.getCartSPTotal();
+              const bottomTotal = Math.max(0, spTotal - this.appliedDiscount);
+              const formattedTotal = `₹${Math.round(bottomTotal).toLocaleString('en-IN')}`;
+              element.textContent = formattedTotal;
+              console.log(
+                '✅ Cart footer total updated to:',
+                formattedTotal,
+                `(SP: ${spTotal} - FreeCash: ${this.appliedDiscount})`
+              );
+            } else {
+              // Restore original when disabled
+              element.textContent = element.dataset.originalTotal;
+              console.log('✅ Cart footer total restored to:', element.dataset.originalTotal);
+            }
+
+            break; // Only update the first match
+          }
+        }
+      }
+
+      saveCheckoutData() {
+        const checkoutData = {
+          anveshan_freecash_enabled: 'true',
+          anveshan_discount_amount: this.appliedDiscount.toString(),
+          anveshan_user_phone: this.userPhone,
+          anveshan_timestamp: Date.now().toString(),
+        };
+
+        // Save to cookies
+        Object.keys(checkoutData).forEach((key) => {
+          document.cookie = `${key}=${checkoutData[key]}; path=/; max-age=3600`;
+        });
+
+        // Save to localStorage
+        localStorage.setItem('anveshan_checkout_data', JSON.stringify(checkoutData));
+
+        // Update cart attributes
+        this.updateCartAttributes(this.appliedDiscount);
+
+        console.log('💾 Checkout data saved:', checkoutData);
+      }
+
+      clearCheckoutData() {
+        const cookieNames = [
+          'anveshan_freecash_enabled',
+          'anveshan_discount_amount',
+          'anveshan_user_phone',
+          'anveshan_timestamp',
+        ];
+
+        cookieNames.forEach((name) => {
+          document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        });
+
+        localStorage.removeItem('anveshan_checkout_data');
+        this.updateCartAttributes(0);
+
+        console.log('🗑️ Checkout data cleared');
+      }
+
+      async updateCartAttributes(discountAmount) {
+        try {
+          await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              attributes: {
+                anveshan_freecash_discount: discountAmount.toString(),
+                anveshan_user_phone: this.userPhone,
+              },
+            }),
+          });
+          console.log('✅ Cart attributes updated');
+        } catch (error) {
+          console.error('❌ Failed to update cart attributes:', error);
+        }
+      }
+
+      getCartTotal() {
+        // Method 1: From window.cart
+        if (window.cart && window.cart.total_price) {
+          return Math.round(window.cart.total_price) / 100;
+        }
+
+        // Method 2: From totalAmount element
+        const totalEl = document.getElementById('totalAmount');
+        if (totalEl && totalEl.dataset.total) {
+          const amount = parseFloat(totalEl.dataset.total.replace(/[₹,]/g, ''));
+          if (amount > 0) return amount;
+        }
+
+        return 0;
+      }
+
+      getCartSPTotal() {
+        // SP Total = Order Total - Items Discount
+        // This is the value shown at the bottom near Continue button
+
+        // Method 1: Try to get from cart footer element's original value
+        const cartFooterSelectors = [
+          '.totals__total-value',
+          '.cart__footer .totals__total-value',
+          '.cart__ctas .totals__total-value',
+          '[data-cart-total]',
+        ];
+
+        for (const selector of cartFooterSelectors) {
+          const element = document.querySelector(selector);
+          if (element && element !== document.getElementById('totalAmount')) {
+            if (element.dataset.originalTotal) {
+              const spTotal = parseFloat(element.dataset.originalTotal.replace(/[₹,]/g, ''));
+              if (spTotal > 0) {
+                console.log('📊 SP Total from footer:', spTotal);
+                return spTotal;
+              }
+            } else {
+              // If not stored yet, get current value
+              const spTotal = parseFloat(element.textContent.replace(/[₹,]/g, ''));
+              if (spTotal > 0) {
+                console.log('📊 SP Total from footer (current):', spTotal);
+                return spTotal;
+              }
+            }
+          }
+        }
+
+        // Method 2: Fallback - calculate from window.cart if available
+        if (window.cart) {
+          // Get items total from cart
+          let itemsTotal = 0;
+          if (window.cart.items && window.cart.items.length > 0) {
+            window.cart.items.forEach((item) => {
+              itemsTotal += item.final_price * item.quantity;
+            });
+            const spTotal = Math.round(itemsTotal) / 100;
+            console.log('📊 SP Total calculated from cart items:', spTotal);
+            return spTotal;
+          }
+        }
+
+        // Method 3: Fallback to getCartTotal (To Pay value)
+        return this.getCartTotal();
+      }
+
+      showWidget() {
+        const widget = document.querySelector('#anveshan-freecash-widget');
+        if (widget) {
+          widget.style.display = 'block';
+          console.log('✅ Widget shown');
+        }
+      }
+
+      hideWidget() {
+        const widget = document.querySelector('#anveshan-freecash-widget');
+        if (widget) {
+          widget.style.display = 'none';
+        }
+      }
+
+      showWelcomeMessage(bonus) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #235A49, #2d6e5b);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        z-index: 10001;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        max-width: 400px;
+        width: 90%;
+      `;
+
+        modal.innerHTML = `
+        <div style="font-size: 48px; margin-bottom: 15px;">🎉</div>
+        <h3 style="margin: 0 0 10px 0; font-size: 24px;">Welcome to Anveshan!</h3>
+        <p style="margin: 0 0 20px 0; font-size: 16px; opacity: 0.9;">
+          You've received ₹${bonus} FreeCash!
+        </p>
+        <button onclick="this.parentElement.remove()" style="
+          background: white;
+          color: #235A49;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 25px;
+          font-weight: 600;
+          cursor: pointer;
+        ">
+          Start Shopping
+        </button>
+      `;
+
+        document.body.appendChild(modal);
+        setTimeout(() => modal.remove(), 5000);
+      }
+
+      // ===== CART LISTENERS =====
+
+      setupCartListeners() {
+        document.addEventListener('cart:updated', () => this.scheduleReinit());
+        this.interceptCartAPI();
+        this.setupMutationObserver();
+      }
+
+      interceptCartAPI() {
+        const originalFetch = window.fetch;
+        window.fetch = (...args) => {
+          const url = args[0];
+          if (
+            typeof url === 'string' &&
+            (url.includes('/cart/add') || url.includes('/cart/update') || url.includes('/cart/change'))
+          ) {
+            return originalFetch(...args).then((response) => {
+              this.scheduleReinit();
+              return response;
+            });
+          }
+          return originalFetch(...args);
+        };
+      }
+
+      setupMutationObserver() {
+        setTimeout(() => {
+          const cartDrawer = document.querySelector('#CartDrawer-CartItems');
+          if (!cartDrawer) return;
+
+          const observer = new MutationObserver(() => {
+            this.scheduleReinit();
+          });
+
+          observer.observe(cartDrawer, {
+            childList: true,
+            subtree: false,
+          });
+
+          console.log('👀 Cart observer active');
+        }, 1000);
+      }
+
+      scheduleReinit() {
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
+        }
+
+        this.debounceTimer = setTimeout(() => {
+          this.performReinit();
+        }, 400);
+      }
+
+      async performReinit() {
+        if (this.isInitializing) return;
+
+        this.isInitializing = true;
+        console.log('🔄 Reinitializing...');
+
+        try {
+          await this.fetchFreshCart();
+
+          const hasItems = window.cart && window.cart.item_count > 0;
+
+          if (!hasItems) {
+            this.hideWidget();
+            this.isInitializing = false;
+            return;
+          }
+
+          if (!this.userPhone) {
+            this.hideWidget();
+            this.isInitializing = false;
+            return;
+          }
+
+          this.ensureWidgetInDOM();
+          this.updateDisplay();
+          this.attachEventListeners();
+          this.showWidget();
+
+          console.log('✅ Reinit complete');
+        } catch (error) {
+          console.error('❌ Reinit failed:', error);
+        } finally {
+          this.isInitializing = false;
+        }
+      }
+
+      async fetchFreshCart() {
+        try {
+          const response = await fetch('/cart.js');
+          const cart = await response.json();
+          window.cart = cart;
+          console.log('💰 Fresh cart:', { items: cart.item_count, total: cart.total_price / 100 });
+        } catch (error) {
+          console.error('❌ Failed to fetch cart:', error);
+        }
+      }
+
+      ensureWidgetInDOM() {
+        const widget = document.querySelector('#anveshan-freecash-widget');
+        if (widget) return;
+
+        console.log('🔧 Widget missing, recreating...');
+
+        const container = document.querySelector('#freecash-widget-container');
+        if (container) {
+          // Widget container exists, just re-render widget
+          const template = this.getWidgetHTML();
+          container.innerHTML = template;
+        }
+      }
+
+      getWidgetHTML() {
+        // Return the widget HTML (copy from top of this file)
+        return document.querySelector('#anveshan-freecash-widget').outerHTML;
+      }
+
+      startHealthCheck() {
+        this.healthCheckInterval = setInterval(() => {
+          const cartDrawer = document.querySelector('#CartDrawer');
+          if (!cartDrawer || getComputedStyle(cartDrawer).display === 'none') {
+            return;
+          }
+
+          const widget = document.querySelector('#anveshan-freecash-widget');
+          const hasItems = window.cart && window.cart.item_count > 0;
+
+          if (!widget && hasItems && this.userPhone && this.currentBalance > 0) {
+            console.log('🚨 Health check: Widget missing, recovering...');
+            this.ensureWidgetInDOM();
+            this.updateDisplay();
+            this.attachEventListeners();
+            this.showWidget();
+          }
+        }, 3000);
+
+        console.log('💊 Health check started');
+      }
+
+      cleanup() {
+        if (this.healthCheckInterval) {
+          clearInterval(this.healthCheckInterval);
+        }
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
+        }
+      }
+    }
+
+    // Initialize
+    window.anveshanFreeCashPro = new AnveshanFreeCashProduction();
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      if (window.anveshanFreeCashPro) {
+        window.anveshanFreeCashPro.cleanup();
+      }
+    });
+  })();
+</script>

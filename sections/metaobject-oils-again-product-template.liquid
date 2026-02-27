@@ -1,0 +1,729 @@
+{% comment %} {{ 'metaobject-product-template.css' | asset_url | stylesheet_tag }} {% endcomment %}
+{{ 'ghee-again-grid.css' | asset_url | stylesheet_tag }}
+{{ 'Ghee-Comparison-Container.css' | asset_url | stylesheet_tag }}
+{{ 'product-review-images-gallery.css' | asset_url | stylesheet_tag }}
+{{ 'FAQ-ghee-again.css' | asset_url | stylesheet_tag }}
+{{ 'uses-ghee-again.css' | asset_url | stylesheet_tag }}
+{{ 'viedo-ghee-again.css' | asset_url | stylesheet_tag }}
+
+ <style>
+        /* PERFECTLY RESPONSIVE PAGE SECTION TITLE WITH DYNAMIC SPACING */
+        .page-section-title {
+            color: #235A49;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+            text-align: center;
+            display: block;
+            
+            /* SMOOTH RESPONSIVE FONT SIZE - From 1.9rem to 3.2rem */
+            font-size: clamp(1.9rem, 2vw + 1.3rem, 3.2rem);
+            
+            /* DYNAMIC SPACING BASED ON FONT SIZE */
+            /* Top margin = 2X font size, Bottom margin = 0.7X font size */
+            margin-top: calc(2 * clamp(1.9rem, 2vw + 1.3rem, 3.2rem));
+            margin-bottom: calc(0.7 * clamp(1.9rem, 2vw + 1.3rem, 3.2rem));
+        }
+
+        /* ALTERNATIVE METHOD WITH SPECIFIC BREAKPOINTS AND SPACING */
+        /* VERY SMALL SCREENS (320px-374px) - 1.9rem */
+        @media screen and (max-width: 374px) {
+            .page-section-title {
+                font-size: 1.9rem;
+                margin-top: 3.8rem;    /* 2 × 1.9rem = 3.8rem */
+                margin-bottom: 1.33rem; /* 0.7 × 1.9rem = 1.33rem */
+            }
+        }
+
+        /* SMALL MOBILE (375px-479px) - 2.0rem */
+        @media screen and (min-width: 375px) and (max-width: 479px) {
+            .page-section-title {
+                font-size: 2.0rem;
+                margin-top: 4rem;      /* 2 × 2.0rem = 4rem */
+                margin-bottom: 1.4rem; /* 0.7 × 2.0rem = 1.4rem */
+            }
+        }
+
+        /* MEDIUM MOBILE (480px-599px) - 2.1rem */
+        @media screen and (min-width: 480px) and (max-width: 599px) {
+            .page-section-title {
+                font-size: 2.1rem;
+                margin-top: 4.2rem;    /* 2 × 2.1rem = 4.2rem */
+                margin-bottom: 1.47rem; /* 0.7 × 2.1rem = 1.47rem */
+            }
+        }
+
+        /* LARGE MOBILE (600px-749px) - 2.3rem */
+        @media screen and (min-width: 600px) and (max-width: 749px) {
+            .page-section-title {
+                font-size: 2.3rem;
+                margin-top: 4.6rem;    /* 2 × 2.3rem = 4.6rem */
+                margin-bottom: 1.61rem; /* 0.7 × 2.3rem = 1.61rem */
+            }
+        }
+
+        /* TABLET (750px-899px) - 2.5rem */
+        @media screen and (min-width: 750px) and (max-width: 899px) {
+            .page-section-title {
+                font-size: 2.5rem;
+                margin-top: 5rem;      /* 2 × 2.5rem = 5rem */
+                margin-bottom: 1.75rem; /* 0.7 × 2.5rem = 1.75rem */
+            }
+        }
+
+        /* SMALL DESKTOP (900px-1099px) - 2.7rem */
+        @media screen and (min-width: 900px) and (max-width: 1099px) {
+            .page-section-title {
+                font-size: 2.7rem;
+                margin-top: 5.4rem;    /* 2 × 2.7rem = 5.4rem */
+                margin-bottom: 1.89rem; /* 0.7 × 2.7rem = 1.89rem */
+            }
+        }
+
+        /* MEDIUM DESKTOP (1100px-1299px) - 2.9rem */
+        @media screen and (min-width: 1100px) and (max-width: 1299px) {
+            .page-section-title {
+                font-size: 2.9rem;
+                margin-top: 5.8rem;    /* 2 × 2.9rem = 5.8rem */
+                margin-bottom: 2.03rem; /* 0.7 × 2.9rem = 2.03rem */
+            }
+        }
+
+        /* LARGE DESKTOP (1300px-1499px) - 3.1rem */
+        @media screen and (min-width: 1300px) and (max-width: 1499px) {
+            .page-section-title {
+                font-size: 3.1rem;
+                margin-top: 6.2rem;    /* 2 × 3.1rem = 6.2rem */
+                margin-bottom: 2.17rem; /* 0.7 × 3.1rem = 2.17rem */
+            }
+        }
+
+        /* EXTRA LARGE DESKTOP (1500px+) - 3.2rem */
+        @media screen and (min-width: 1500px) {
+            .page-section-title {
+                font-size: 3.2rem;
+                margin-top: 6.4rem;    /* 2 × 3.2rem = 6.4rem */
+                margin-bottom: 2.24rem; /* 0.7 × 3.2rem = 2.24rem */
+            }
+        }
+
+        /* ENSURE ALWAYS CENTERED - Extra reinforcement */
+        .page-section-title {
+            width: 100%;
+            text-align: center !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+
+
+
+{% liquid
+  assign product_object = product.metafields.custom.product_template.value
+%}
+
+{% for metaobject in product_object.blocks.value %}
+  {% case metaobject.system.type %}
+    {% when 'media_banner' %}
+      {% unless section.settings.hiden %}
+        <div class="page-width-desktop media-banner">
+          <picture>
+            <source
+              media="(min-width:750px)"
+              srcset="
+                {{ metaobject.browser_banner.value | image_url: width: 900 }} 900w,
+                {{ metaobject.browser_banner.value | image_url: width: 1200 }} 1200w,
+                {{ metaobject.browser_banner.value | image_url: width: 1500 }} 1500w
+              "
+            >
+            {{
+              metaobject.item.value.media.value
+              | image_url: width: 720
+              | image_tag: widths: '320,480,720', style: 'width:auto', loading: 'lazy'
+            }}
+          </picture>
+        </div>
+      {% endunless %}
+{% when 'images' %}
+<div style="text-align: center; margin: 0; padding: 0; line-height: 1;">
+ <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+</div>
+
+  
+ <div class="page-width product-images-gallery">
+    {% assign product_images = metaobject.product_images.value %}
+    
+    {% if product_images %}
+      <!-- Check if this is a ghee comparison entry -->
+      {% assign is_ghee_comparison = false %}
+      {% if metaobject.title.value contains 'ghee' or metaobject.title.value contains 'Ghee' or metaobject.title.value contains 'comparison' or metaobject.title.value contains 'Comparison' %}
+        {% assign is_ghee_comparison = true %}
+      {% endif %}
+      
+      {% if is_ghee_comparison %}
+        <!-- Ghee comparison layout -->
+        <div class="ghee-comparison-container">
+          <!-- Mobile vertical stack -->
+          <div class="mobile-vertical-stack">
+            {% for image_file in product_images %}
+              <div class="horizontal-image-item">
+                <img 
+                  src="{{ image_file | image_url: master }}"
+                  srcset="
+                    {{ image_file | image_url: width: 800 }} 800w,
+                    {{ image_file | image_url: width: 1200 }} 1200w,
+                    {{ image_file | image_url: width: 1600 }} 1600w,
+                    {{ image_file | image_url: master }} 2000w
+                  "
+                  sizes="(max-width: 749px) 100vw, 800px"
+                  loading="lazy" 
+                  alt="{{ image_file.alt | default: 'Ghee comparison image' }}"
+                >
+              </div>
+            {% endfor %}
+          </div>
+          
+          <!-- Desktop horizontal row -->
+          <div class="desktop-horizontal-row">
+            {% for image_file in product_images %}
+              <div class="horizontal-image-item">
+                <img 
+                  src="{{ image_file | image_url: width: 1600 }}"
+                  srcset="
+                    {{ image_file | image_url: width: 600 }} 600w,
+                    {{ image_file | image_url: width: 900 }} 900w,
+                    {{ image_file | image_url: width: 1200 }} 1200w,
+                    {{ image_file | image_url: width: 1600 }} 1600w,
+                    {{ image_file | image_url: width: 2000 }} 2000w
+                  "
+                  sizes="(max-width: 749px) 100vw, 33vw"
+                  loading="lazy" 
+                  alt="{{ image_file.alt | default: 'Ghee comparison image' }}"
+                >
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <!-- Regular grid layout for non-ghee comparison -->
+        <div class="images-container">
+          {% for image_file in product_images %}
+            <div class="product-image-item">
+              <img 
+                src="{{ image_file | image_url: width: 1600 }}"
+                srcset="
+                  {{ image_file | image_url: width: 600 }} 600w,
+                  {{ image_file | image_url: width: 900 }} 900w,
+                  {{ image_file | image_url: width: 1200 }} 1200w,
+                  {{ image_file | image_url: width: 1600 }} 1600w,
+                  {{ image_file | image_url: width: 2000 }} 2000w,
+                  {{ image_file | image_url: width: 2400 }} 2400w
+                "
+                sizes="(max-width: 749px) 90vw, (max-width: 1199px) 45vw, 600px"
+                loading="lazy" 
+                alt="{{ image_file.alt | default: 'Product process step' }}"
+              >
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="no-images-found">
+        <p>No images found in metaobject</p>
+      </div>
+    {% endif %}
+  </div>
+ 
+
+
+{% when 'customer_iimages_ghee' %}
+<div style="display: flex; flex-direction: column; align-items: center;">
+  <div >
+    <h1 class="page-section-title">{{ metaobject.customer_review_iimages_ghee.value }}</h1>
+  </div>
+  
+  <div style="width: 100%;" class="page-width product-review-images-gallery">
+    {% assign customer_images = metaobject.customer_images_ghee.value %}
+    
+    {% if customer_images %}
+        <div class="gallery-wrapper">
+          <button class="gallery-nav prev" onclick="scrollGallery('left')" aria-label="Previous images">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          
+          <div class="review-images-container" id="reviewGallery">
+            {% for image_file in customer_images %}
+              <div class="review-image-item">
+                <img 
+                  src="{{ image_file | image_url: width: 800 }}"
+                  srcset="
+                    {{ image_file | image_url: width: 300 }} 300w,
+                    {{ image_file | image_url: width: 500 }} 500w,
+                    {{ image_file | image_url: width: 800 }} 800w,
+                    {{ image_file | image_url: width: 1200 }} 1200w
+                  "
+                  sizes="(max-width: 749px) 200px, (max-width: 1199px) 280px, 300px"
+                  loading="lazy" 
+                  alt="{{ image_file.alt | default: 'Customer Review Image' }}"
+                >
+                <div class="review-overlay">
+                  <div class="review-content">
+                    <div class="reviewer-name"></div>
+                    <div class="star-rating">
+                      <div class="stars-container">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                      </div>
+                      <span class="rating-number"></span>
+                    </div>
+                    <div class="verified-purchase">Verified Purchase</div>
+                    <div class="review-text"></div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <button class="gallery-nav next" onclick="scrollGallery('right')" aria-label="Next images">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+
+<script>
+function scrollGallery(direction) {
+  const gallery = document.getElementById('reviewGallery');
+  const isMobile = window.innerWidth <= 749;
+  const scrollAmount = isMobile ? gallery.offsetWidth * 0.9 : gallery.offsetWidth * 0.75;
+  
+  if (direction === 'left') {
+    gallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  } else {
+    gallery.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+}
+
+// Random reviewer names
+const reviewerNames = [
+   'Meenakshi Panchal', 'Aakash Choudhary','Kunal Prajapati', 'Abhay Kumar', 
+  'Hariom Singh', 'Chavvi Sharma', 'Shubham Gupta', 'Priya Jain', 
+  'Rohit Verma', 'Sneha Agarwal', 'Vikash Yadav', 'Pooja Mishra',
+  'Ravi Shankar', 'Divya Pandey', 'Amit Sinha', 'Kavita Devi',
+  'Suresh Kumar', 'Anjali Singh', 'Manoj Tiwari', 'Rekha Sharma'
+];
+
+// Random reviews
+const reviews = [
+  'Nice and effective with good aroma',
+  'Excellent quality, very satisfied with the purchase',
+  'Great product, authentic taste and smell',
+  'Pure and natural, exactly what I was looking for',
+  'Amazing quality, will definitely order again',
+  'Fresh and aromatic, highly recommended',
+  'Best quality ghee, family loves it',
+  'Authentic and pure, worth every penny',
+  'Excellent taste and aroma, very impressed',
+  'Premium quality, great for cooking',
+  'Natural and pure, perfect for daily use',
+  'Outstanding quality, exceeded expectations',
+  'Fresh delivery, excellent packaging',
+  'Traditional taste, reminds me of homemade',
+  'Top quality product, very satisfied',
+  'Pure and authentic, great value for money',
+  'Excellent aroma and taste, highly recommend',
+  'Best ghee I have used, amazing quality',
+  'Natural and pure, perfect for health conscious people',
+  'Great product, will order again soon'
+];
+
+// Function to randomly assign ratings, names and reviews
+function assignRandomReviews() {
+  const imageItems = document.querySelectorAll('.review-image-item');
+  
+  // Shuffle arrays to ensure unique assignments
+  const shuffledNames = [...reviewerNames].sort(() => Math.random() - 0.5);
+  const shuffledReviews = [...reviews].sort(() => Math.random() - 0.5);
+  
+  imageItems.forEach((item, index) => {
+    const reviewerNameEl = item.querySelector('.reviewer-name');
+    const ratingNumberEl = item.querySelector('.rating-number');
+    const reviewTextEl = item.querySelector('.review-text');
+    const stars = item.querySelectorAll('.star');
+    
+    // Random rating between 4.0 and 5.0
+    const rating = (Math.random() * 1 + 4).toFixed(1); // 4.0 to 5.0
+    
+    // Use unique names and reviews based on index
+    const uniqueName = shuffledNames[index % shuffledNames.length];
+    const uniqueReview = shuffledReviews[index % shuffledReviews.length];
+    
+    // Set the content
+    reviewerNameEl.textContent = uniqueName;
+    ratingNumberEl.textContent = rating + ' Stars';
+    reviewTextEl.textContent = uniqueReview;
+    
+    // Fill stars based on rating
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    stars.forEach((star, index) => {
+      star.classList.remove('filled', 'half-filled');
+      if (index < fullStars) {
+        star.classList.add('filled');
+      } else if (index === fullStars && hasHalfStar) {
+        star.classList.add('half-filled');
+      }
+    });
+  });
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', assignRandomReviews);
+</script>
+
+    
+ {% when 'videos' %}
+ <div>
+   <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+ </div>
+ 
+ <div class="page-width product-videos-gallery" style="margin-top: 0; padding-top: 0;">
+   {% assign product_videos = metaobject.product_videos.value %}
+   
+   {% if product_videos %}
+     <div class="videos-container" style="margin-top: 0; padding-top: 0;">
+       {% for video_file in product_videos %}
+         <div class="video-item">
+           {% if video_file.media_type == 'video' %}
+             {{ video_file | video_tag: controls: true, muted: true, autoplay: true, loop: true }}
+           {% else %}
+             <video 
+               controls 
+               autoplay
+               muted
+               loop
+               preload="metadata"
+               playsinline
+               webkit-playsinline
+               crossorigin="anonymous"
+             >
+               <source src="{{ video_file | file_url }}" type="video/mp4">
+               <source src="{{ video_file.url }}" type="{{ video_file.mime_type | default: 'video/mp4' }}">
+               Your browser does not support the video tag.
+             </video>
+           {% endif %}
+         </div>
+       {% endfor %}
+     </div>
+   {% else %}
+     <div class="no-videos-found">
+       <p>No videos found in metaobject</p>
+     </div>
+   {% endif %}
+ </div>
+ 
+      
+    {% when 'media_list_accordion' %}
+      {% render 'metaobject-media-list', metaobject: metaobject %}
+      
+ {% when 'rich_text_accordion' %}
+  <!-- CHECK IF THIS IS FAQ TYPE CONTENT -->
+  {% assign content_text = metaobject.content.value | strip_html | downcase %}
+  {% assign is_faq = false %}
+  {% if content_text contains 'q.' and content_text contains 'a.' %}
+    {% assign is_faq = true %}
+  {% endif %}
+  
+  {% if is_faq %}
+    <!-- CUSTOM FAQ ACCORDION -->
+    <div class="page-width custom-faq-accordion">
+      <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+      
+      <div class="faq-container">
+        {% assign faq_content = metaobject.content.value %}
+        
+        <!-- SUPER AGGRESSIVE CLEANING OF RICH TEXT JSON GARBAGE -->
+        {% assign clean_content = faq_content 
+          | strip_html 
+          | replace: '= type=', '' 
+          | replace: '=type=', '' 
+          | replace: 'type=', '' 
+          | replace: '= children=', '' 
+          | replace: '=children=', '' 
+          | replace: 'children=', '' 
+          | replace: ' children', '' 
+          | replace: 'children', '' 
+          | replace: '= value=', '' 
+          | replace: '=value=', '' 
+          | replace: 'value=', '' 
+          | replace: '=text', '' 
+          | replace: 'text', '' 
+          | replace: '"type":', '' 
+          | replace: '"children":', '' 
+          | replace: '"text":', '' 
+          | replace: '"value":', '' 
+          | replace: 'paragraph', '' 
+          | replace: 'bold', '' 
+          | replace: 'true', '' 
+          | replace: 'false', '' 
+          | replace: '{', '' 
+          | replace: '}', '' 
+          | replace: '[', '' 
+          | replace: ']', '' 
+          | replace: '"', '' 
+          | replace: '>', '' 
+          | replace: '<', '' 
+          | replace: ':', '' 
+          | replace: ',', ' ' 
+          | replace: '  ', ' ' 
+          | replace: '   ', ' ' 
+          | replace: '    ', ' ' 
+          | replace: '     ', ' ' 
+          | strip %}
+        
+        {% assign faq_parts = clean_content | split: 'Q.' %}
+        
+        {% for faq_part in faq_parts %}
+          {% if faq_part != blank and faq_part.size > 10 %}
+            {% assign qa_split = faq_part | split: 'A.' %}
+            {% if qa_split.size >= 2 %}
+              {% assign question = qa_split[0] | strip %}
+              {% assign answer = qa_split[1] | strip %}
+              
+              <!-- EXTRA CLEANING FOR INDIVIDUAL Q&A -->
+              {% assign question = question 
+                | replace: '= type=', '' 
+                | replace: '=type=', '' 
+                | replace: 'type=', '' 
+                | replace: '= children=', '' 
+                | replace: '=children=', '' 
+                | replace: 'children=', '' 
+                | replace: ' children', '' 
+                | replace: 'children', '' 
+                | replace: '= value=', '' 
+                | replace: '=value=', '' 
+                | replace: 'value=', '' 
+                | replace: '=text', '' 
+                | replace: 'text', '' 
+                | strip %}
+              
+              {% assign answer = answer 
+                | replace: '= type=', '' 
+                | replace: '=type=', '' 
+                | replace: 'type=', '' 
+                | replace: '= children=', '' 
+                | replace: '=children=', '' 
+                | replace: 'children=', '' 
+                | replace: ' children', '' 
+                | replace: 'children', '' 
+                | replace: '= value=', '' 
+                | replace: '=value=', '' 
+                | replace: 'value=', '' 
+                | replace: '=text', '' 
+                | replace: 'text', '' 
+                | strip %}
+              
+              {% if question.size > 3 and answer.size > 10 %}
+                <div class="faq-item">
+                  <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span class="faq-question-text">{{ question | truncatewords: 50 }}</span>
+                    <span class="faq-arrow">+</span>
+                  </button>
+                  <div class="faq-answer">
+                    <div class="faq-answer-text">
+                      {{ answer | truncatewords: 200 }}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <!-- Non-FAQ rich text accordion (e.g., Uses section) -->
+    <div class="page-width product__accordion accordion quick-add-hidden uses-section">
+      <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+      <div class="uses-content richtext rte" id="productAccordion_{{ metaobject._id.value }}">
+        {{ metaobject.content | metafield_tag }}
+      </div>
+    </div>
+ 
+
+  {% endif %}
+      
+    {% when 'media_accordion' %}
+      <div class="page-width product__accordion accordion quick-add-hidden">
+        <details class="product_accordion-tab" id="Details-{{ metaobject._id.value }}">
+          <summary>
+            <div class="summary__title">
+              <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+            </div>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </summary>
+          <div class="accordion__content rte" id="ProductAccordion-{{ metaobject._id.value }}">
+            <figure>{{ metaobject.content.value | image_url: width: 700 | image_tag }}</figure>
+          </div>
+        </details>
+      </div>
+      
+    {% when 'youtube_video' %}
+      {% render 'metaobject-video', metaobject: metaobject %}
+      
+    {% when 'static_content_accordion' %}
+      <div class="page-width product__accordion accordion only-mobile quick-add-hidden">
+        <details class="product_accordion-tab" open id="Details-{{ metaobject._id.value }}">
+          <summary>
+            <div class="summary__title">
+              <h1 class="page-section-title">{{ metaobject.title.value }}</h1>
+            </div>
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </summary>
+          <div class="accordion__content product-description rte" id="ProductAccordion-{{ metaobject._id.value }}">
+            {{ product.description }}
+          </div>
+        </details>
+      </div>
+  {% endcase %}
+{% endfor %}
+
+<script>
+function toggleFAQ(button) {
+  // Get the next sibling (answer div)
+  const answer = button.nextElementSibling;
+  const arrow = button.querySelector('.faq-arrow');
+  
+  // Toggle active class on button
+  button.classList.toggle('active');
+  
+  // Toggle active class on answer
+  if (answer.classList.contains('active')) {
+    answer.classList.remove('active');
+    answer.style.maxHeight = '0';
+    arrow.textContent = '+'; // ✅ Change arrow to plus when closed
+  } else {
+    // Close all other FAQs first
+    const allFAQs = document.querySelectorAll('.faq-item');
+    allFAQs.forEach(function(faq) {
+      const otherButton = faq.querySelector('.faq-question');
+      const otherAnswer = faq.querySelector('.faq-answer');
+      const otherArrow = otherButton.querySelector('.faq-arrow'); // ✅ Get other arrows
+      if (otherButton !== button) {
+        otherButton.classList.remove('active');
+        otherAnswer.classList.remove('active');
+        otherAnswer.style.maxHeight = '0';
+        otherArrow.textContent = '+'; // ✅ Reset other arrows to plus
+      }
+    });
+    
+    // Open current FAQ
+    answer.classList.add('active');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+    arrow.textContent = '-'; // ✅ Change arrow to minus when open
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle video loading and optimization
+  const videos = document.querySelectorAll('.product-videos-gallery video');
+  
+  videos.forEach(function(video) {
+    video.parentElement.classList.add('video-loading');
+    
+    video.addEventListener('loadedmetadata', function() {
+      video.parentElement.classList.remove('video-loading');
+    });
+    
+    video.addEventListener('error', function(e) {
+      {% comment %} console.log('Video error:', e); {% endcomment %}
+      video.parentElement.classList.remove('video-loading');
+      
+      setTimeout(function() {
+        video.load();
+      }, 1000);
+    });
+    
+    video.addEventListener('click', function() {
+      if (video.paused) {
+        video.load();
+        video.play().catch(function(error) {
+          {% comment %} console.log('Play failed:', error); {% endcomment %}
+        });
+      }
+    });
+    
+    video.load();
+  });
+
+  // Optimize image loading for better performance
+  const images = document.querySelectorAll('.product-images-gallery img');
+  
+  // Intersection Observer for lazy loading optimization
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.classList.add('loaded');
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach(function(img) {
+      imageObserver.observe(img);
+    });
+  }
+});
+</script>
+<div style="margin-top:80px">
+{% if  product.tags contains 'oil-compare' %}
+  {{ 'compare-table.css' | asset_url | stylesheet_tag }}
+  <div class="compare-data" style="order:1; margin-top:20px;">
+    <h4>Make A Conscious Wellness Choice</h4>
+    <div class="compare-data-content">
+      {% liquid
+        if product.tags contains 'ghee-compare'
+          render 'compare-ghee', product: product
+        else
+          render 'compare-oils', product: product
+        endif
+      %}
+    </div>
+  </div>
+{% endif %}
+</div>
+
+
+{% schema %}
+{
+  "name": "Oils Again Metaobject",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "hiden",
+      "label": "Hide",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

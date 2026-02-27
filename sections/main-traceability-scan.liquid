@@ -1,0 +1,347 @@
+{% comment %} <style>
+    .loading {
+      position: absolute;
+      height: 100%;
+      background: rgb(255 255 255 / 100%);
+      width: 100%;
+      z-index: 9;
+    }
+    div.lds-hourglass { display: inline-block; position: relative; width: 80px; height: 80px; display: block;
+      margin: auto;
+      top: 150px; }
+  .lds-hourglass:after { content: " "; display: block; border-radius: 50%; width: 0; height: 0; margin: 8px; box-sizing: border-box; border: 32px solid #05a081; border-color: #05a081 transparent #05a081 transparent; animation: lds-hourglass 1.2s infinite; }
+  @keyframes lds-hourglass {
+    0% { transform: rotate(0); animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+    50% { transform: rotate(900deg); animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+    100% { transform: rotate(1800deg); }
+  }
+</style>
+<style>
+  .traceability-scan img {
+    max-width: 100%;
+  }
+  .process-setup {
+    text-align: center;
+    padding: 0 15px;
+  }
+  .process-setup h2 {
+    font-weight: 700;
+    color: rgb(5, 160, 129)
+  }
+  .process-setup img {
+    border-radius: 50%;
+    background: #ccc;
+    max-width: 120px;
+  }
+  .product-report {
+    background: #05A081;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+  }
+  .product-report h2 {
+    color: #fff;
+    font-weight: 700;
+  }
+  .qualitylab--icon { list-style: none; font-weight: 600; justify-content: space-between; display: flex; padding: 0; text-align: center }
+  .qualitylab--icon svg { display: block; margin: 0 auto 10px; }
+  .single-video { text-align: center; padding-top: 10px }
+  .single-video iframe { max-width: 960px; width: 100%; height: 60vw; }
+  .block-image img { display: block; }
+  .slider_item { padding: 0 5px }
+  .report-pdf { position: relative; text-align: center; }
+  .report-pdf a { display: inline-block; width: 25px; background: #05a081;
+    height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    top: 48%;
+    padding: 4px; z-index: 3; }
+  .report-pdf a#next { right: -12px; transform: rotate(-90deg); }
+  .report-pdf a#prev { left: -12px; transform: rotate(90deg); }
+  .journey-banner {
+    text-align: center;
+    background: #fef8e6;
+    padding-top: 25px;
+  }
+  .journey-banner h3 {
+    background: rgb(5, 160, 129);
+    color: #fff;
+    text-transform: uppercase;
+        margin: 0 auto 15px;
+    width: fit-content;
+    padding: 5px 15px;
+    border-radius: 20px;
+  }
+  .qualitylab--icon li { max-width: 120px; padding: 0 3px; }
+  .qualitylab--icon img { background: #fff; border-radius: 100%; }
+  @media (min-width: 750px) {
+    .product--report {
+      display: flex;
+      max-width: 1400px;
+      padding: 0 30px;
+    }
+    .product-report-top {
+      padding-right: 80px
+    }
+    .single-video iframe {  width: 100%; height: 60vw; }
+  }
+  @media (max-width: 749px) {
+    .process-setup h2 {
+      max-width: 290px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+</style>
+
+<div class="traceability-scan">
+  <div id="load" class="loading">
+    <div class="lds-hourglass"></div>
+  </div>
+  <div class="main-banner block-image">
+    <picture class="banner-image">
+      <!-- <source media="(min-width:750px)" srcset=""> -->
+      <img src="" alt="" style="width:auto;">
+    </picture>
+  </div>
+  <div class="journey-banner block-image">
+    <h3>journey</h3>
+    <picture class="journey-image">
+      <!-- <source media="(min-width:750px)" srcset=""> -->
+      <img src="" alt="" style="width:auto;">
+    </picture>
+  </div>
+  <div class="product-report">
+    <div class="product--report">
+      <div class="product-report-top"></div>
+      <div class="report-pdf">
+        <canvas id="cnv-0" style="width:100%;"></canvas>
+        <input type="hidden" value="" id="pdfUrl">
+        <a id="prev">
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret" viewBox="0 0 10 6">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+          </svg>
+        </a>
+        <span style="width: 50px;display: inline-block;">
+          <span id="page_num">1</span> / <span id="page_count"></span>
+        </span>
+        <a id="next">
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret" viewBox="0 0 10 6">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.354.646a.5.5 0 00-.708 0L5 4.293 1.354.646a.5.5 0 00-.708.708l4 4a.5.5 0 00.708 0l4-4a.5.5 0 000-.708z" fill="currentColor"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="processer"></div>
+  {% comment %}
+      <div class="slider_wrap">
+        <div class="slider_item">
+            <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/88KDfg3FyJs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <div class="slider_item">
+            <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/88KDfg3FyJs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <div class="slider_item">
+            <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/88KDfg3FyJs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+  {% endcomment %}
+  <div class="single-video">
+    <iframe
+      width="560"
+      height="315"
+      src=""
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+  <div class="generic block-image">
+    <picture>
+      <source media="(min-width:750px)" srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/oils-journy.jpg">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/common-banner.jpg?v=1671459013"
+        alt=""
+        style="width:auto;"
+      >
+    </picture>
+  </div>
+  <div class="owner-banner block-image">
+    <picture>
+      <source
+        media="(min-width:750px)"
+        srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/owner-kuldeep.jpg"
+      >
+      <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/owner--kuldeep.jpg" alt="" style="width:auto;">
+    </picture>
+  </div>
+  <div class="product-list"></div>
+</div>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+  integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"
+  integrity="sha512-Z8CqofpIcnJN80feS2uccz+pXWgZzeKxDsDNMD/dJ6997/LSRY+W4NmEt9acwR+Gt9OHN0kkI1CTianCwoqcjQ=="
+  crossorigin="anonymous"
+></script>
+<script>
+    function onPrevPage() {
+      pageNum = parseInt(document.getElementById('page_num').innerText);
+      if (pageNum <= 1) { return; }
+      pageNum--;
+      PDFStart(document.getElementById('pdfUrl').value,pageNum);
+     document.getElementById('page_num').innerText = pageNum; }
+    	document.getElementById('prev').addEventListener('click', onPrevPage);
+
+    function onNextPage() {
+      pageNum = parseInt(document.getElementById('page_num').innerText);
+      if (pageNum >= document.getElementById('page_count').innerText) { return; }
+      pageNum++;
+      PDFStart(document.getElementById('pdfUrl').value,pageNum);
+    	document.getElementById('page_num').innerText = pageNum; }
+    document.getElementById('next').addEventListener('click', onNextPage);
+
+  const PDFStart = (nameRoute, page) => {
+    let loadingTask = pdfjsLib.getDocument(nameRoute),
+        pdfDoc = null,
+        canvas = document.querySelector('#cnv-0'),
+        ctx = canvas.getContext('2d'),
+        scale = 1.5,
+        numPage = page;
+
+    const GeneratePDF = (numPage) => {
+      pdfDoc.getPage(numPage).then((page) => {
+        let viewport = page.getViewport({ scale: scale });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        let renderContext = {
+          canvasContext: ctx,
+          viewport: viewport,
+        };
+
+        page.render(renderContext);
+      });
+      document.getElementById('page_count').innerText = pdfDoc.numPages;
+    };
+
+    loadingTask.promise.then((pdfDoc_) => {
+      pdfDoc = pdfDoc_;
+      GeneratePDF(numPage);
+    });
+  };
+  const applyData = (data) => {
+    const trac = data[0];
+    //console.log(trac.banner);
+    // jQuery('.banner-image source').attr("srcset", 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.banners);
+    jQuery('.banner-image img').attr("src", 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.banner).removeAttr('style');
+
+    // jQuery('.journey-image source').attr("srcset", 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.journys);
+    jQuery('.journey-image img').attr("srcset", 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.journy);
+
+    PDFStart('https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.pdf,1);
+    jQuery('#pdfUrl').val('https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.pdf);
+    let reports = trac.report[0];
+    const productReport = '<h2>'+reports.title+'</h2>'+
+    '<p>'+reports.desc+'</p>'+
+    '<ul class="qualitylab--icon flex">'+
+      '<li><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/report-icon01.png?v=1671453074" alt=""/></li>'+
+      '<li><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/report-icon02.png?v=1671453074" alt=""/></li>'+
+      '<li><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/report-icon03.png?v=1671453074" alt=""/></li>'+
+      '<li><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/report-icon04.png?v=1671453074" alt=""/></li>'+
+      '<li><img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/report-icon05.png?v=1671453074" alt=""/></li></ul>';
+    jQuery('.product-report-top').html(productReport);
+
+    let process = trac.process[0];
+    const processStep = '<div class="process-setup"><h2>'+process.heading+'</h2>'+
+    '<img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+process.image+'" alt=""/>'+
+    '<div class="process-setup-content">'+process.desc+'</div></div>';
+    jQuery('.processer').html(processStep);
+
+    jQuery('.single-video iframe').attr("src", 'https://www.youtube-nocookie.com/embed/'+trac.videos);
+    // jQuery('.generic img').attr("src", 'https://cdn.shopify.com/s/files/1/0270/3346/9006/files/'+trac.generic);
+
+    jQuery('#load').hide();
+  }
+
+  const defaultData = () => {
+    let defaultContent = '<style>.custom-page-container { padding-left: 10px; padding-right: 10px; }.change-prop { line-height: 1.4; text-align: center; }.text-center { text-align: center; }.page-width{ width:100% !important; position:relative; left:0px !important; }.main-heading{ font-size:21px; font-weight: 700; margin-bottom: 0; }.section-header p { margin:10px 0 20px; padding:0px; font-style:italic; font-weight:600; }.container-class{ display:flex; justify-content:center; }.traceability-video-container { width: 100%; height: 40vh; }@media only screen and (min-width: 750px){ .main-heading { font-size:32px; }.main-class { width:80%; }.change-prop, .section-header{ font-size:17px; }.traceability-video-container { width: 100%; height: 60vh; }}</style>'+
+      '<div class="custom-page-container"><div class="container-class change-prop">'+
+      '<div class="main-class change-prop"><div class="section-header text-center">'+
+      '<h1 class="main-heading">Traceability</h1><p><i>From farm to fork, every detail about your product is just a scan away!</i></p></div>'+
+      '<div style="text-align:center;" class="traceability-video-container"><iframe style="width: 100%;height: 100%;" src="https://www.youtube.com/embed/88KDfg3FyJs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>'+
+      '<br/><div class="rte change-prop"><div id="intro" class="change-prop">'+
+      'We should be completely aware of the food we eat, and what goes inside our body. We at Anveshan try to achieve this by establishing a completely transparent system allowing you to know every aspect of your product by simply scanning it.<br><br> With the use of technology, we have established organized data, giving you complete access to the information of a product. From farm to your doorstep, every step can be traced. The traceability of the product goes down to the roots of the crop we grow it on.</div>'+
+      '<div id="traceability-main"><img style="width:100%;border: 0;" src="//cdn.shopify.com/s/files/1/0270/3346/9006/t/309/assets/Group_774.png?v=17501982472772173981671428374"></div>'+
+      '</div></div></div></div>';
+    jQuery('.traceability-scan').html(defaultContent);
+  }
+
+  const loadData = (urlParams) => {
+    $.getJSON("{{ 'traceability.json' | asset_url }}", function(response) {
+      switch(urlParams) {
+        case 'CO': applyData(response.co); break;
+        case 'MO': applyData(response.bmo); break;
+        case 'SNFL': applyData(response.sfo); break;
+        case 'YMO': applyData(response.ymo); break;
+        case 'BSO': applyData(response.sso); break;
+        case 'GO': applyData(response.go); break;
+        case 'STMX': applyData(response.stmx); break;
+        case 'HON': applyData(response.hon); break;
+        case 'WLFT': applyData(response.wlft); break;
+        case 'A2G': applyData(response.a2g); break;
+        case 'GG': applyData(response.gg); break;
+        case 'TL': applyData(response.tl); break;
+        case 'DFP': applyData(response.dfp); break;
+        case 'BPP': applyData(response.bpp); break;
+       default: defaultData(); break;
+    }
+    })
+  };
+  let urlParams = new URLSearchParams(window.location.search);
+  window.addEventListener('load', loadData(urlParams.get('p')));
+</script>
+{% comment %}
+<script src="{{ 'slick.min.js' | asset_url }}"></script>
+<script type="text/javascript">
+  jQuery(document).ready(function(){
+    jQuery('.slider_wrap').slick({
+      speed: 300,
+      autoplay: true,
+      infinite: true,
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      arrows: false,
+      responsive: [
+        {
+          breakpoint: 1000,
+          settings: {
+            slidesToShow: 2.2
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 1.2
+          }
+        }
+      ]
+    });
+  });
+</script>
+{% endcomment %}
+{% schema %}
+{
+  "name": "Traceability Scan",
+  "settings": []
+}
+{% endschema %} {% endcomment %}

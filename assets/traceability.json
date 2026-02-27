@@ -1,0 +1,381 @@
+{
+  "bmo": [
+    {
+      "banner": "bmo-banner.jpg",
+      "banners": "bmo--banner.jpg",
+      "journy": "bmo--journy.jpg",
+      "journys": "bmo-journy.jpg",
+      "pdf": "BMO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our black mustard oil passes through 12 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Gajraj Parewa</b> from <b>Hatharas</b>, UP, is our superhero turned Micro-Entrepreneur</p><p>He ensures that the oil is extracted through a completely natural process. He buys mustard seeds from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan he is able to empowers 90+ farmers across 4 villages.</p>",
+          "image": "gajraj-kisan.jpg",
+          "tile": "Farmer"
+        }
+      ],
+      "videos": "8JpvZMYTAtk",
+      "generic": "wood-pressed-oil-03.jpg",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "ymo": [
+    {
+      "banner": "ymo-banner.jpg",
+      "banners": "ymo--banner.jpg",
+      "journy": "ymo--journy.jpg",
+      "journys": "ymo-journy.jpg",
+      "pdf": "YMO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our yellow mustard oil passes through 12 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Gajraj Parewa</b> from <b>Hatharas</b>, UP, is our superhero turned Micro-Entrepreneur</p><p>He ensures that the oil is extracted through a completely natural process. He buys yellow mustard seeds from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan he is able to empowers 90+ farmers across 4 villages.</p>",
+          "image": "gajraj-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "vKO26hPtuGk",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "co": [
+    {
+      "banner": "co-banner.jpg",
+      "banners": "co-banner.jpg",
+      "journy": "co--journy.jpg",
+      "journys": "co-journy.jpg",
+      "pdf": "CO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our coconut oil passes through 10 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Gokul Ayyan</b> from <b>Tiruvanamalai</b>, Tamil Nadu, is our superhero turned Micro-Entrepreneur.</p><p>He ensures that the oil is extracted in a completely natural process. He buys coconuts from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan, he is able to empower 85+ farmers across 5 villages.</p>",
+          "image": "gokul-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "JX4_UmkMaFY",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "go": [
+    {
+      "banner": "go-banner.jpg",
+      "banners": "go--banner.jpg",
+      "journy": "go--journy.jpg",
+      "journys": "go-journy.jpg",
+      "pdf": "GNO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our groundnut oil passes through 10 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Haribabu</b> from <b>Pollur</b>, Tamil Nadu, is our superhero turned Micro-Entrepreneur.</p><p>He ensures that the oil is extracted through a completely natural process. He buys peanuts from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan, he is able to empower 50+ farmers across 3 villages.</p>",
+          "image": "haribabu-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "-NVY-FDm4A0",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "sfo": [
+    {
+      "banner": "sfo-banner.jpg",
+      "banners": "sfo--banner.jpg",
+      "journy": "sfo--journy.jpg",
+      "journys": "sfo-journy.jpg",
+      "pdf": "SFO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our sunflower oil passes through 11 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Haribabu</b> from <b>Pollur</b>, Tamil Nadu, is our superhero turned Micro-Entrepreneur.</p><p>He ensures that the oil is extracted through a completely natural process. He buys peanuts from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan, he is able to empower 50+ farmers across 3 villages.</p>",
+          "image": "haribabu-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "lDN2mp1MfIM",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "sso": [
+    {
+      "banner": "sso-banner.jpg",
+      "banners": "sso--banner.jpg",
+      "journy": "sso--journy.jpg",
+      "journys": "sso-journy.jpg",
+      "pdf": "BSO_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>After the natural filtering process, every batch of our sesame oil passes through 10 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Haribabu</b> from <b>Pollur</b>, Tamil Nadu, is our superhero turned Micro-Entrepreneur.</p><p>He ensures that the oil is extracted through a completely natural process. He buys peanuts from farmers in his village and presses them in wooden Kachi Ghani machines (or Kolhu). While running his micro-processing unit with Anveshan, he is able to empower 50+ farmers across 3 villages.</p>",
+          "image": "haribabu-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "stmx": [
+    {
+      "banner": "stmx-banner.jpg",
+      "banners": "stmx-banner.jpg",
+      "journy": "stmx-journy.jpg",
+      "journys": "stmx--journy.jpg",
+      "pdf": "moringasattu_-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our moringa sattu drink mix passes through 12 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Handcrafted by mothers of our women Self Help Group",
+          "desc": "<p><b>Mrs Sarita Devi</b> from <b>Hatharas</b>, UP, is the head of the Women's Self Help Group.</p><p>She procures handpicked ingredients from the farmers while ensuring the utmost care and quality control. She stone-grounds these ingredients in Okhalis/Chakkis with the help of strong and independent women of the Self Help Group. While working with Anveshan, she is able to empower 70+ farmers and other women across villages.</p>",
+          "image": "sarita-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "BgM9SZUVT6s",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "wlft": [
+    {
+      "banner": "honey-banner.jpg",
+      "banners": "honey-banner.jpg",
+      "journy": "honey--journey.jpg",
+      "journys": "honey-journey.jpg",
+      "pdf": "hqc_-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO, NABL, And NMR Approved",
+          "desc": "<p>After the natural filtering process, every batch of our honey passes through 11 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Rajeev Kumar</b> from <b>Bijnor</b>, UP, is our certified beekeeper turned Micro-Entrepreneur.</p><p>He ensures that the honey is extracted through a completely natural process. First, he sources honey from certified beekeepers. After that, he sieve-filters it and performs in-house testing on every batch to ensure quality. While running his micro-processing unit with Anveshan, he is able to empower 100+ beekeepers across villages.</p>",
+          "image": "rajiv-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "-IjFb453GbY",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "hon": [
+    {
+      "banner": "wlft-banner.jpg",
+      "banners": "wlft-banner.jpg",
+      "journy": "honey--journey.jpg",
+      "journys": "honey-journey.jpg",
+      "pdf": "hqc_-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO, NABL, And NMR Approved",
+          "desc": "<p>After the natural filtering process, every batch of our honey passes through 11 parameters of quality testing before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Rajeev Kumar</b> from <b>Bijnor</b>, UP, is our certified beekeeper turned Micro-Entrepreneur.</p><p>He ensures that the honey is extracted through a completely natural process. First, he sources honey from certified beekeepers. After that, he sieve-filters it and performs in-house testing on every batch to ensure quality. While running his micro-processing unit with Anveshan, he is able to empower 100+ beekeepers across villages.</p>",
+          "image": "rajiv-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "-IjFb453GbY",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "gg": [
+    {
+      "banner": "gir-banner.jpg",
+      "banners": "gir-banner.jpg",
+      "journy": "gir-journey.jpg",
+      "journys": "ghee--journey.jpg",
+      "pdf": "GIRGHEE_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our A2 Gir Cow Ghee passes through 10 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Dhaval</b> from <b>Rajkot</b>, Gujarat, is our superhero turned Micro-Entrepreneur.</p><p>He procures pure milk from nearby dairy farmers. He ensures that farmers have Gir breed cows while onboarding them and performs in-house testing on every batch of milk to ensure that it is not adulterated with water or other additives. He is also responsible for maintaining the right flow, temperature, and speed of the traditional bilona method. While running his micro-processing unit with Anveshan, he is able to empower 1000+ farmers across 6 villages.</p>",
+          "image": "dhaval-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "obgma3gHiM4",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "a2g": [
+    {
+      "banner": "ghee-banner.jpg",
+      "banners": "ghee-banner.jpg",
+      "journy": "ghee-journey.jpg",
+      "journys": "gir--journey.jpg",
+      "pdf": "A2HGhee_COA_April.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our A2 Desi Cow Ghee passes through 10 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Know Your Farmer, Know Your Food",
+          "desc": "<p><b>Mr Manju</b> from <b>Coorg</b>, Karnataka, is our superhero turned Micro-Entrepreneur.</p><p>He procures pure milk from nearby dairy farmers. He ensures that farmers have Hallikar breed cows while onboarding them and performs in-house testing on every batch of milk to ensure that it is not adulterated with water or other additives. He is also responsible for maintaining the right flow, temperature, and speed of the traditional bilona method. While running his micro-processing unit with Anveshan, he is able to empower 3150+ farmers across 8 villages.</p>",
+          "image": "manju-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "9DAxSeJTzKk",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "tl": [
+    {
+      "banner": "tl-banner.jpg",
+      "banners": "tl-banner.jpg",
+      "journy": "tl-journey.jpg",
+      "journys": "tl-journey.jpg",
+      "pdf": "turmericlatte_-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our turmeric latte passes through 11 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Behind This Superfood",
+          "desc": "<p><b>Rishi</b> is our Ayurveda-driven entrepreneur who is building a new niche called computational Ayurveda to provide solutions on food and Ayurveda.</p><p>He hand-picks premium quality ingredients directly from farmers and tests them in-house before sourcing them. He ensures that the components are stone-ground and blended in specific Ayurvedic proportions to provide optimal nutrition. While working with Anveshan, he empowered 27+ women who traditionally hand-ground techniques.</p>",
+          "image": "rishi-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "-EGfcF_7VKw",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "dfp": [
+    {
+      "banner": "dfp-banner.jpg",
+      "banners": "dfp-banner.jpg",
+      "journy": "dfp-journey.jpg",
+      "journys": "dfp--journey.jpg",
+      "pdf": "dfp_-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our dry fruit paak passes through 9 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Behind This Wholesome Sweet",
+          "desc": "<p><b>Mr Jaydeep Dhirubhai Ribadeeya</b> from <b>Surat</b>, is our superhero turned Micro-Entrepreneur.</p><p>He hand-picks premium quality dry fruits directly from farmers and tests them in-house before sourcing them. He ensures that sweet is prepared using a completely natural process, and all the ingredients are mixed in specific proportions to provide optimal nutrition. While working with Anveshan, he empowered 35+ women who handmade these sweets with utmost care.</p>",
+          "image": "jaydeep-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "PSmLND0ORoI",
+      "ownerimage": "",
+      "product": []
+    }
+  ],
+  "bpp": [
+    {
+      "banner": "bpp-banner.jpg",
+      "banners": "bpp-banner.jpg",
+      "journy": "bpp-journey.jpg",
+      "journys": "bpp-journey.jpg",
+      "pdf": "bpp-report.pdf",
+      "report": [
+        {
+          "title": "We Are ISO And NABL Approved",
+          "desc": "<p>Every batch of our black pepper powder passes through 7 quality testing parameters before getting packed.</p>",
+          "icon": []
+        }
+      ],
+      "process": [
+        {
+          "heading": "Behind This Super Spice",
+          "desc": "<p><b>Mr Vivek Ayyan</b> is our superhero turned Micro-Entrepreneur.</p><p>He is connected with tribal farmers of nearby regions of the Malabar coast and Western Ghats, who hand-pick the peppercorns. Before onboarding these farmers, he conducts in-house tests for quality control. He ensures that it is traditionally stone-ground to provide optimal nutrition, taste, and texture. While working with Anveshan, he empowered 27+ women across villages who traditionally hand-ground them.</p>",
+          "image": "vivek-kisan.jpg",
+          "tile": ""
+        }
+      ],
+      "videos": "GwJ_ijIfVWs",
+      "ownerimage": "",
+      "product": []
+    }
+  ]
+}

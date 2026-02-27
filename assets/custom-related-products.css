@@ -1,0 +1,72 @@
+.related-products {
+  display: block;
+}
+.related-products__heading {
+  margin: 0 0 2rem;
+}
+
+/* 5 products in one row */
+product-recommendations .product-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+product-recommendations .grid__item {
+  flex: 0 0 calc(20% - 10px);
+  max-width: calc(20% - 10px);
+  min-width: 180px;
+}
+
+product-recommendations .card-wrapper {
+  box-sizing: border-box;
+}
+
+product-recommendations .card__heading {
+  font-size: 0.85em;
+  min-height: calc(1.2em * 2);
+  max-height: calc(1.2em * 2);
+}
+
+product-recommendations .card__content {
+  padding: 0.6rem;
+}
+
+product-recommendations .best-price {
+  font-size: 8px;
+  padding: 2px 5px;
+}
+
+product-recommendations .quick-add__submit {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+/* Hide slider buttons completely to prevent FOUC */
+product-recommendations .slider-buttons {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide any arrow icons that might flash */
+product-recommendations .slider-button,
+product-recommendations .slider-button--prev,
+product-recommendations .slider-button--next {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  product-recommendations .related-products__heading { padding-left: 1.5rem; margin-bottom: 1rem; }
+  product-recommendations ul.slider.slider--tablet { padding-left: 1.5rem; padding-right: 1.5rem; }
+  product-recommendations .card-wrapper { box-sizing: border-box; }
+
+  product-recommendations .grid__item {
+    flex: 0 0 45%;
+    max-width: 45%;
+    min-width: 140px;
+  }
+}

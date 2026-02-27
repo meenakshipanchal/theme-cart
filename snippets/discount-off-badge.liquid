@@ -1,0 +1,379 @@
+{% comment %}
+  ═══════════════════════════════════════════════════════════════════════════════
+  UNIFIED DISCOUNT BADGE - Top-Left Corner Discount Badge + Flash Sale
+  ═══════════════════════════════════════════════════════════════════════════════
+
+  A reusable snippet for displaying discount badges on product cards.
+
+  USAGE:
+  ──────
+  1. Auto-calculate discount from product:
+     {% render 'discount-off-badge', product_item: card_product %}
+
+  2. Custom text badge (no calculation):
+     {% render 'discount-off-badge', custom_text: 'FLAT 30%', custom_subtext: 'OFF' %}
+
+  3. Direct discount value:
+     {% render 'discount-off-badge', discount_value: 30 %}
+
+  4. Flash Sale badge with timer:
+     {% render 'discount-off-badge', badge_type: 'flash-sale' %}
+
+  5. Flash Sale badge without timer:
+     {% render 'discount-off-badge', badge_type: 'flash-sale', show_timer: false %}
+
+  6. Disable percentage, show custom only:
+     {% render 'discount-off-badge', show_percent: false, custom_text: 'FLAT 30%', custom_subtext: 'OFF' %}
+
+  PARAMETERS:
+  ───────────
+  • product_item   (object)  - Product/variant with price & compare_at_price
+  • discount_value (number)  - Direct discount percentage (overrides calculation)
+  • min_discount   (number)  - Minimum discount % to show badge (default: 1)
+  • show_badge     (boolean) - Force show/hide badge (default: auto)
+  • show_percent   (boolean) - Show calculated percentage (default: true)
+  • custom_text    (string)  - Custom top line text (e.g., 'FLAT 30%', 'SALE')
+  • custom_subtext (string)  - Custom bottom line text (e.g., 'OFF', 'LIVE')
+  • badge_type     (string)  - 'default' or 'flash-sale' (default: 'default')
+  • show_timer     (boolean) - Show timer with flash sale (default: true)
+  • sale_end_date  (string)  - Sale end date for timer (default: 'May 23, 2025 23:00:00 GMT+0530')
+
+  STYLES:
+  ───────
+  CSS is in assets/variant-card.css under .custom-badge and flash sale styles
+
+  ═══════════════════════════════════════════════════════════════════════════════
+{% endcomment %}
+
+{%- liquid
+  # Set defaults
+  assign min_threshold = min_discount | default: 1
+  assign use_percent = show_percent | default: true
+  assign type = badge_type | default: 'default'
+  assign timer_enabled = show_timer | default: true
+  assign end_date = sale_end_date | default: 'May 23, 2025 23:00:00 GMT+0530'
+
+  # Calculate discount if product_item is provided
+  assign calculated_discount = 0
+  if product_item != blank and product_item.compare_at_price > product_item.price
+    assign calculated_discount = product_item.compare_at_price | minus: product_item.price | times: 100.0 | divided_by: product_item.compare_at_price | round
+  endif
+
+  # Use direct discount_value if provided, otherwise use calculated
+  if discount_value != blank and discount_value > 0
+    assign final_discount = discount_value | round
+  else
+    assign final_discount = calculated_discount
+  endif
+
+  # Determine what to display
+  assign display_top = ''
+  assign display_bottom = 'OFF'
+
+  # If custom_text is provided, use it (overrides percentage)
+  if custom_text != blank
+    assign display_top = custom_text
+    if custom_subtext != blank
+      assign display_bottom = custom_subtext
+    endif
+    assign should_show = true
+  elsif use_percent == true and final_discount >= min_threshold
+    # Show calculated percentage
+    assign display_top = final_discount | append: '%'
+    assign display_bottom = 'OFF'
+    assign should_show = true
+  else
+    assign should_show = false
+  endif
+
+  # Force show/hide if explicitly set
+  if show_badge == true
+    assign should_show = true
+  elsif show_badge == false
+    assign should_show = false
+  endif
+
+  # Flash sale always shows if badge_type is flash-sale
+  if type == 'flash-sale'
+    assign should_show = true
+  endif
+-%}
+
+{%- if type == 'flash-sale' -%}
+  {%- comment -%} ═══════════════ FLASH SALE BADGE ═══════════════ {%- endcomment -%}
+  <div
+    class="sale-badge-container"
+    style="position: absolute; z-index: 5; display: flex; align-items: flex-start;"
+  >
+    <!-- Flash Sale Badge -->
+    <div
+      class="sale-badge flash-sale-badge"
+      style="background: linear-gradient(90deg, #3EB988, #3EB988); border-radius: 0 999px 999px 0; overflow: hidden; box-shadow: 0 0 8px rgba(50, 205, 50, 0.5); display: inline-block; max-width: 80px; min-width: 8px; z-index: 6;"
+    >
+      <div style="color: #ffffff; font-weight: bold; padding: 1px 2px; display: flex; align-items: center; justify-content: center; white-space: nowrap;">
+        <span
+          class="flash-emoji"
+          style="cursor: pointer; display: inline-block; margin-right: 4px; color: white; font-size: 10px;"
+        >⚡</span>
+        <span
+          class="flash-sale-text"
+          style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;"
+        >SALE</span>
+      </div>
+    </div>
+
+    {%- if timer_enabled -%}
+      <!-- Animated Timer Badge -->
+      <div
+        class="deal-timer"
+        data-end-date="{{ end_date }}"
+        style="
+          position: absolute;
+          bottom: 10px;
+          right: 10px;
+          background: #FFD700;
+          border-radius: 30px;
+          box-shadow: 0 0 6px rgba(30, 64, 175, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2px 6px;
+          z-index: 10;
+          animation: bounceBubble 2s infinite ease-in-out;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(4px);
+        "
+      >
+        <span
+          class="timer-emoji"
+          style="margin-right: 6px; font-size: 16px; animation: wiggleClock 1.3s infinite;"
+        >⏰</span>
+        <span
+          class="time-display"
+          style="
+            font-size: 12px;
+            color: black;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+          "
+        >Hurry Up!</span>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <style>
+    /* Flash Sale Animations */
+    @keyframes wiggleClock {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(12deg); }
+      50% { transform: rotate(-12deg); }
+      75% { transform: rotate(6deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes bounceBubble {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px rgba(50, 205, 50, 0.5); }
+      50% { box-shadow: 0 0 15px rgba(50, 205, 50, 0.8); }
+      100% { box-shadow: 0 0 5px rgba(50, 205, 50, 0.5); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); text-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+      50% { transform: scale(1.5); text-shadow: 0 0 10px rgba(255, 215, 0, 1); }
+      100% { transform: scale(1); text-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+    }
+
+    @keyframes moveBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes ring {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-15deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .sale-badge-container {
+      transition: all 0.3s ease;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .sale-badge {
+      animation: bounce 0.6s ease-out, glow 2s infinite;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .sale-badge:hover {
+      transform: translateY(-2px);
+    }
+
+    .flash-emoji {
+      animation: blink 1s infinite;
+    }
+
+    .flash-emoji.active {
+      animation: pulse 0.4s ease-in-out, blink 1s infinite;
+    }
+
+    .deal-timer {
+      background-size: 200% 200% !important;
+      animation: moveBackground 4s ease-in-out infinite;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .timer-emoji {
+      font-size: 16px !important;
+      animation: ring 1s infinite;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 750px) {
+      .flash-sale-text {
+        font-size: 8px !important;
+        letter-spacing: 0.5px !important;
+      }
+
+      .flash-emoji {
+        font-size: 12px !important;
+        margin-right: 2px !important;
+      }
+
+      .sale-badge.flash-sale-badge {
+        min-width: 55px !important;
+        max-width: 55px !important;
+      }
+
+      .deal-timer {
+        min-width: 80px !important;
+        max-width: 80px !important;
+        padding: 2px 4px !important;
+      }
+
+      .timer-emoji {
+        font-size: 10px !important;
+      }
+
+      .time-display {
+        font-size: 9px !important;
+      }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function initializeTimers() {
+        // Interactive emoji functionality for Flash Sale badge
+        const flashEmojis = document.querySelectorAll('.flash-emoji:not(.initialized)');
+        flashEmojis.forEach(function (flashEmoji) {
+          flashEmoji.classList.add('initialized');
+          flashEmoji.addEventListener('click', function () {
+            flashEmoji.classList.add('active');
+            setTimeout(() => {
+              flashEmoji.classList.remove('active');
+            }, 400);
+          });
+        });
+
+        // Timer functionality
+        const timerElements = document.querySelectorAll('.deal-timer:not(.initialized)');
+
+        timerElements.forEach(function (timerElement) {
+          timerElement.classList.add('initialized');
+
+          const endDateStr = timerElement.getAttribute('data-end-date') || 'May 23, 2025 23:00:00 GMT+0530';
+          const endTime = new Date(endDateStr).getTime();
+          const timeDisplay = timerElement.querySelector('.time-display');
+
+          function updateTimer() {
+            const now = new Date().getTime();
+            const timeRemaining = Math.max(0, Math.floor((endTime - now) / 1000));
+            const hours = Math.floor(timeRemaining / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+
+            timeDisplay.textContent =
+              hours.toString().padStart(2, '0') +
+              ':' +
+              minutes.toString().padStart(2, '0') +
+              ':' +
+              seconds.toString().padStart(2, '0');
+
+            if (timeRemaining > 0) {
+              setTimeout(updateTimer, 1000);
+            } else {
+              timeDisplay.textContent = 'SALE EXPIRED';
+              timerElement.style.background = '#777777 !important';
+              timerElement.style.color = '#ffffff';
+            }
+          }
+          updateTimer();
+        });
+      }
+
+      initializeTimers();
+
+      // Observer to watch for dynamically added content
+      const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach(function (node) {
+              if (node.nodeType === 1) {
+                if (
+                  node.querySelector &&
+                  (node.querySelector('.deal-timer') ||
+                    node.querySelector('.flash-emoji') ||
+                    node.classList.contains('deal-timer') ||
+                    node.classList.contains('flash-emoji'))
+                ) {
+                  setTimeout(initializeTimers, 100);
+                }
+              }
+            });
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    });
+  </script>
+
+{%- elsif should_show and display_top != blank -%}
+  {%- comment -%} ═══════════════ DEFAULT X% OFF BADGE ═══════════════ {%- endcomment -%}
+  <i class="custom-badge">
+    {%- if custom_prefix != blank -%}
+      <span class="discount-prefix">{{- custom_prefix -}}</span>
+    {%- endif -%}
+    <span class="discount-percent">{{- display_top -}}</span>
+    <span class="discount-off">{{- display_bottom -}}</span>
+  </i>
+{%- endif -%}

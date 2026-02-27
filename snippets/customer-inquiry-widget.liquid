@@ -1,0 +1,642 @@
+<!-- Customer Inquiry Widget with Animated Messages -->
+<div id="customer-inquiry-widget" class="widget-container">
+  <!-- Animated Widget Button -->
+  <div id="widget-button" class="widget-btn" onclick="toggleWidget()">
+    <div class="message-animation">
+      <div class="message-item active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div class="message-item">
+        <span class="message-text">Need Bulk Orders?</span>
+      </div>
+      <div class="message-item">
+        <span class="message-text">Corporate Gifting?</span>
+      </div>
+      {% comment %} <div class="message-item">
+        {% comment %} <span class="message-text">Distributorship?</span> {% endcomment %}
+      </div> {% endcomment %}
+      
+    </div>
+  </div>
+
+  <!-- Widget Popup -->
+  <div id="widget-popup" class="widget-popup">
+    <!-- Header -->
+    <div class="popup-header">
+      <h3>Looking for Bulk Orders?</h3>
+      <div class="close-btn" onclick="closeWidget()">×</div>
+    </div>
+
+    <!-- Scrollable Form Container -->
+    <div class="form-container">
+      <!-- Form -->
+      <form id="inquiry-form" class="inquiry-form">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Contact Number *</label>
+          <input type="tel" name="contact" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Type of Query *</label>
+          <select name="query_type" required>
+            <option value="">Select Query Type</option>
+            <option value="Corporate Gifting">Corporate Gifting</option>
+            <option value="Bulk Purchase">Bulk Purchase</option>
+            <option value="Distributorship">Distributorship</option>
+            <option value="Retailership">Retailership</option>
+            <option value="Private/White Labelling">Private/White Labelling</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" maxlength="200" placeholder="Describe your inquiry (max 200 characters)"></textarea>
+          <div class="char-counter">
+            <span id="char-count">0</span>/200
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="submit-btn">Send Message</button>
+
+        <div id="success-message" class="success-message">
+          Thanks for reaching out! We’ll respond within 24 hours.
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.widget-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.widget-btn {
+  background: linear-gradient(135deg, #F4DC57, #F4DC57);
+  color: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%; /* Made circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(244, 220, 87, 0.4);
+}
+
+.widget-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: linear-gradient(135deg, #F4DC57, #F4DC57);
+  box-shadow: 0 6px 25px rgba(244, 220, 87, 0.5);
+}
+
+.message-animation {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-item {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.message-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Message icon responsive styling */
+.message-item svg {
+  width: 28px;
+  height: 28px;
+  color: #235a49;
+  stroke: #235a49;
+  stroke-width: 2.5;
+}
+
+.message-text {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: #235a49;
+  line-height: 1.2;
+  padding: 0 8px;
+  word-wrap: break-word;
+}
+
+.widget-popup {
+  position: absolute;
+  bottom: 90px;
+  left: 0;
+  width: 350px;
+  max-height: 500px; /* Fixed max height */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  display: none;
+  overflow: hidden;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-popup.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.popup-header {
+  background: linear-gradient(135deg, #235a49, #235a49);
+  padding: 20px;
+  position: relative;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 20px;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* New scrollable form container */
+.form-container {
+  max-height: 400px; /* Limit height */
+  overflow-y: auto; /* Enable scrolling */
+  padding: 0;
+}
+
+/* Custom scrollbar for webkit browsers */
+.form-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.inquiry-form {
+  padding: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #235a49;
+  box-shadow: 0 0 0 3px rgba(35, 90, 73, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  height: 80px;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #235a49, #235a49);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e4a3a, #1e4a3a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(35, 90, 73, 0.3);
+}
+
+.submit-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.success-message {
+  display: none;
+  text-align: center;
+  padding: 20px;
+  color: #235a49;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Tablet Responsiveness */
+@media (max-width: 768px) {
+  .widget-container {
+    bottom: 25px;
+    left: 15px;
+  }
+  
+  .widget-btn {
+    width: 65px;
+    height: 65px;
+  }
+  
+  .message-item svg {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .message-text {
+    font-size: 10px;
+  }
+  
+  .widget-popup {
+    width: 320px;
+    bottom: 85px;
+    max-height: 450px;
+  }
+  
+  .form-container {
+    max-height: 350px;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .widget-container {
+    bottom: 90px;
+    left: 15px;
+  }
+  
+  .widget-btn {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .message-item svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.5;
+  }
+  
+  .message-text {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  
+  .widget-popup {
+    width: calc(100vw - 30px);
+    max-width: 300px;
+    left: 0;
+    bottom: 80px;
+    max-height: 400px; /* Reduced for mobile */
+  }
+  
+  .form-container {
+    max-height: 300px; /* Reduced for mobile */
+  }
+  
+  .inquiry-form {
+    padding: 20px;
+  }
+  
+  .popup-header {
+    padding: 15px 20px;
+  }
+  
+  .popup-header h3 {
+    font-size: 16px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 375px) {
+  .widget-container {
+    bottom: 45px;
+    left: 10px;
+  }
+  
+  .widget-btn {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .message-item svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .message-text {
+    font-size: 8px;
+    padding: 0 6px;
+  }
+  
+  .widget-popup {
+    width: calc(100vw - 20px);
+    max-width: 280px;
+    left: -5px;
+    bottom: 70px;
+    max-height: 350px; /* Further reduced for small screens */
+  }
+  
+  .form-container {
+    max-height: 250px; /* Further reduced for small screens */
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+</style>
+
+<script>
+// Message Animation Controller
+class MessageAnimator {
+  constructor() {
+    this.messages = document.querySelectorAll('.message-item');
+    this.currentIndex = 0;
+    this.isAnimating = false;
+    this.interval = null;
+    this.init();
+  }
+
+  init() {
+    if (this.messages.length > 0) {
+      this.startAnimation();
+    }
+  }
+
+  startAnimation() {
+    this.interval = setInterval(() => {
+      this.nextMessage();
+    }, 3000); // Change message every 3 seconds
+  }
+
+  nextMessage() {
+    if (this.isAnimating) return;
+    
+    this.isAnimating = true;
+    const current = this.messages[this.currentIndex];
+    
+    // Fade out current message
+    current.style.animation = 'fadeOutDown 0.5s ease-in-out forwards';
+    
+    setTimeout(() => {
+      current.classList.remove('active');
+      this.currentIndex = (this.currentIndex + 1) % this.messages.length;
+      const next = this.messages[this.currentIndex];
+      
+      // Fade in next message
+      next.classList.add('active');
+      next.style.animation = 'fadeInUp 0.5s ease-in-out forwards';
+      
+      setTimeout(() => {
+        this.isAnimating = false;
+        next.style.animation = '';
+      }, 500);
+    }, 500);
+  }
+
+  stop() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  start() {
+    if (!this.interval) {
+      this.startAnimation();
+    }
+  }
+}
+
+// Initialize message animator
+let messageAnimator;
+document.addEventListener('DOMContentLoaded', function() {
+  messageAnimator = new MessageAnimator();
+});
+
+// Widget Functions
+function toggleWidget() {
+  const popup = document.getElementById('widget-popup');
+  const isVisible = popup.style.display === 'block';
+  
+  if (isVisible) {
+    closeWidget();
+  } else {
+    popup.style.display = 'block';
+    setTimeout(() => {
+      popup.classList.add('show');
+    }, 10);
+    
+    // Pause message animation when popup is open
+    if (messageAnimator) {
+      messageAnimator.stop();
+    }
+  }
+}
+
+function closeWidget() {
+  const popup = document.getElementById('widget-popup');
+  popup.classList.remove('show');
+  
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 300);
+  
+  // Resume message animation when popup is closed
+  if (messageAnimator) {
+    messageAnimator.start();
+  }
+}
+
+// Character Counter
+document.addEventListener('DOMContentLoaded', function() {
+  const textarea = document.querySelector('textarea[name="description"]');
+  const charCount = document.getElementById('char-count');
+  
+  if (textarea && charCount) {
+    textarea.addEventListener('input', function() {
+      charCount.textContent = this.value.length;
+    });
+  }
+});
+
+// Form Submission
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('inquiry-form');
+  
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+      
+      // Get form data
+      const formData = {
+        name: this.name.value,
+        contact: this.contact.value,
+        email: this.email.value,
+        query_type: this.query_type.value,
+        description: this.description.value,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Send to Google Sheets
+      fetch('https://script.google.com/macros/s/AKfycbw6NsLsIZTcR_LAuvxTl2x1wtRkH3m4bIRVfiwds5gMVu7xsCrcJsOjAoeI0tQNsrptAg/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      }).then(() => {
+        // Show success message
+        const formElements = document.querySelectorAll('.form-group, .submit-btn');
+        formElements.forEach(el => el.style.display = 'none');
+        document.getElementById('success-message').style.display = 'block';
+        
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          this.reset();
+          document.getElementById('char-count').textContent = '0';
+          formElements.forEach(el => el.style.display = '');
+          document.getElementById('success-message').style.display = 'none';
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          closeWidget();
+        }, 3000);
+      }).catch(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        alert('Error sending message. Please try again.');
+      });
+    });
+  }
+});
+
+// Close widget when clicking outside
+document.addEventListener('click', function(e) {
+  const widget = document.getElementById('customer-inquiry-widget');
+  if (widget && !widget.contains(e.target)) {
+    closeWidget();
+  }
+});
+</script>

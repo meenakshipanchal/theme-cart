@@ -1,0 +1,680 @@
+{% liquid
+ 
+  
+  assign coupon_1 = 'PURE15|Flat 15% off|• Minimum purchase of ₹599<br>• Not applicable on combos'
+assign coupon_2= 'NO_CODE_NEEDED|Save More with Prepaid|• Extra 2% off on prepaid<br>• COD on orders < ₹10,000, ₹50 COD fee'
+
+
+  assign coupons_array = ''
+  assign separator = '||'
+
+  if coupon_1 != blank
+    assign coupons_array = coupons_array | append: coupon_1
+  endif
+
+  if coupon_2 != blank
+    if coupons_array != blank
+      assign coupons_array = coupons_array | append: separator
+    endif
+    assign coupons_array = coupons_array | append: coupon_2
+  endif
+
+  if coupon_3 != blank
+    if coupons_array != blank
+      assign coupons_array = coupons_array | append: separator
+    endif
+    assign coupons_array = coupons_array | append: coupon_3
+  endif
+
+  if coupon_4 != blank
+    if coupons_array != blank
+      assign coupons_array = coupons_array | append: separator
+    endif
+    assign coupons_array = coupons_array | append: coupon_4
+  endif
+
+  if coupon_5 != blank
+    if coupons_array != blank
+      assign coupons_array = coupons_array | append: separator
+    endif
+    assign coupons_array = coupons_array | append: coupon_5
+  endif
+
+  assign coupons_array = coupons_array | split: separator
+%}
+  {% comment %} assign coupon_1 = 'HEALTH30|Flat 30% off|• Minimum purchase of ₹599<br>• Applicable on combos' {% endcomment %}
+
+{% comment %} assign coupon_1 = 'B3P2|Buy 3 get Lowest priced item FREE|• Minimum purchase of ₹599<br>• Applicable on combos' {% endcomment %}
+<style>
+  .coupon-offers-section {
+    position: static !important;
+    top: unset !important;
+    z-index: 1 !important;
+    clear: both;
+    margin: 15px 0 !important;
+    background: #f9fafb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .coupon-header {
+    padding: 16px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    user-select: none;
+  }
+
+  .coupon-header:hover {
+    background: #f9fafb;
+  }
+
+  .coupon-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .coupon-header-content {
+    flex: 1;
+  }
+
+  .coupon-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+  }
+
+  .coupon-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .offer-count {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .coupon-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+  }
+
+  .toggle-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #6b7280;
+    min-width: 40px;
+    height: 40px;
+  }
+
+  .toggle-button:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .toggle-arrow {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+    transform: rotate(180deg); /* Default rotated state for open */
+  }
+
+  .toggle-arrow.collapsed {
+    transform: rotate(0deg);
+  }
+
+  .coupon-content {
+    max-height: 800px; /* Default expanded state */
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    background: #f9fafb;
+    padding: 20px 0; /* Default padding for expanded state */
+  }
+
+  .coupon-content.collapsed {
+    max-height: 0;
+    padding: 0;
+  }
+
+  .coupon-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 0 20px;
+    margin: 0;
+    list-style: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    user-select: none;
+    scroll-behavior: smooth;
+  }
+
+  .coupon-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .coupon-list:active {
+    cursor: grabbing;
+  }
+
+  .coupon-list.dragging {
+    cursor: grabbing;
+  }
+
+  .coupon-card {
+    background: #fff;
+    border: 2px dotted #d1d5db;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 280px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .coupon-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .coupon-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 12px 0;
+  }
+
+  .coupon-description {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+  }
+
+  .coupon-code-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .coupon-code-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border: 2px dotted #bbb;
+    border-radius: 20px;
+    padding: 8px 16px;
+    flex: 1;
+  }
+
+  .coupon-code-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .coupon-apply-btn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 20px;
+    min-width: 80px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .coupon-apply-btn:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+  }
+
+  .coupon-apply-btn:active {
+    transform: translateY(0);
+  }
+
+  .applied-automatically {
+    background: #6b7280 !important;
+    cursor: default !important;
+    pointer-events: none;
+  }
+
+  .no-code-needed {
+    justify-content: center;
+    background: #e8f5e8;
+    border-color: #4ade80;
+  }
+
+  .copy-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #16a34a;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .copy-feedback.show {
+    opacity: 1;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 480px) {
+    .coupon-header {
+      padding: 12px 16px;
+    }
+
+    .coupon-header-title {
+      font-size: 14px;
+      gap: 6px;
+    }
+
+    .coupon-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .offer-count {
+      font-size: 12px;
+      padding: 1px 6px;
+    }
+
+    .coupon-subtitle {
+      font-size: 11px;
+    }
+
+    .toggle-button {
+      min-width: 32px;
+      height: 32px;
+      padding: 6px;
+    }
+
+    .toggle-arrow {
+      width: 16px;
+      height: 16px;
+    }
+
+    .coupon-content {
+      padding: 16px 0;
+    }
+
+    .coupon-list {
+      gap: 12px;
+      padding: 0 16px;
+      cursor: default; /* Remove grab cursor on mobile */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .coupon-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .coupon-card {
+      min-width: 200px;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .coupon-title {
+      font-size: 13px;
+      margin: 0 0 8px 0;
+    }
+
+    .coupon-description {
+      font-size: 11px;
+      margin: 0 0 12px 0;
+    }
+
+    .coupon-code-section {
+      gap: 8px;
+    }
+
+    .coupon-code-wrapper {
+      padding: 6px 12px;
+      border-radius: 16px;
+    }
+
+    .coupon-code-value {
+      font-size: 12px;
+    }
+
+    .coupon-apply-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      min-width: 60px;
+      border-radius: 16px;
+    }
+
+    .copy-feedback {
+      font-size: 12px;
+      padding: 8px 16px;
+    }
+  }
+
+  /* Desktop-specific styles */
+  @media (min-width: 769px) {
+    .coupon-list {
+      cursor: grab;
+      user-select: none;
+    }
+
+    .coupon-list:active {
+      cursor: grabbing;
+    }
+
+    .coupon-list.dragging {
+      cursor: grabbing;
+    }
+  }
+</style>
+
+<section class="coupon-offers-section">
+  <div class="coupon-header" onclick="toggleCoupons(event)" id="cartdrawerCouponHeader">
+    <div class="coupon-header-row">
+      <div class="coupon-header-content">
+        <h3 class="coupon-header-title">
+          <img src="{{ 'Vector.svg' | asset_url }}" alt="Offers" class="coupon-icon">
+          Available offers for you
+          <span class="offer-count">{{ coupons_array.size }}</span>
+        </h3>
+        <p class="coupon-subtitle">All coupons are applicable on SP</p>
+      </div>
+
+      <button class="toggle-button" id="cartdrawerToggleBtn" type="button" onclick="toggleCoupons(event)">
+        <svg
+          class="toggle-arrow"
+          id="cartdrawerToggleArrow"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="6,9 12,15 18,9"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="coupon-content" id="cartdrawerCouponContent">
+    <ul class="coupon-list" id="cartdrawerCouponList">
+      {% for coupon_data in coupons_array %}
+        {% assign coupon_parts = coupon_data | split: '|' %}
+        {% assign coupon_code = coupon_parts[0] %}
+        {% assign coupon_title = coupon_parts[1] %}
+        {% assign coupon_desc = coupon_parts[2] %}
+
+        <li class="coupon-card">
+          <h4 class="coupon-title">{{ coupon_title }}</h4>
+          <p class="coupon-description">{{ coupon_desc }}</p>
+
+          <div class="coupon-code-section">
+            {% if coupon_code == 'NO_CODE_NEEDED' %}
+              <div class="coupon-code-wrapper no-code-needed">
+                <span class="coupon-code-value">No code needed</span>
+              </div>
+              <span class="coupon-apply-btn applied-automatically">Applied</span>
+            {% else %}
+              <div class="coupon-code-wrapper">
+                <span class="coupon-code-value">{{ coupon_code }}</span>
+              </div>
+              <button class="coupon-apply-btn" onclick="applyCoupon('{{ coupon_code }}', this)">Copy</button>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<div class="copy-feedback" id="cartdrawerCopyFeedback">Coupon Copied!</div>
+
+<script>
+  function toggleCoupons(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    const content = document.getElementById('cartdrawerCouponContent');
+    const arrow = document.getElementById('cartdrawerToggleArrow');
+
+    if (content.classList.contains('collapsed')) {
+      // Expand
+      content.classList.remove('collapsed');
+      arrow.classList.remove('collapsed');
+    } else {
+      // Collapse
+      content.classList.add('collapsed');
+      arrow.classList.add('collapsed');
+    }
+
+    return false;
+  }
+
+  function applyCoupon(code, btn) {
+    // Prevent drag interference
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(code)
+      .then(() => {
+        showCopyFeedback();
+        updateButtonState(btn);
+      })
+      .catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand('copy');
+          showCopyFeedback();
+          updateButtonState(btn);
+        } catch (err) {
+          console.error('Copy failed:', err);
+        }
+
+        document.body.removeChild(textArea);
+      });
+  }
+
+  function updateButtonState(btn) {
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.background = '#059669';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = '#16a34a';
+      btn.disabled = false;
+    }, 2000);
+  }
+
+  function showCopyFeedback() {
+    const feedback = document.getElementById('cartdrawerCopyFeedback');
+    feedback.classList.add('show');
+    setTimeout(() => {
+      feedback.classList.remove('show');
+    }, 2000);
+  }
+
+  // Initialize desktop scroll and drag functionality
+  document.addEventListener('DOMContentLoaded', function () {
+    const couponList = document.getElementById('cartdrawerCouponList');
+
+    // Check if it's desktop
+    if (couponList && window.innerWidth > 768) {
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      let hasDragged = false;
+
+      // Horizontal mouse wheel scroll
+      couponList.addEventListener(
+        'wheel',
+        function (event) {
+          event.preventDefault();
+          const scrollAmount = event.deltaY * 3; // Increased scroll speed
+          couponList.scrollLeft += scrollAmount;
+
+          // Smooth scroll behavior
+          if (Math.abs(event.deltaY) < 50) {
+            couponList.style.scrollBehavior = 'smooth';
+            setTimeout(() => {
+              couponList.style.scrollBehavior = 'auto';
+            }, 300);
+          }
+        },
+        { passive: false }
+      );
+
+      // Mouse down - start drag
+      couponList.addEventListener('mousedown', function (e) {
+        // Don't start drag on buttons
+        if (e.target.closest('.coupon-apply-btn')) return;
+
+        isDown = true;
+        hasDragged = false;
+        couponList.classList.add('dragging');
+        startX = e.pageX - couponList.offsetLeft;
+        scrollLeft = couponList.scrollLeft;
+        e.preventDefault();
+      });
+
+      // Mouse leave - end drag
+      couponList.addEventListener('mouseleave', function () {
+        isDown = false;
+        couponList.classList.remove('dragging');
+      });
+
+      // Mouse up - end drag (on document to catch releases outside the list)
+      document.addEventListener('mouseup', function () {
+        if (isDown) {
+          isDown = false;
+          couponList.classList.remove('dragging');
+          // Small delay to prevent click events after dragging
+          setTimeout(() => {
+            hasDragged = false;
+          }, 100);
+        }
+      });
+
+      // Mouse move - perform drag
+      couponList.addEventListener('mousemove', function (e) {
+        if (!isDown) return;
+        e.preventDefault();
+        hasDragged = true;
+
+        const x = e.pageX - couponList.offsetLeft;
+        const walk = (x - startX) * 3; // Increased scroll speed multiplier
+        couponList.scrollLeft = scrollLeft - walk;
+      });
+
+      // Prevent clicks when dragging (especially for buttons)
+      couponList.addEventListener(
+        'click',
+        function (e) {
+          if (hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }
+        },
+        true
+      );
+
+      // Touch events for mobile-like behavior on desktop touchscreens
+      couponList.addEventListener(
+        'touchstart',
+        function (e) {
+          if (e.target.closest('.coupon-apply-btn')) return;
+
+          isDown = true;
+          hasDragged = false;
+          startX = e.touches[0].pageX - couponList.offsetLeft;
+          scrollLeft = couponList.scrollLeft;
+        },
+        { passive: true }
+      );
+
+      couponList.addEventListener(
+        'touchmove',
+        function (e) {
+          if (!isDown) return;
+          hasDragged = true;
+
+          const x = e.touches[0].pageX - couponList.offsetLeft;
+          const walk = (x - startX) * 2;
+          couponList.scrollLeft = scrollLeft - walk;
+        },
+        { passive: true }
+      );
+
+      couponList.addEventListener('touchend', function () {
+        isDown = false;
+        setTimeout(() => {
+          hasDragged = false;
+        }, 100);
+      });
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+      // Re-initialize drag functionality if switching to desktop
+      if (window.innerWidth > 768) {
+        const list = document.getElementById('cartdrawerCouponList');
+        if (list && !list.classList.contains('drag-initialized')) {
+          list.classList.add('drag-initialized');
+          // Reinitialize drag functionality
+          location.reload(); // Simple approach, or you can call the initialization function again
+        }
+      }
+    });
+  });
+</script>

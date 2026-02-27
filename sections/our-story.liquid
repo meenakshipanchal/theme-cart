@@ -1,0 +1,673 @@
+{% comment %}
+  Our Story Page Section
+  Recreates the Anveshan Our Story page design
+{% endcomment %}
+
+<style>
+  .our-story-page {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .our-story-hero {
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+  }
+
+  .our-story-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 700px;
+    color: white;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+
+  .hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: #2d5f3f;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: #234a31;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: #d4a855;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #c09647;
+    transform: translateY(-2px);
+  }
+
+  .story-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px;
+  }
+
+  .story-item {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    margin-bottom: 100px;
+  }
+
+  .story-item:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  .story-content {
+    flex: 1;
+  }
+
+  .story-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+
+  .story-content p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #4a4a4a;
+    margin-bottom: 15px;
+  }
+
+  .story-image {
+    flex: 1;
+    max-width: 450px;
+  }
+
+  .story-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .stats-section {
+    background: #f8f8f8;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .stats-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+  }
+
+  .stat-item {
+    padding: 20px;
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2d5f3f;
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    color: #4a4a4a;
+    font-weight: 500;
+  }
+
+  .impact-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px;
+  }
+
+  .impact-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .impact-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+  }
+
+  .impact-header p {
+    font-size: 1.1rem;
+    color: #4a4a4a;
+    line-height: 1.8;
+  }
+
+  .traceability-section {
+    background: #2d5f3f;
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+  }
+
+  .traceability-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .traceability-content h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+  }
+
+  .traceability-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+
+  .traceability-images {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin: 50px 0;
+  }
+
+  .traceability-images img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .products-showcase {
+    margin-top: 60px;
+  }
+
+  .products-showcase img {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .certification-section {
+    background: #f8f8f8;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .certification-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .certification-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 40px;
+  }
+
+  .certification-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .certification-logos img {
+    height: 60px;
+    width: auto;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+
+  .certification-logos img:hover {
+    opacity: 1;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-content h1 {
+      font-size: 1.8rem;
+    }
+
+    .hero-content p {
+      font-size: 1rem;
+    }
+
+    .story-item {
+      flex-direction: column !important;
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .story-content h2 {
+      font-size: 1.6rem;
+    }
+
+    .story-content p {
+      font-size: 1rem;
+    }
+
+    .story-image {
+      max-width: 100%;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+    }
+
+    .stats-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+
+    .traceability-images {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .traceability-content h2 {
+      font-size: 1.8rem;
+    }
+
+    .impact-header h2 {
+      font-size: 1.8rem;
+    }
+
+    .certification-logos {
+      gap: 20px;
+    }
+
+    .certification-logos img {
+      height: 45px;
+    }
+  }
+</style>
+
+<div class="our-story-page">
+  <!-- Hero Section -->
+  <section class="our-story-hero" style="background-image: url('{{ section.settings.hero_image | img_url: 'master' }}');">
+    <div class="hero-content">
+      <h1>{{ section.settings.hero_title }}</h1>
+      <p>{{ section.settings.hero_subtitle }}</p>
+      <div class="hero-buttons">
+        {% if section.settings.button_1_text != blank %}
+          <a href="{{ section.settings.button_1_link }}" class="btn-primary">
+            {{ section.settings.button_1_text }}
+          </a>
+        {% endif %}
+        {% if section.settings.button_2_text != blank %}
+          <a href="{{ section.settings.button_2_link }}" class="btn-secondary">
+            {{ section.settings.button_2_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Story Items Section -->
+  <section class="story-section">
+    {% for block in section.blocks %}
+      {% if block.type == 'story_item' %}
+        <div class="story-item">
+          <div class="story-content">
+            <h2>{{ block.settings.title }}</h2>
+            <div class="story-text">
+              {{ block.settings.content }}
+            </div>
+          </div>
+          <div class="story-image">
+            {% if block.settings.image != blank %}
+              <img src="{{ block.settings.image | img_url: '800x' }}" alt="{{ block.settings.title }}">
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="stats-container">
+      {% for block in section.blocks %}
+        {% if block.type == 'stat_item' %}
+          <div class="stat-item">
+            <div class="stat-number">{{ block.settings.number }}</div>
+            <div class="stat-label">{{ block.settings.label }}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section class="impact-section">
+    <div class="impact-header">
+      <h2>{{ section.settings.impact_title }}</h2>
+      <p>{{ section.settings.impact_description }}</p>
+    </div>
+  </section>
+
+  <!-- Traceability System Section -->
+  <section class="traceability-section">
+    <div class="traceability-content">
+      <h2>{{ section.settings.traceability_title }}</h2>
+      <p>{{ section.settings.traceability_description }}</p>
+      
+      <div class="hero-buttons">
+        {% if section.settings.trace_button_1_text != blank %}
+          <a href="{{ section.settings.trace_button_1_link }}" class="btn-primary">
+            {{ section.settings.trace_button_1_text }}
+          </a>
+        {% endif %}
+        {% if section.settings.trace_button_2_text != blank %}
+          <a href="{{ section.settings.trace_button_2_link }}" class="btn-secondary">
+            {{ section.settings.trace_button_2_text }}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if section.settings.traceability_grid_title != blank %}
+        <p style="margin-top: 40px; font-size: 1.1rem;">{{ section.settings.traceability_grid_title }}</p>
+      {% endif %}
+
+      <!-- Traceability Images Grid -->
+      <div class="traceability-images">
+        {% for block in section.blocks %}
+          {% if block.type == 'traceability_image' %}
+            <div>
+              {% if block.settings.image != blank %}
+                <img src="{{ block.settings.image | img_url: '400x' }}" alt="{{ block.settings.label }}">
+              {% endif %}
+              {% if block.settings.label != blank %}
+                <p style="margin-top: 10px; font-size: 0.95rem;">{{ block.settings.label }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Products Showcase -->
+      <div class="products-showcase">
+        {% if section.settings.products_image != blank %}
+          <img src="{{ section.settings.products_image | img_url: 'master' }}" alt="Our Products">
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Certification Section -->
+  <section class="certification-section">
+    <div class="certification-content">
+      <h3>{{ section.settings.certification_title }}</h3>
+      <div class="certification-logos">
+        {% for block in section.blocks %}
+          {% if block.type == 'certification_logo' %}
+            {% if block.settings.logo != blank %}
+              <img src="{{ block.settings.logo | img_url: '150x' }}" alt="{{ block.settings.alt_text }}">
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Our Story Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "The Train Ride That Changed Everything And anveshan Was Born"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "A story of vision, hard work, and a desire to give our country's organic farmers the stage they deserve"
+    },
+    {
+      "type": "text",
+      "id": "button_1_text",
+      "label": "Button 1 Text",
+      "default": "Know our farmers"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Button 1 Link"
+    },
+    {
+      "type": "text",
+      "id": "button_2_text",
+      "label": "Button 2 Text",
+      "default": "Meet your Farmer"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Button 2 Link"
+    },
+    {
+      "type": "header",
+      "content": "Impact Section"
+    },
+    {
+      "type": "text",
+      "id": "impact_title",
+      "label": "Impact Title",
+      "default": "More Than Numbers. It's About Impact."
+    },
+    {
+      "type": "textarea",
+      "id": "impact_description",
+      "label": "Impact Description"
+    },
+    {
+      "type": "header",
+      "content": "Traceability Section"
+    },
+    {
+      "type": "text",
+      "id": "traceability_title",
+      "label": "Traceability Title",
+      "default": "We Built Our Own Traceability System"
+    },
+    {
+      "type": "textarea",
+      "id": "traceability_description",
+      "label": "Traceability Description",
+      "default": "We went for a top-up on our journey without that is right by the people. That's possible in ours, with on a very low, we have made possible to follow us. And where possible a, here are more than."
+    },
+    {
+      "type": "text",
+      "id": "trace_button_1_text",
+      "label": "Trace Button 1 Text",
+      "default": "Trace your order"
+    },
+    {
+      "type": "url",
+      "id": "trace_button_1_link",
+      "label": "Trace Button 1 Link"
+    },
+    {
+      "type": "text",
+      "id": "trace_button_2_text",
+      "label": "Trace Button 2 Text",
+      "default": "Download the App"
+    },
+    {
+      "type": "url",
+      "id": "trace_button_2_link",
+      "label": "Trace Button 2 Link"
+    },
+    {
+      "type": "text",
+      "id": "traceability_grid_title",
+      "label": "Grid Section Title",
+      "default": "Every journey of yours starts at one of these places in the Northeast and beyond."
+    },
+    {
+      "type": "image_picker",
+      "id": "products_image",
+      "label": "Products Showcase Image"
+    },
+    {
+      "type": "header",
+      "content": "Certification Section"
+    },
+    {
+      "type": "text",
+      "id": "certification_title",
+      "label": "Certification Title",
+      "default": "Purity our aapka, connection"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "story_item",
+      "name": "Story Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "html",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "stat_item",
+      "name": "Stat Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "7,000+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Farmers"
+        }
+      ]
+    },
+    {
+      "type": "traceability_image",
+      "name": "Traceability Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        }
+      ]
+    },
+    {
+      "type": "certification_logo",
+      "name": "Certification Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Our Story Page",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,503 @@
+{% comment %} {% liquid
+  assign kits = kitData.value.system
+  assign bundle = shop.metaobjects[kits.type][kits.handle]
+  assign banner = bundle.banner.value
+  assign bundle_list = bundle.product.value
+  assign limit = bundle.limit.value
+%}
+
+<div class="kit-banner">
+  <picture>
+    {% for img in banner %}
+      {% if forloop.first %}
+        <source
+          media="(min-width: 800px)"
+          srcset="
+            {{ img | image_url: width: 1200 }} 1200w,
+            {{ img | image_url: width: 1600 }} 1600w,
+            {{ img | image_url: width: 2100 }} 2100w,
+            {{ img | image_url: width: 2800 }} 2800w
+          "
+        >
+      {% else %}
+        {{
+          img
+          | image_url: width: 720
+          | image_tag: widths: '360, 480, 720', height: 'auto', loading: load, style: 'width: 100%'
+        }}
+      {% endif %}
+    {% endfor %}
+  </picture>
+</div>
+
+<div id="flexBox">
+  <div class="flex-box align-center">
+    {{ bundle.heading | metafield_tag }}
+  </div>
+
+  <div class="selected-items-sticky">
+    <div class="selected-items">
+      <div class="selected-item-outer" v-for="(items, index) in itemsBox">
+        <div class="selected-item">
+          <div class="cancle-item" v-on:click="removeBox(index,items.title,items.sku,items.list)">
+            <img
+              class="close-icon"
+              src="https://cdn.shopify.com/s/files/1/0627/8778/0848/files/Asset_1close.svg?v=1647283408"
+              width="5px"
+            >
+          </div>
+          <figure data-count="{{i}}"><img v-bind:src="items.url" class="img"></figure>
+          <p class="item-title" v-text="items.heading"></p>
+        </div>
+        <span class="dash-line"></span>
+      </div>
+
+      <div class="selected-item-outer" v-for="i in k" :key="i" v-if="itemsBox.length < i">
+        <div class="selected-item">
+          <figure v-bind:data-count="i"><img class="img"></figure>
+          <p class="item-title"><span v-text="k - i + 1"></span> more to go</p>
+        </div>
+        <span class="dash-line"></span>
+      </div>
+
+      <div class="cart-button">
+        <button v-if="itemsBox.length != k" disabled>Add to Cart</button>
+        {%- assign product_form_id = 'product-form-' | append: product.id -%}
+        <product-form class="product-form" data-cart-type="{{ settings.cart_type }}">
+          {%- form 'product',
+            product,
+            id: product_form_id,
+            class: 'form',
+            novalidate: 'novalidate',
+            data-type: 'add-to-cart-form'
+          -%}
+            <span v-for="(items, index) in listsBox"
+              ><input
+                type="hidden"
+                v-bind:name="`properties[_bundle_product${index+1}]`"
+                v-bind:value="`${items.sku}/${items.price}/1`"
+            ></span>
+            <!--
+              <input
+                type="hidden"
+                name="properties[_bundle_productX]"
+                v-bind:value="`{{product.selected_or_first_available_variant.sku}}/0/1`"
+              >
+            -->
+            <input id="propertiesProd" type="hidden" name="properties[_title]">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <input
+              class="quantity__input"
+              type="hidden"
+              name="quantity"
+              min="1"
+              value="1"
+              form="{{ product_form_id }}"
+            >
+            <div class="product-form__buttons">
+              <button
+                type="submit"
+                name="add"
+                v-on:click="addtoCart"
+                class="product-form__submit button button--full-width button--primary active"
+              >
+                <span>{{ 'products.product.add_to_cart' | t }}</span>
+                {%- render 'loading-spinner' -%}
+              </button>
+            </div>
+          {%- endform -%}
+        </product-form>
+      </div>
+    </div>
+  </div>
+
+  {% for bundle_product in bundle_list %}
+    {% liquid
+      assign list_no = forloop.index
+    %}
+    <div class="bundle_list list_0{{- list_no -}}">
+      <div class="cat-heading">{{ bundle_product.heading | metafield_tag }}</div>
+
+      <div class="flex-box-items box-5" id="app">
+        {%- for sample in bundle_product.product.value -%}
+          <div class="flex-box--item">
+            <picture width="150px">
+              {% liquid
+                assign lazy_load = 'eager'
+                if forloop.index > 2
+                  assign lazy_load = 'lazy'
+                endif
+                assign title = sample.product.title
+                assign sku = sample.sku
+                assign sample_img = sample.featured_media
+                if sample.featured_media == blank
+                  assign sample_img = sample.product.featured_media
+                endif
+              %}
+              {{
+                sample_img
+                | image_url: width: 200
+                | image_tag:
+                  widths: '100, 200',
+                  height: 'auto',
+                  loading: lazy_load,
+                  style: 'width: 100%',
+                  class: 'sample-product-image'
+              }}
+              {%- capture title_image -%}
+                  {{- title -}}|{{- sample_img -}}
+                {%- endcapture -%}
+            </picture>
+            <h6>{{ title }}</h6>
+            <p class="prd-price">Worth at {{ sample.compare_at_price | money }}</p>
+            <label class="giftcheckbox">
+              <input
+                :disabled="skuList.includes('{{sku}}') || listSelections['list{{ list_no }}']?.length >= selectionLimits['list{{ list_no }}']"
+                v-on:change="addBox('list{{ list_no }}', '{{title}}', {{sample.price | divided_by: 100}}, '{{sku}}', '{{sample_img | image_url: width: 100 }}', '{{- title_image -}}', $event)"
+                type="checkbox"
+                name="giftbox"
+                value="{{-title_image-}}"
+                v-model="checkedNames"
+              >
+              <span v-if="skuList.indexOf('{{sku}}') != -1">Remove Item</span>
+              <span v-if="skuList.indexOf('{{sku}}') == -1">Add to Box</span>
+            </label>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<script>
+  var k = {{ limit }};
+  var proid = {{ product.selected_or_first_available_variant.id }};
+  new Vue({
+    el: '#flexBox',
+    data() {
+      return {
+        itemsBox: [],
+        listsBox: [],
+        skuList: [],
+        checkedNames: [],
+        listSelections: {}, // Tracks selected SKUs per list
+        selectionLimits: { 
+          {% for bundle_product in bundle_list %}
+          list{{- forloop.index}}: {{ bundle_product.limit.value}},
+          {% endfor %}
+        } // Define custom limits for each list
+      };
+    },
+    methods: {
+      addBox(listName, t, p, s, u, ti, e) {
+        if (!this.listSelections[listName]) {
+          this.listSelections[listName] = [];
+        }
+        // Check if the limit for the list is exceeded
+        if (e.target.checked && this.listSelections[listName].length >= this.selectionLimits[listName]) { console.log(e.target.checked);
+          alert(`You can select up to ${this.selectionLimits[listName]} products from ${listName}.`);
+          e.preventDefault();
+          return;
+        }
+        if (e.target.checked) {
+          this.itemsBox.push({ title: ti, price: p, sku: s, url: u, list: listName, heading: t});
+          this.skuList.push(s);
+          this.listSelections[listName].push(s); // Add SKU to the list selection
+        } else {
+          this.itemsBox = this.itemsBox.filter(item => item.sku !== s);
+          this.skuList = this.skuList.filter(sku => sku !== s);
+          this.listSelections[listName] = this.listSelections[listName].filter(sku => sku !== s); // Remove SKU
+        }
+        console.log(this.listSelections);
+      },
+      removeBox(index, checkedN, s, listName) {
+        this.checkedNames = this.checkedNames.filter(name => name !== checkedN);
+        this.itemsBox = this.itemsBox.filter(item => item.sku !== s);
+        this.skuList = this.skuList.filter(sku => sku !== s);
+        this.listSelections[listName] = this.listSelections[listName].filter(sku => sku !== s);
+        console.log(this.skuList);
+        console.log(this.listSelections);
+        console.log(this.checkedNames);
+      },
+      isDisabled(listName) {
+        // Disable additional products when the limit is reached
+        return this.listSelections[listName]?.length >= this.selectionLimits[listName];
+      },
+      addtoCart() {
+        this.listsBox = this.itemsBox.slice();
+        document.getElementById('propertiesProd').value=this.checkedNames;
+        this.itemsBox.splice(0);
+        this.listSelections.splice(0);
+        this.skuList.splice(0);
+      },
+    },
+  });
+</script>
+ {% endcomment %}
+
+
+ {% liquid
+  assign kits = kitData.value.system
+  assign bundle = shop.metaobjects[kits.type][kits.handle]
+  assign banner = bundle.banner.value 
+  assign bundle_list = bundle.product.value
+  assign limit = bundle.limit.value
+%}
+
+<!-- <div class="kit-banner">
+  <picture>
+    {% for img in banner %}
+      {% if forloop.first %}
+        <source
+          media="(min-width: 800px)"
+          srcset="
+            {{ img | image_url: width: 1200 }} 1200w,
+            {{ img | image_url: width: 1600 }} 1600w,
+            {{ img | image_url: width: 2100 }} 2100w,
+            {{ img | image_url: width: 2800 }} 2800w
+          "
+        >
+      {% else %}
+        {{
+          img
+          | image_url: width: 720
+          | image_tag: widths: '360, 480, 720', height: 'auto', loading: load, style: 'width: 100%'
+        }}
+      {% endif %}
+    {% endfor %}
+  </picture>
+</div> -->
+<div class="kit-banner">
+  <picture>
+    <source
+      media="(min-width: 800px)"
+      srcset="
+        https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1.jpg?v=1745390972 1200w,
+        https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1.jpg?v=1745390972 1600w,
+        https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1.jpg?v=1745390972 2100w,
+        https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Artboard_1.jpg?v=1745390972 2800w
+      "
+    >
+    <img
+      src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/700X300_1.jpg?v=1745391567"
+      width="720"
+      height="auto"
+      loading="lazy"
+      style="width: 100%"
+      alt="Banner image"
+    >
+  </picture>
+</div>
+
+<div id="flexBox">
+  <div class="flex-box align-center">
+    {{ bundle.heading | metafield_tag }}
+  </div>
+
+  <div class="selected-items-sticky">
+    <div class="selected-items">
+      <div class="selected-item-outer" v-for="(items, index) in itemsBox">
+        <div class="selected-item">
+          <div class="cancle-item" v-on:click="removeBox(index,items.title,items.sku,items.list)">
+            <img
+              class="close-icon"
+              src="https://cdn.shopify.com/s/files/1/0627/8778/0848/files/Asset_1close.svg?v=1647283408"
+              width="5px"
+            >
+          </div>
+          <figure data-count="{{i}}"><img v-bind:src="items.url" class="img"></figure>
+          <p class="item-title" v-text="items.heading"></p>
+        </div>
+        <span class="dash-line"></span>
+      </div>
+
+      <div class="selected-item-outer" v-for="i in k" :key="i" v-if="itemsBox.length < i">
+        <div class="selected-item">
+          <figure v-bind:data-count="i"><img class="img"></figure>
+          <p class="item-title"><span v-text="k - i + 1"></span> more to go</p>
+        </div>
+        <span class="dash-line"></span>
+      </div>
+
+      <div class="cart-button">
+        <button v-if="itemsBox.length != k" disabled>Add to Cart</button>
+        {%- assign product_form_id = 'product-form-' | append: product.id -%}
+        <product-form class="product-form" data-cart-type="{{ settings.cart_type }}">
+          {%- form 'product',
+            product,
+            id: product_form_id,
+            class: 'form',
+            novalidate: 'novalidate',
+            data-type: 'add-to-cart-form'
+          -%}
+            <span v-for="(items, index) in listsBox"
+              ><input
+                type="hidden"
+                v-bind:name="`properties[_bundle_product${index+1}]`"
+                v-bind:value="`${items.sku}/${items.price}/1`"
+            ></span>
+            <input id="propertiesProd" type="hidden" name="properties[_title]">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <input
+              class="quantity__input"
+              type="hidden"
+              name="quantity"
+              min="1"
+              value="1"
+              form="{{ product_form_id }}"
+            >
+            <div class="product-form__buttons">
+              <button
+                type="submit"
+                name="add"
+                v-on:click="addtoCart"
+                class="product-form__submit button button--full-width button--primary active"
+              >
+                <span>{{ 'products.product.add_to_cart' | t }}</span>
+                {%- render 'loading-spinner' -%}
+              </button>
+            </div>
+          {%- endform -%}
+        </product-form>
+      </div>
+    </div>
+  </div>
+
+  {% for bundle_product in bundle_list %}
+    {% liquid
+      assign list_no = forloop.index
+    %}
+    <div class="bundle_list list_0{{- list_no -}}">
+      <div class="cat-heading">{{ bundle_product.heading | metafield_tag }}</div>
+
+      <div class="flex-box-items box-5" id="app">
+        {%- for sample in bundle_product.product.value -%}
+          <div class="flex-box--item">
+            <picture width="150px">
+              {% liquid
+                assign lazy_load = 'eager'
+                if forloop.index > 2
+                  assign lazy_load = 'lazy'
+                endif
+                assign title = sample.product.title
+                assign sku = sample.sku
+                assign sample_img = sample.featured_media
+                if sample.featured_media == blank
+                  assign sample_img = sample.product.featured_media
+                endif
+              %}
+              {{
+                sample_img
+                | image_url: width: 200
+                | image_tag:
+                  widths: '100, 200',
+                  height: 'auto',
+                  loading: lazy_load,
+                  style: 'width: 100%',
+                  class: 'sample-product-image'
+              }}
+              {%- capture title_image -%}
+                  {{- title -}}|{{- sample_img -}}
+                {%- endcapture -%}
+            </picture>
+            <h6>{{ title }}</h6>
+            <p class="prd-price">Worth at {{ sample.compare_at_price | money }}</p>
+            <label class="giftcheckbox">
+              <input
+                :disabled="skuList.includes('{{sku}}') && !getItemBySku('{{sku}}') || listSelections['list{{ list_no }}']?.length >= selectionLimits['list{{ list_no }}'] && !skuList.includes('{{sku}}')"
+                v-on:change="toggleItem('list{{ list_no }}', '{{title}}', {{sample.price | divided_by: 100}}, '{{sku}}', '{{sample_img | image_url: width: 100 }}', '{{- title_image -}}', $event)"
+                type="checkbox"
+                name="giftbox"
+                value="{{-title_image-}}"
+                v-model="checkedNames"
+              >
+              <span v-if="skuList.includes('{{sku}}')" class="remove-btn" @click.prevent="manuallyRemoveItem('{{sku}}', '{{- title_image -}}', 'list{{ list_no }}')">Remove Item</span>
+              <span v-else>Add to Box</span>
+            </label>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<script>
+  var k = {{ limit }};
+  var proid = {{ product.selected_or_first_available_variant.id }};
+  new Vue({
+    el: '#flexBox',
+    data() {
+      return {
+        itemsBox: [],
+        listsBox: [],
+        skuList: [],
+        checkedNames: [],
+        listSelections: {}, // Tracks selected SKUs per list
+        selectionLimits: { 
+          {% for bundle_product in bundle_list %}
+          list{{- forloop.index}}: {{ bundle_product.limit.value}},
+          {% endfor %}
+        } // Define custom limits for each list
+      };
+    },
+    methods: {
+      getItemBySku(sku) {
+        return this.itemsBox.find(item => item.sku === sku);
+      },
+      toggleItem(listName, t, p, s, u, ti, e) {
+        if (!this.listSelections[listName]) {
+          this.listSelections[listName] = [];
+        }
+        
+        // Check if the limit for the list is exceeded
+        if (e.target.checked && this.listSelections[listName].length >= this.selectionLimits[listName]) {
+          alert(`You can select up to ${this.selectionLimits[listName]} products from ${listName}.`);
+          e.preventDefault();
+          e.target.checked = false;
+          return;
+        }
+        
+        if (e.target.checked) {
+          this.itemsBox.push({ title: ti, price: p, sku: s, url: u, list: listName, heading: t});
+          this.skuList.push(s);
+          this.listSelections[listName].push(s); // Add SKU to the list selection
+        } else {
+          this.removeItem(s, ti, listName);
+        }
+      },
+      removeItem(sku, title, listName) {
+        this.itemsBox = this.itemsBox.filter(item => item.sku !== sku);
+        this.skuList = this.skuList.filter(s => s !== sku);
+        this.checkedNames = this.checkedNames.filter(name => name !== title);
+        this.listSelections[listName] = this.listSelections[listName].filter(s => s !== sku);
+      },
+      manuallyRemoveItem(sku, title, listName) {
+        // Find the checkbox associated with this item and uncheck it
+        const checkbox = document.querySelector(`input[type="checkbox"][value="${title}"]`);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+        
+        this.removeItem(sku, title, listName);
+      },
+      removeBox(index, checkedN, s, listName) {
+        this.removeItem(s, checkedN, listName);
+      },
+      isDisabled(listName) {
+        // Disable additional products when the limit is reached
+        return this.listSelections[listName]?.length >= this.selectionLimits[listName];
+      },
+      addtoCart() {
+        this.listsBox = this.itemsBox.slice();
+        document.getElementById('propertiesProd').value=this.checkedNames;
+        this.itemsBox.splice(0);
+        
+        // Reset all list selections
+        Object.keys(this.listSelections).forEach(key => {
+          this.listSelections[key] = [];
+        });
+        
+        this.skuList = [];
+        this.checkedNames = [];
+      },
+    },
+  });
+</script>

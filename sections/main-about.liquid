@@ -1,0 +1,1620 @@
+<section class="about-page">
+  <div class="about-hero">
+    <picture>
+      <source media="(max-width: 768px)" srcset="{{ section.settings.hero_mobile | image_url }}">
+      <img src="{{ section.settings.hero_desktop | image_url }}" alt="About Anveshan">
+    </picture>
+    <div class="about-hero-overlay">
+      <div class="about-hero-content">
+        <h1>{{ section.settings.hero_title }}</h1>
+        <p>{{ section.settings.hero_subtitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <section style="background-:red" class="founders-section">
+    <div style="background-:yellow" class="container">
+      <div style="background-:blue" class="founders-wrapper">
+        <div style="background-:green" class="founders-text">
+          <h2>{{ section.settings.founder_heading }}</h2>
+          <div style="background-:green" class="founder-content">
+            {{ section.settings.founder_text }}
+          </div>
+          <div style="background-:orange" class="founders-image mobile-only">
+            {% if section.settings.founder_img %}
+              <img src="{{ section.settings.founder_img | image_url }}" alt="Founders">
+            {% endif %}
+          </div>
+        </div>
+        <div class="founders-image desktop-only">
+          {% if section.settings.founder_img %}
+            <img src="{{ section.settings.founder_img | image_url }}" alt="Founders">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="way-section">
+    <div class="container">
+      <div class="way-wrapper">
+        <div class="way-text">
+          <h2>{{ section.settings.way_heading }}</h2>
+          <div class="way-image mobile-only">
+            {% if section.settings.way_img %}
+              <img src="{{ section.settings.way_img | image_url }}" alt="The Anveshan Way">
+            {% endif %}
+          </div>
+          <div class="way-content">
+            {{ section.settings.way_text }}
+          </div>
+        </div>
+        <div class="way-image desktop-only">
+          {% if section.settings.way_img %}
+            <img src="{{ section.settings.way_img | image_url }}" alt="The Anveshan Way">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fixing-section">
+    <div class="container">
+      <div class="fixing-wrapper">
+        <div class="fixing-image desktop-only">
+          {% if section.settings.fixing_img %}
+            <img src="{{ section.settings.fixing_img | image_url }}" alt="What We're Fixing">
+          {% endif %}
+        </div>
+        <div class="fixing-text">
+          <h2>{{ section.settings.fixing_heading }}</h2>
+          <div class="fixing-image mobile-only">
+            {% if section.settings.fixing_img %}
+              <img src="{{ section.settings.fixing_img | image_url }}" alt="What We're Fixing">
+            {% endif %}
+          </div>
+          <div class="fixing-content">
+            {{ section.settings.fixing_text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <div class="">
+      <div class="values-image-wrapper">
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/our_value_3.png?"
+          >
+          <img
+            src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/our_value_2.png?"
+            alt="{{ section.settings.values_heading }}"
+            class="values-image"
+          >
+        </picture>
+      </div>
+
+      <div class="values-grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'value' %}
+            <div class="value-item" {{ block.shopify_attributes }}>
+              {% if block.settings.icon %}
+                <div class="value-icon">
+                  <img src="{{ block.settings.icon | image_url }}" alt="{{ block.settings.label }}">
+                </div>
+              {% endif %}
+              <p class="value-label">{{ block.settings.label }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-section native-sourcing">
+    <div class="container">
+      <div class="feature-wrapper">
+        <div class="feature-image desktop-only">
+          {% if section.settings.native_img %}
+            <img src="{{ section.settings.native_img | image_url }}" alt="Native Sourcing">
+          {% endif %}
+        </div>
+        <div class="feature-text">
+          <h2>{{ section.settings.native_heading }}</h2>
+          <div class="feature-image mobile-only">
+            {% if section.settings.native_img %}
+              <img src="{{ section.settings.native_img | image_url }}" alt="Native Sourcing">
+            {% endif %}
+          </div>
+          <div class="feature-content">
+            {{ section.settings.native_text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-section best-processing">
+    <div class="container">
+      <div class="feature-wrapper reverse">
+        <div class="feature-text">
+          <h2>{{ section.settings.processing_heading }}</h2>
+          <div class="feature-image mobile-only">
+            {% if section.settings.processing_img %}
+              <img src="{{ section.settings.processing_img | image_url }}" alt="Best Processing">
+            {% endif %}
+          </div>
+          <div class="feature-content">
+            {{ section.settings.processing_text }}
+          </div>
+        </div>
+        <div class="feature-image desktop-only">
+          {% if section.settings.processing_img %}
+            <img src="{{ section.settings.processing_img | image_url }}" alt="Best Processing">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-section quality-checks">
+    <div class="container">
+      <div class="feature-wrapper">
+        <div class="feature-image desktop-only">
+          {% if section.settings.quality_img %}
+            <img src="{{ section.settings.quality_img | image_url }}" alt="Quality Checks">
+          {% endif %}
+        </div>
+        <div class="feature-text">
+          <h2>{{ section.settings.quality_heading }}</h2>
+          <div class="feature-image mobile-only">
+            {% if section.settings.quality_img %}
+              <img src="{{ section.settings.quality_img | image_url }}" alt="Quality Checks">
+            {% endif %}
+          </div>
+          <div class="feature-content">
+            {{ section.settings.quality_text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-section impact-section">
+    <div class="container">
+      <div class="feature-wrapper reverse">
+        <div class="feature-text">
+          <h2>{{ section.settings.impact_heading }}</h2>
+          <div class="feature-image mobile-only">
+            {% if section.settings.impact_img %}
+              <img src="{{ section.settings.impact_img | image_url }}" alt="Impact We Make">
+            {% endif %}
+          </div>
+          <div class="feature-content">
+            {{ section.settings.impact_text }}
+          </div>
+        </div>
+        <div class="feature-image desktop-only">
+          {% if section.settings.impact_img %}
+            <img src="{{ section.settings.impact_img | image_url }}" alt="Impact We Make">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-section">
+    <div class="">
+      <section class="values-section">
+        <div class="">
+          <div class="values-image-wrapper">
+            <picture>
+              <source
+                media="(max-width: 768px)"
+                srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/WHERE_WE_ARE_NOW.jpg"
+              >
+              <img
+                src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7029.jpg"
+                alt="{{ section.settings.values_heading }}"
+                class="values-image"
+              >
+            </picture>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+<section class="community-text-section">
+    <div class="container">
+      <h2>The Anveshan Community</h2>
+      <p class="community-intro">
+        We are a growing circle of conscious eaters, passionate farmers, nutrition experts, and modern cooks. We share:
+      </p>
+
+      <ul class="community-features">
+        <li>Seasonal recipes tested in real homes</li>
+        <li>Ayurvedic food wisdom tailored for today</li>
+        <li>Interactive workshops and kitchen experiments</li>
+        <li>Open sourcing stories and lab-backed truth</li>
+      </ul>
+
+      <p class="community-footer">
+        Food is more than fuel. It's history. It's science. It's identity. We invite you to be part of this new journey.
+      </p>
+    </div>
+  </section>
+</section>
+<section class="testimonials-section">
+  <div class="">
+    <div class="testimonials-wrapper">
+      {% assign all_testimonials = shop.metaobjects.about_testimonial.values %}
+      {% for testimonial in all_testimonials %}
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            {% if testimonial.user_image %}
+              <img
+                src="{{ testimonial.user_image | image_url: width: 60 }}"
+                alt="{{ testimonial.user_name.value }}"
+                class="testimonial-avatar"
+              >
+            {% endif %}
+            <div class="testimonial-user-info">
+              <h4 class="testimonial-name">{{ testimonial.user_name.value }}</h4>
+              <div class="testimonial-stars">
+                {% assign rating = testimonial.star_rating.value | default: 5 %}
+                {% for i in (1..rating) %}
+                  <span class="star">⭐</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-content">
+            <p>{{ testimonial.review_content.value }}</p>
+          </div>
+          <div class="testimonial-date">
+            {% if testimonial.review_date.value %}
+              {{ testimonial.review_date.value | date: '%B %d, %Y' }}
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="community-section">
+  <div class="">
+    <div class="values-image-wrapper">
+      <picture>
+        <source
+          media="(max-width: 768px)"
+          srcset="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/join_the_moment_-_mobile_screen_copy_1.jpg"
+        >
+        <img
+          src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/join_the_movement_1.jpg?"
+          alt="{{ section.settings.values_heading }}"
+          class="values-image"
+        >
+      </picture>
+    </div>
+  </div>
+</section>
+<div class="svg-icon-container">
+  <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Layer_1_9452de43-0820-4d68-9411-689f16633d19.svg?v=1759733714" alt="Decorative Icon" class="centered-svg-icon" loading="lazy">
+</div>
+
+{% comment %}
+  {% if section.settings.bottom_tagline != blank %}
+    <section class="bottom-tagline">
+      <div class="">
+        <h3>{{ section.settings.bottom_tagline }}</h3>
+      </div>
+    </section>
+  {% endif %}
+{% endcomment %}
+
+<style>
+    .svg-icon-container {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    {% comment %} background-color:red {% endcomment %}
+  }
+    @media (max-width: 768px) {
+    .svg-icon-container {
+      padding: 30px 15px;
+    }
+
+    .centered-svg-icon {
+      max-width: 300px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .svg-icon-container {
+      padding: 20px 10px;
+    }
+
+    .centered-svg-icon {
+      max-width: 200px;
+    }
+  }
+    /* Desktop - hide mobile images */
+    .mobile-only {
+      display: none;
+    }
+
+    .desktop-only {
+      display: block;
+    }
+
+    /* Mobile - show mobile images, hide desktop images */
+    @media (max-width: 768px) {
+      .mobile-only {
+        display: block;
+        margin: 20px 0;
+      }
+
+      .desktop-only {
+        display: none;
+      }
+
+      /* Founders section specific - no bottom space */
+      .founders-section .mobile-only {
+        margin: 20px 0 0 0;
+      }
+
+      .founders-section {
+        padding-bottom: 0 !important;
+      }
+
+      .founders-image.mobile-only {
+        margin-bottom: 0;
+      }
+
+      .founders-image.mobile-only img {
+        margin-bottom: 0;
+        display: block;
+      }
+    }
+
+    .community-text-section {
+      background-color: #f9f6f1;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .community-text-section .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .community-text-section h2 {
+      font-size: 2.9rem;
+      font-weight: 700;
+      color: #235A49;
+      margin-bottom: 30px;
+    }
+
+    .community-intro {
+      font-size: 1.7rem;
+      color: #333;
+      line-height: 1.2;
+      margin-bottom: 40px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .community-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto 40px;
+      max-width: 800px;
+      text-align: left;
+    }
+
+    .community-features li {
+      font-size: 1.7rem;
+      color: #333;
+      line-height: 1.2;
+      padding-left: 30px;
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .community-features li:before {
+      content: "•";
+      color: #1a3d31;
+      font-weight: bold;
+      font-size: 2.5rem;
+      position: absolute;
+      left: 0;
+      top: -8px;
+    }
+
+    .community-footer {
+      font-size: 1.7rem;
+      color: #333;
+      line-height: 1.2;
+      max-width: 900px;
+      margin: 0 auto;
+      font-style: italic;
+    }
+
+    .values-image-wrapper {
+      text-align: center;
+    }
+
+    .values-image {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .about-page * {
+      box-sizing: border-box;
+    }
+
+    .about-page {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .about-hero {
+      position: relative;
+      width: 100%;
+      min-height: 400px;
+    }
+
+    .about-hero picture,
+    .about-hero img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .about-hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .about-hero-content {
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .about-hero-content h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      color: #235A49;
+    }
+
+    .about-hero-content p {
+      font-size: 1.5rem;
+      line-height: 1.6;
+      opacity: 0.95;
+      color: black;
+    }
+
+    .founders-section {
+      background-color: #235A49;
+      color: white;
+    }
+
+    .founders-wrapper {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .founders-image img {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 12px;
+    }
+
+    .founders-text h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #E8D998;
+    }
+
+    .founder-content {
+      font-size: 1.7rem;
+      line-height: 1.2;
+      white-space: pre-line;
+    }
+
+    .way-section {
+      padding: 50px 0;
+      background-color: #f9f6f1;
+    }
+
+    .way-wrapper {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .way-text h2 {
+      font-size: 2.9rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+      color: #235A49;
+    }
+
+    .way-content {
+      font-size: 1.7rem;
+      line-height: 1.2;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    /* Square images for Way, Fixing, and Feature sections */
+    .way-image img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 12px;
+    }
+
+    .fixing-section {
+      padding: 80px 0;
+    }
+
+    .fixing-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .fixing-image img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 12px;
+    }
+
+    .fixing-text h2 {
+      font-size: 2.9rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+      color: #235A49;
+    }
+
+    .fixing-content {
+      font-size: 1.7rem;
+      line-height: 1.2;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    .values-section {
+      color: white;
+      text-align: center;
+    }
+
+    .values-section h2 {
+      font-size: 2.9rem;
+      margin-bottom: 50px;
+      font-weight: 700;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .value-item {
+      text-align: center;
+    }
+
+    .value-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .value-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .value-label {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .feature-section {
+      padding: 80px 0;
+    }
+
+    .feature-section:nth-child(even) {
+      background-color: #f9f6f1;
+    }
+
+    .feature-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .feature-wrapper.reverse {
+      grid-template-columns: 1.5fr 1fr;
+    }
+
+    .feature-image img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 12px;
+    }
+
+    .feature-text h2 {
+      font-size: 2.9rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+      color: #235A49;
+    }
+
+    .feature-content {
+      font-size: 1.7rem;
+      line-height: 1.2;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    .stats-section {
+      background-color: #235A49;
+      color: white;
+      text-align: center;
+    }
+
+    .stats-section h2 {
+      font-size: 2.9rem;
+      font-weight: 700;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+
+    .stat-item h3 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .stat-item p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .community-section {
+      background-color: #f9f6f1;
+      text-align: center;
+    }
+
+    .community-section h2 {
+      font-size: 2.9rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #235A49;
+    }
+
+    .community-subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 50px;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .testimonial-item {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: left;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      {% comment %} margin-bottom: 20px; {% endcomment %}
+    }
+
+    .testimonial-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .testimonial-info h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #235A49;
+      margin-bottom: 4px;
+    }
+
+    .testimonial-location {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .testimonial-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .certifications-section {
+      padding: 60px 0;
+      background-color: white;
+    }
+
+    .certifications-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .certification-item img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .certification-item img:hover {
+      opacity: 1;
+    }
+
+    .cta-section {
+      background-color: #235A49;
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .cta-content h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .cta-content p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background-color: #d4a574;
+      color: white;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #c19563;
+    }
+
+    .cta-image {
+      margin-top: 40px;
+    }
+
+    .cta-image img {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .bottom-tagline {
+      text-align: center;
+      background-color: #f9f6f1;
+    }
+
+    .bottom-tagline h3 {
+      font-size: 1.5rem;
+      color: #235A49;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      .about-hero-content h1 {
+        font-size: 2rem;
+      }
+
+      .founders-wrapper,
+      .way-wrapper,
+      .fixing-wrapper,
+      .feature-wrapper,
+      .feature-wrapper.reverse {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 16px;
+      }
+
+      .about-hero {
+        min-height: 300px;
+      }
+
+      .about-hero-content {
+        padding: 20px 20px;
+        text-align: center;
+      }
+
+      .about-hero-content h1 {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .about-hero-content p {
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .founders-image img {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+      }
+
+      /* Mobile - square images for Way, Fixing, Feature sections */
+      .way-image img,
+      .fixing-image img,
+      .feature-image img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 12px;
+      }
+
+      .founders-section,
+      .way-section,
+      .fixing-section,
+      .feature-section,
+      .values-section,
+      .stats-section,
+      .community-section,
+      .cta-section {
+        padding: 10px 0;
+        text-align: center;
+      }
+
+      .founders-text,
+      .way-text,
+      .fixing-text,
+      .feature-text {
+        text-align: center;
+      }
+
+      .founders-text h2,
+      .way-text h2,
+      .fixing-text h2,
+      .feature-text h2,
+      .values-section h2,
+      .stats-section h2,
+      .community-section h2,
+      .cta-content h2 {
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .founder-content,
+      .way-content,
+      .fixing-content,
+      .feature-content {
+        font-size: 1.5rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .founders-image,
+      .way-image,
+      .fixing-image,
+      .feature-image {
+        text-align: center;
+      }
+
+      .stats-grid,
+      .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-item h3 {
+        font-size: 3rem;
+        text-align: center;
+      }
+
+      .stat-item p {
+        text-align: center;
+        font-size: 1.3rem;
+      }
+
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .testimonial-item {
+        text-align: center;
+      }
+
+      .testimonial-header {
+        justify-content: center;
+      }
+
+      .testimonial-info h4 {
+        font-size: 1.3rem;
+      }
+
+      .testimonial-location {
+        font-size: 1.1rem;
+      }
+
+      .testimonial-text {
+        text-align: center;
+        font-size: 1.2rem;
+      }
+
+      .certifications-grid {
+        gap: 25px;
+        justify-content: center;
+      }
+
+      .certification-item {
+        text-align: center;
+      }
+
+      .certification-item img {
+        height: 50px;
+        margin: 0 auto;
+      }
+
+      .cta-content {
+        text-align: center;
+      }
+
+      .cta-content p {
+        font-size: 1.3rem;
+        text-align: center;
+      }
+
+      .cta-image {
+        text-align: center;
+      }
+
+      .bottom-tagline {
+        text-align: center;
+      }
+
+      .bottom-tagline h3 {
+        font-size: 1.6rem;
+        text-align: center;
+      }
+
+      .community-subtitle {
+        font-size: 1.3rem;
+      }
+
+      .community-text-section {
+        padding: 40px 0;
+      }
+
+      .community-text-section h2 {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+      }
+
+      .community-intro {
+        font-size: 1.5rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+
+      .community-features {
+        text-align: center;
+        padding-left: 0;
+      }
+
+      .community-features li {
+        font-size: 1.5rem;
+        line-height: 1.6;
+        padding-left: 0;
+        text-align: left;
+        padding-left: 25px;
+      }
+
+      .community-features li:before {
+        font-size: 2rem;
+        top: -5px;
+      }
+
+      .community-footer {
+        font-size: 1.5rem;
+        line-height: 1.6;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .about-hero-content h1 {
+        font-size: 1.25rem;
+      }
+
+      .founders-text h2,
+      .way-text h2,
+      .fixing-text h2,
+      .feature-text h2 {
+        font-size: 1.8rem;
+      }
+
+      .values-grid {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+      }
+
+      .value-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    /* Testimonials Section Styles */
+  .testimonials-section {
+    background-color: #f9f6f1;
+    padding: 10px 0;
+  }
+
+  .testimonials-section .container {
+    max-width: 1800px;
+    margin: 0 auto;
+    {% comment %} padding: 0 20px; {% endcomment %}
+  }
+
+  .testimonials-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .testimonial-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid #e5e5e5;
+  }
+
+  .testimonial-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .testimonial-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .testimonial-user-info {
+    flex: 1;
+  }
+
+  .testimonial-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: black;
+    margin: 0 0 0px 0;
+  }
+
+  .testimonial-stars {
+    display: flex;
+    gap: 2px;
+    margin-top:7px
+  }
+
+  .star {
+    font-size: 1.5rem;
+  }
+
+  .testimonial-content {
+    flex: 1;
+  }
+
+  .testimonial-content p {
+    font-size: 1.2rem;
+    {% comment %} line-height: 1.6; {% endcomment %}
+    color: black;
+    
+  }
+
+  .read-more-link {
+    color: #235A49;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .read-more-link:hover {
+    text-decoration: underline;
+  }
+
+  .testimonial-date {
+    font-size: 0.85rem;
+    color: black;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  /* Tablet - 2 columns */
+  @media (max-width: 1024px) {
+    .testimonials-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Mobile - Horizontal Scroll */
+  @media (max-width: 768px) {
+    .testimonials-section {
+      padding: 40px 0;
+    }
+
+    .testimonials-section .container {
+      padding: 0;
+    }
+
+    .testimonials-wrapper {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 16px;
+      padding: 0 16px;
+      scrollbar-width: none;
+    }
+
+    .testimonials-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .testimonial-card {
+      min-width: 280px;
+      max-width: 280px;
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+
+    .testimonial-name {
+      font-size: 1rem;
+    }
+
+    .testimonial-content p {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "About Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_desktop",
+      "label": "Hero Desktop Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_mobile",
+      "label": "Hero Mobile Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "India's Most Trusted Staples. From Farmers. For Families."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle"
+    },
+    {
+      "type": "header",
+      "content": "Founder's Note"
+    },
+    {
+      "type": "image_picker",
+      "id": "founder_img",
+      "label": "Founders Image"
+    },
+    {
+      "type": "text",
+      "id": "founder_heading",
+      "label": "Founder's Heading",
+      "default": "Founder's Note"
+    },
+    {
+      "type": "textarea",
+      "id": "founder_text",
+      "label": "Founder's Description"
+    },
+    {
+      "type": "header",
+      "content": "The Anveshan Way"
+    },
+    {
+      "type": "image_picker",
+      "id": "way_img",
+      "label": "Way Image"
+    },
+    {
+      "type": "text",
+      "id": "way_heading",
+      "label": "Way Heading",
+      "default": "The Anveshan Way"
+    },
+    {
+      "type": "textarea",
+      "id": "way_text",
+      "label": "Way Text"
+    },
+    {
+      "type": "header",
+      "content": "What We're Fixing"
+    },
+    {
+      "type": "image_picker",
+      "id": "fixing_img",
+      "label": "Fixing Image"
+    },
+    {
+      "type": "text",
+      "id": "fixing_heading",
+      "label": "Fixing Heading",
+      "default": "What We're Fixing"
+    },
+    {
+      "type": "textarea",
+      "id": "fixing_text",
+      "label": "Fixing Text"
+    },
+    {
+      "type": "header",
+      "content": "Our Values"
+    },
+    {
+      "type": "text",
+      "id": "values_heading",
+      "label": "Values Heading",
+      "default": "Our Values"
+    },
+    {
+      "type": "header",
+      "content": "Native Sourcing"
+    },
+    {
+      "type": "image_picker",
+      "id": "native_img",
+      "label": "Native Sourcing Image"
+    },
+    {
+      "type": "text",
+      "id": "native_heading",
+      "label": "Native Sourcing Heading",
+      "default": "Native Sourcing"
+    },
+    {
+      "type": "textarea",
+      "id": "native_text",
+      "label": "Native Sourcing Text"
+    },
+    {
+      "type": "header",
+      "content": "Best Processing"
+    },
+    {
+      "type": "image_picker",
+      "id": "processing_img",
+      "label": "Processing Image"
+    },
+    {
+      "type": "text",
+      "id": "processing_heading",
+      "label": "Processing Heading",
+      "default": "Best Processing"
+    },
+    {
+      "type": "textarea",
+      "id": "processing_text",
+      "label": "Processing Text"
+    },
+    {
+      "type": "header",
+      "content": "17+ Quality Checks"
+    },
+    {
+      "type": "image_picker",
+      "id": "quality_img",
+      "label": "Quality Image"
+    },
+    {
+      "type": "text",
+      "id": "quality_heading",
+      "label": "Quality Heading",
+      "default": "17+ Quality Checks"
+    },
+    {
+      "type": "textarea",
+      "id": "quality_text",
+      "label": "Quality Text"
+    },
+    {
+      "type": "header",
+      "content": "Impact We Make"
+    },
+    {
+      "type": "image_picker",
+      "id": "impact_img",
+      "label": "Impact Image"
+    },
+    {
+      "type": "text",
+      "id": "impact_heading",
+      "label": "Impact Heading",
+      "default": "Impact We Make"
+    },
+    {
+      "type": "textarea",
+      "id": "impact_text",
+      "label": "Impact Text"
+    },
+    {
+      "type": "header",
+      "content": "Stats Section"
+    },
+    {
+      "type": "text",
+      "id": "stats_heading",
+      "label": "Stats Heading",
+      "default": "Where We Are Now"
+    },
+    {
+      "type": "header",
+      "content": "Community Section"
+    },
+    {
+      "type": "text",
+      "id": "community_heading",
+      "label": "Community Heading",
+      "default": "The Anveshan Community"
+    },
+    {
+      "type": "textarea",
+      "id": "community_subtitle",
+      "label": "Community Subtitle"
+    },
+    {
+      "type": "header",
+      "content": "CTA Section"
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "CTA Heading",
+      "default": "Join the Movement"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA Text"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_text",
+      "label": "CTA Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_url",
+      "label": "CTA Button URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "cta_image",
+      "label": "CTA Products Image"
+    },
+    {
+      "type": "header",
+      "content": "Bottom Tagline"
+    },
+    {
+      "type": "text",
+      "id": "bottom_tagline",
+      "label": "Bottom Tagline",
+      "default": "Purity aur aapka connection"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Stat Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "stat_number",
+          "label": "Number",
+          "default": "20+"
+        },
+        {
+          "type": "text",
+          "id": "stat_label",
+          "label": "Label",
+          "default": "Products"
+        }
+      ]
+    },
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Avatar Image"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial",
+          "label": "Testimonial Text"
+        }
+      ]
+    },
+    {
+      "type": "certification",
+      "name": "Certification Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "cert_logo",
+          "label": "Certification Logo"
+        },
+        {
+          "type": "text",
+          "id": "cert_name",
+          "label": "Certification Name"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Page"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,226 @@
+<!-- Anveshan Hero Section -->
+<section 
+  id="anveshan-hero-{{ section.id }}" 
+  class="anveshan-hero-wrapper"
+  style="
+    background-color: {{ section.settings.background_color }};
+    padding-top: {{ section.settings.section_padding_top }}px;
+    padding-bottom: {{ section.settings.section_padding_bottom }}px;
+  "
+>
+  <div class="anveshan-hero-container">
+    <div class="anveshan-hero-content">
+      
+      <!-- Anveshan Logo/Image -->
+      {% if section.settings.anveshan_logo_image %}
+        <div class="anveshan-logo-wrapper">
+          <img 
+            src="{{ section.settings.anveshan_logo_image | img_url: '400x' }}"
+            alt="{{ section.settings.anveshan_logo_image.alt | default: 'Anveshan Logo' }}"
+            class="anveshan-logo-image"
+            loading="lazy"
+          >
+        </div>
+      {% endif %}
+      
+      <!-- Hero Tagline -->
+      {% if section.settings.hero_tagline != blank %}
+        <div class="anveshan-tagline-wrapper">
+          <p 
+            class="anveshan-tagline-text"
+            style="color: {{ section.settings.tagline_color }};"
+          >
+            {{ section.settings.hero_tagline }}
+          </p>
+        </div>
+      {% endif %}
+      
+    </div>
+  </div>
+</section>
+
+<!-- Anveshan Hero Section Styles -->
+<style>
+  /* Container and Layout */
+  .anveshan-hero-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+  
+  .anveshan-hero-container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+  
+  .anveshan-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  /* Logo Styling */
+  .anveshan-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .anveshan-logo-image {
+    max-width: 100%;
+    height: auto;
+    width: auto;
+    max-height: 120px;
+    object-fit: contain;
+    display: block;
+  }
+  
+  /* Tagline Styling */
+  .anveshan-tagline-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .anveshan-tagline-text {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .anveshan-hero-wrapper {
+      min-height: 250px;
+    }
+    
+    .anveshan-hero-container {
+      padding: 0 15px;
+    }
+    
+    .anveshan-logo-image {
+      max-height: 100px;
+    }
+    
+    .anveshan-tagline-text {
+      font-size: 16px;
+    }
+    
+    .anveshan-hero-content {
+      gap: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .anveshan-hero-wrapper {
+      min-height: 200px;
+    }
+    
+    .anveshan-hero-container {
+      padding: 0 12px;
+    }
+    
+    .anveshan-logo-image {
+      max-height: 80px;
+    }
+    
+    .anveshan-tagline-text {
+      font-size: 14px;
+    }
+    
+    .anveshan-hero-content {
+      gap: 12px;
+    }
+  }
+  
+  /* Large screen adjustments */
+  @media (min-width: 1200px) {
+    .anveshan-logo-image {
+      max-height: 140px;
+    }
+    
+    .anveshan-tagline-text {
+      font-size: 20px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Anveshan Hero Section",
+  "tag": "section",
+  "class": "anveshan-hero-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "anveshan_logo_image",
+      "label": "Anveshan Logo Image",
+      "info": "Upload your Anveshan logo/text image here"
+    },
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero Tagline",
+      "default": "You are one step closer to purity",
+      "info": "Enter the tagline text below the logo"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Section Padding Top",
+      "min": 0,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Section Padding Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2c5530"
+    },
+    {
+      "type": "color",
+      "id": "tagline_color",
+      "label": "Tagline Color",
+      "default": "#666666"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Anveshan Hero",
+      "settings": {
+        "hero_tagline": "You are one step closer to purity"
+      }
+    }
+  ]
+}
+{% endschema %}

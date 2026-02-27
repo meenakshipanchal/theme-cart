@@ -1,0 +1,346 @@
+{% comment %}
+  Universal Menu Snippet
+  Replaces homepage-oil-menu, homepage-ghee-menu, and homepage-collection-menu
+
+  Parameters:
+  - menu_type: 'oil' | 'ghee' | 'collection' (required)
+  - section_settings: section.settings object (required)
+  - section_id: section.id (required)
+{% endcomment %}
+
+{% liquid
+  assign menu_type = menu_type | default: 'collection'
+
+  case menu_type
+    when 'oil'
+      assign menu_metaobject = shop.metaobjects.oils_homepagemenu.values
+      assign menu_prefix = 'oils'
+    when 'ghee'
+      assign menu_metaobject = shop.metaobjects.ghee_homepagemenu.values
+      assign menu_prefix = 'ghee'
+    else
+      assign menu_metaobject = shop.metaobjects.homepagemenu_list.values
+      assign menu_prefix = 'main'
+  endcase
+
+  assign menu_list = menu_metaobject
+
+  assign first_menu_item = blank
+  assign first_collection = blank
+  assign first_metafield_products = blank
+
+  # Build position-to-handle mapping and sort manually
+  assign sorted_handles = ''
+  for pos in (1..20)
+    for menu_item in menu_list
+      assign item_pos = menu_item.position.value | default: 999 | plus: 0
+      if item_pos == pos
+        assign sorted_handles = sorted_handles | append: menu_item.system.handle | append: ','
+      endif
+    endfor
+  endfor
+  # Add items without valid position (999) at end
+  for menu_item in menu_list
+    assign item_pos = menu_item.position.value | default: 999 | plus: 0
+    if item_pos >= 999 or item_pos == 0
+      assign sorted_handles = sorted_handles | append: menu_item.system.handle | append: ','
+    endif
+  endfor
+  assign sorted_handles_array = sorted_handles | split: ','
+
+  # Get first menu item
+  for handle in sorted_handles_array
+    if handle != ''
+      for menu_item in menu_list
+        if menu_item.system.handle == handle
+          assign first_menu_item = menu_item
+          break
+        endif
+      endfor
+      break
+    endif
+  endfor
+
+  if first_menu_item != blank
+    assign first_collection = collections[first_menu_item.select_collection.value.handle]
+
+    if first_collection != blank
+      assign first_product_list = first_collection.metafields.custom.template.value
+
+      if first_product_list != blank
+        for objbundle in first_product_list.blocks.value
+          case objbundle.system.type
+            when 'product_variants'
+              assign first_metafield_products = objbundle.product.value
+              break
+          endcase
+        endfor
+      endif
+
+      if first_metafield_products == blank
+        assign first_metafield_products = first_collection.products
+      endif
+    endif
+  endif
+
+  assign quick_add = section_settings.quick_add | default: 'standard'
+%}
+
+{{ 'homepage-menu-shared.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'homepage-menu-shared.js' | asset_url }}" defer></script>
+
+<style>
+  #{{ menu_prefix }}-products-container,#{{ menu_prefix }}-products-container .collection,#{{ menu_prefix }}-products-container>div>div{width:100%!important;max-width:100%!important}
+  #{{ menu_prefix }}-product-grid{transition:opacity .1s}
+</style>
+
+{% if section_settings.show_headings %}
+  <div class="menu-section-headings">
+    {% if section_settings.main_heading != blank %}
+      <h1 class="menu-main-heading">{{ section_settings.main_heading }}</h1>
+    {% endif %}
+    {% if section_settings.subheading != blank %}
+      <h2 class="menu-subheading">{{ section_settings.subheading }}</h2>
+    {% endif %}
+  </div>
+{% endif %}
+
+<!-- MENU NAVIGATION -->
+<div class="menu-wrapper">
+  <div class="menu-collection-container" id="{{ menu_prefix }}-nav-menu">
+    {% assign menu_index = 0 %}
+    {% if sorted_handles_array.size > 0 %}
+      {% for handle in sorted_handles_array %}
+        {% if handle != '' %}
+          {% liquid
+            assign menu = blank
+            for m in menu_list
+              if m.system.handle == handle
+                assign menu = m
+                break
+              endif
+            endfor
+          %}
+          {% if menu != blank %}
+            {% liquid
+              assign collection_link = menu.select_collection.value.url
+              assign collection_handle = menu.select_collection.value.handle
+              assign title = menu.title.value
+              assign position = menu.position.value | default: 999
+              assign img = menu.icon.value
+              assign active_img = menu.active_icon.value
+              assign is_first = false
+              if menu_index == 0
+                assign is_first = true
+                assign img = active_img
+              endif
+              assign menu_index = menu_index | plus: 1
+            %}
+
+        <a href="{{ collection_link }}"
+           class="menu-nav-item menu-item-transition{% if is_first %} active{% endif %}"
+           data-collection-handle="{{ collection_handle }}"
+           data-collection-url="{{ collection_link }}"
+           data-collection-title="{{ title }}"
+           data-active-icon="{{ active_img | image_url: width: 60 }}"
+           data-inactive-icon="{{ menu.icon.value | image_url: width: 60 }}"
+           data-position="{{ position }}">
+          <img src="{{ img | image_url: width: 60 }}"
+               alt="{{ title }}"
+               loading="eager"
+               class="menu-nav-icon"
+               width="40"
+               height="40">
+          <strong>{{ title }}</strong>
+        </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <div class="sliding-indicator" id="{{ menu_prefix }}-sliding-indicator"></div>
+  </div>
+</div>
+
+<!-- DYNAMIC PRODUCTS CONTAINER -->
+<div style="margin-top:10px" id="{{ menu_prefix }}-products-container">
+  <div class="collection section-padding">
+    <div class="collection__title title-wrapper page-width" style="display: none;">
+      <h2 id="{{ menu_prefix }}-collection-title" class="title h1">{{ first_menu_item.title.value }}</h2>
+    </div>
+
+    <div style="margin-top:10px">
+      <ul id="{{ menu_prefix }}-product-grid"
+          class="menu-product-grid grid product-grid contains-card contains-card--product{% if settings.card_style == 'standard' %} contains-card--standard{% endif %}"
+          role="list">
+        {%- assign skip_card_product_styles = false -%}
+        {%- for product_variant in first_metafield_products limit: 10 -%}
+            {% liquid
+              if product_variant.product
+                assign actual_product = product_variant.product
+                assign variant_for_card = product_variant
+              else
+                assign actual_product = product_variant
+                assign variant_for_card = product_variant.selected_or_first_available_variant
+                if variant_for_card == blank or variant_for_card.available == false
+                  assign variant_for_card = product_variant.variants | where: 'available', true | first
+                endif
+                if variant_for_card == blank
+                  assign variant_for_card = product_variant.variants.first
+                endif
+              endif
+            %}
+            <li id="Slide-{{ section_id }}-{{ forloop.index }}"
+                class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                {% if settings.animations_reveal_on_scroll %}
+                  data-cascade
+                  style="--animation-order: {{ forloop.index }};"
+                {% endif %}>
+              {% render 'variant-product',
+                card_product: variant_for_card,
+                product: actual_product,
+                show_secondary_image: section_settings.show_secondary_image,
+                show_vendor: section_settings.show_vendor,
+                show_rating: section_settings.show_rating,
+                skip_styles: skip_card_product_styles,
+                section_id: section_id,
+                quick_add: quick_add,
+                media_aspect_ratio: section_settings.image_ratio,
+                lazy_load: false
+              %}
+            </li>
+            {%- assign skip_card_product_styles = true -%}
+        {%- endfor -%}
+      </ul>
+
+      <!-- Custom scrollbar -->
+      <div class="menu-scrollbar-row" id="{{ menu_prefix }}-scrollbar-row">
+        <div class="menu-scrollbar-track" id="{{ menu_prefix }}-scrollbar-track">
+          <div class="menu-scrollbar-thumb" id="{{ menu_prefix }}-scrollbar-thumb"></div>
+        </div>
+        <a href="{{ first_collection.url }}" class="menu-see-all-button" id="{{ menu_prefix }}-see-all-link">
+          See All
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var p='{{ menu_prefix }}',m,g,t,s,i,c,sb,fh='{{ first_menu_item.select_collection.value.handle }}',fHTML,ld=0,html={},ready=0;
+
+  // Regex-based parsing - NO DOM creation, pure string manipulation
+  function parseProducts(d){
+    var gridMatch=d.match(/<ul[^>]*class="[^"]*product-grid[^"]*"[^>]*>([\s\S]*?)<\/ul>/i);
+    if(!gridMatch)return'';
+    var gridContent=gridMatch[1];
+    var items=gridContent.match(/<li[^>]*class="[^"]*grid__item[^"]*"[^>]*>[\s\S]*?<\/li>/gi);
+    if(!items)return'';
+    var out='';
+    for(var j=0;j<items.length;j++){
+      if(items[j].indexOf('card')>-1)out+=items[j];
+    }
+    return out;
+  }
+
+  // DOM-based parsing - fallback only on click
+  function getProducts(d){
+    var x=document.createElement('div');x.innerHTML=d;
+    var grid=x.querySelector('.product-grid')||x.querySelector('[id*="product-grid"]');
+    if(grid){
+      var items=grid.querySelectorAll('.grid__item');
+      if(items.length){var out='';for(var j=0;j<items.length;j++)out+=items[j].outerHTML;return out;}
+    }
+    return'';
+  }
+
+  function init(){
+    var H=window.HomepageMenuShared;
+    if(!H){setTimeout(init,20);return}
+    m=document.getElementById(p+'-nav-menu');
+    g=document.getElementById(p+'-product-grid');
+    t=document.getElementById(p+'-collection-title');
+    s=document.getElementById(p+'-see-all-link');
+    if(!m||!g)return;
+    i=new H.SlidingIndicator('#'+p+'-nav-menu','#'+p+'-sliding-indicator');
+    sb=new H.CustomScrollbar(p+'-product-grid',p+'-scrollbar-track',p+'-scrollbar-thumb',p+'-scrollbar-row');
+    fHTML=g.innerHTML;
+    c=m.querySelector('.active');
+    ready=1;
+
+    m.onclick=function(e){
+      var a=e.target.closest('.menu-nav-item');
+      if(!a)return;
+      // If not ready, allow redirect
+      if(!ready){return;}
+      e.preventDefault();e.stopPropagation();
+      if(a===c||ld)return;
+      ld=1;
+      if(c){c.classList.remove('active');var oi=c.querySelector('img');if(oi)oi.src=c.dataset.inactiveIcon}
+      a.classList.add('active');var ni=a.querySelector('img');if(ni)ni.src=a.dataset.activeIcon;
+      c=a;i.updatePosition(a,1);
+      if(t)t.textContent=a.dataset.collectionTitle;
+      if(s)s.href=a.dataset.collectionUrl;
+      var h=a.dataset.collectionHandle;
+      if(h===fh){g.innerHTML=fHTML;sb.update();ld=0;return}
+      if(html[h]){g.innerHTML=html[h];sb.update();ld=0;return}
+      g.style.opacity='.6';
+      fetch('/collections/'+h+'?view=ajax&limit=30').then(function(r){return r.text()}).then(function(d){
+        var out=parseProducts(d)||getProducts(d);
+        if(out){html[h]=out;g.innerHTML=out;}
+        sb.update();g.style.opacity='1';ld=0;
+      }).catch(function(){g.style.opacity='1';ld=0});
+    };
+
+    sb.update();i.updatePosition(c,0);
+
+    // Scroll fade indicators + overflow detection
+    var wrapper=m.closest('.menu-wrapper');
+    if(wrapper){
+      function checkScroll(){
+        var sl=m.scrollLeft,sw=m.scrollWidth,cw=m.clientWidth;
+        var hasOverflow=sw>cw+5;
+        // If overflow, use flex-start so first icon is visible
+        if(hasOverflow){
+          m.style.justifyContent='flex-start';
+          wrapper.classList.remove('scrolled-end');
+          if(sl>10)wrapper.classList.add('scrolled-start');else wrapper.classList.remove('scrolled-start');
+          if(sl>=sw-cw-10)wrapper.classList.add('scrolled-end');
+        }else{
+          m.style.justifyContent='center';
+          wrapper.classList.remove('scrolled-start');
+          wrapper.classList.remove('scrolled-end');
+        }
+      }
+      m.addEventListener('scroll',checkScroll,{passive:true});
+      window.addEventListener('resize',checkScroll,{passive:true});
+      checkScroll();
+    }
+
+    // Preload after page is interactive - low priority, non-blocking
+    function preloadAll(){
+      var items=m.querySelectorAll('.menu-nav-item:not(.active)');
+      for(var k=0;k<items.length;k++){
+        (function(item){
+          var h=item.dataset.collectionHandle;
+          if(h&&!html[h]){
+            fetch('/collections/'+h+'?view=ajax&limit=30',{priority:'low'}).then(function(r){return r.text()}).then(function(d){
+              var out=parseProducts(d);if(out)html[h]=out;
+            }).catch(function(){});
+          }
+        })(items[k]);
+      }
+    }
+    // Start preload after 1s or on first user interaction (whichever first)
+    var preloaded=0;
+    function triggerPreload(){if(!preloaded){preloaded=1;preloadAll();}}
+    setTimeout(triggerPreload,1000);
+    document.addEventListener('mousemove',triggerPreload,{once:true,passive:true});
+    document.addEventListener('touchstart',triggerPreload,{once:true,passive:true});
+    document.addEventListener('scroll',triggerPreload,{once:true,passive:true});
+  }
+
+  setTimeout(init,0);
+})();
+</script>

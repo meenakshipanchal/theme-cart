@@ -1,0 +1,162 @@
+{% comment %}
+  Variant Selector Modal
+  Shows a bottom sheet modal with all product variants for quick selection
+  Uses the SAME product-form structure as single variant products for reliable add-to-cart
+{% endcomment %}
+
+<!-- Variant Selector Modal (Single instance, reused for all products) -->
+<div class="variant-selector-modal" id="variantSelectorModal">
+  <div class="variant-selector-content">
+    <div class="variant-selector-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span id="variantModalTitle">Select Variant</span>
+      </h3>
+      <button type="button" class="variant-selector-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="variant-selector-list" id="variantSelectorList">
+      <!-- Variants will be injected here via JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var initialized = false;
+  var uniqueCounter = 0;
+
+  function initVariantSelector() {
+    if (initialized) return;
+    initialized = true;
+
+    var modal = document.getElementById('variantSelectorModal');
+    var modalTitle = document.getElementById('variantModalTitle');
+    var variantList = document.getElementById('variantSelectorList');
+    var closeBtn = modal ? modal.querySelector('.variant-selector-close') : null;
+
+    if (!modal || !variantList) return;
+
+    function formatMoney(paise) {
+      var rupees = Math.round(paise / 100);
+      return '₹' + rupees.toLocaleString('en-IN');
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function openModal(productTitle, variants, productId) {
+      modalTitle.textContent = productTitle;
+
+      var html = '';
+
+      for (var i = 0; i < variants.length; i++) {
+        var variant = variants[i];
+
+        var compareHtml = '';
+        if (variant.compare_price && variant.compare_price > variant.price) {
+          compareHtml = '<span class="compare-price">' + formatMoney(variant.compare_price) + '</span>';
+        }
+
+        var isAvailable = variant.available === true;
+        var itemClass = 'variant-selector-item' + (isAvailable ? '' : ' variant-oos');
+
+        var formId = 'modal-variant-form-' + variant.id + '-' + (++uniqueCounter);
+
+        var buttonHtml = '';
+        if (isAvailable) {
+          buttonHtml = '<product-form data-section-id="variant-modal">' +
+            '<form method="post" action="/cart/add" id="' + formId + '" accept-charset="UTF-8" class="form" enctype="multipart/form-data" novalidate="novalidate" data-type="add-to-cart-form">' +
+              '<input type="hidden" name="form_type" value="product">' +
+              '<input type="hidden" name="utf8" value="✓">' +
+              '<input type="hidden" name="id" value="' + variant.id + '" class="product-variant-id">' +
+              '<button id="' + formId + '-submit" type="submit" name="add" class="quick-add__submit button button--primary variant-modal-add-btn" aria-label="Add to cart">' +
+                '<span>Add</span>' +
+                '<div class="loading__spinner hidden">' +
+                  '<svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">' +
+                    '<circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>' +
+                  '</svg>' +
+                '</div>' +
+              '</button>' +
+            '</form>' +
+          '</product-form>';
+        } else {
+          buttonHtml = '<button type="button" class="quick-add__submit button button--secondary qty-oos-btn" disabled><span>Out of Stock</span></button>';
+        }
+
+        html += '<div class="' + itemClass + '" data-variant-id="' + variant.id + '">' +
+          '<div class="variant-selector-image">' +
+            '<img src="' + (variant.image || '') + '" alt="' + escapeHtml(variant.title) + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+          '</div>' +
+          '<div class="variant-selector-info">' +
+            '<p class="variant-selector-name">' + escapeHtml(variant.title) + '</p>' +
+            '<div class="variant-selector-price">' + compareHtml +
+              '<span class="sale-price">' + formatMoney(variant.price) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="variant-selector-add">' + buttonHtml + '</div>' +
+        '</div>';
+      }
+
+      if (!html) html = '<div style="padding:40px 20px;text-align:center;color:#666;">No variants available</div>';
+
+      variantList.innerHTML = html;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    // Trigger modal open
+    document.addEventListener('click', function(e) {
+      var trigger = e.target.closest('.variant-modal-trigger');
+      if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+          var productTitle = trigger.getAttribute('data-product-title') || 'Select Variant';
+          var productId = trigger.getAttribute('data-product-id') || '';
+          var variantsData = trigger.getAttribute('data-variants');
+
+          if (!variantsData) return;
+
+          var variants = JSON.parse(variantsData);
+          if (variants && variants.length > 0) {
+            openModal(productTitle, variants, productId);
+          }
+        } catch (err) {
+          console.error('Error parsing variants:', err);
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVariantSelector);
+  } else {
+    initVariantSelector();
+  }
+})();
+</script>

@@ -1,0 +1,43 @@
+{% comment %}
+  Limited Stock Badge / Selling Fast Badge (on image)
+  - "Selling Fast" shows for products with MRP ₹1000-₹4000 (same as qty-sold-badge)
+  - "Limited Stock Left" shows for dolchi/ghee giants combo products
+{% endcomment %}
+
+{%- liquid
+  assign show_limited_badge = false
+  assign show_selling_fast = false
+  assign variant_title_lower = card_product.title | downcase
+  assign product_title_lower = product.title | downcase
+
+  # Check MRP for Selling Fast badge (same logic as qty-sold-badge)
+  assign mrp = card_product.compare_at_price | divided_by: 100
+  if mrp == 0 or mrp == blank
+    assign mrp = card_product.price | divided_by: 100
+  endif
+
+  if mrp >= 2000 and mrp <= 4000
+    assign show_selling_fast = true
+  endif
+
+  # Check for Limited Stock badge (dolchi/ghee giants combo/khapal)
+  if variant_title_lower contains 'dolchi' or product_title_lower contains 'dolchi'
+    assign show_limited_badge = true
+  elsif variant_title_lower contains 'ghee giants combo' or product_title_lower contains 'ghee giants combo'
+    assign show_limited_badge = true
+  elsif variant_title_lower contains 'khapli' or product_title_lower contains 'khapli'
+    assign show_limited_badge = true
+  endif
+-%}
+
+{%- if show_selling_fast -%}
+  <div class="limited-stock-badge selling-fast-badge" style="position:absolute;bottom:3px;left:3px;display:flex;align-items:center;gap:3px;background:#f5edd0;color:#b5762a;font-size:clamp(9px,1.5vw,13px);font-weight:700;padding:clamp(3px,0.5vw,5px) clamp(5px,1vw,10px);border-radius:4px;z-index:2;line-height:1;pointer-events:none">
+    <svg style="width:clamp(14px,2vw,18px);height:clamp(14px,2vw,18px);flex-shrink:0;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="rotate(12 128 128)"><path d="M148.6 7.8C145.9 7.8 143.3 9.2 141.8 11.7L63.2 137.5C60.3 142.1 63.5 148 68.7 148H118.9L90.4 243.1C88.8 248.5 95.3 252.4 99.7 248.7L192.3 120.9C196.5 115.1 192.4 108.7 186.8 108.7H134.9L156.3 15.6C157.6 11.1 154.2 7.8 148.6 7.8Z" fill="#D4A037"/></g></svg>
+    <span>Selling Fast</span>
+  </div>
+{%- elsif show_limited_badge -%}
+  <div class="limited-stock-badge" style="position:absolute;bottom:3px;left:3px;display:flex;align-items:center;gap:clamp(3px,0.5vw,4px);background:#E2F1E4;color:#235A49;font-size:clamp(9px,1.5vw,13px);font-weight:700;padding:clamp(3px,0.5vw,5px) clamp(5px,1vw,10px);border-radius:4px;z-index:2;line-height:1;pointer-events:none">
+    <svg style="width:clamp(12px,1.8vw,16px);height:clamp(12px,1.8vw,16px);flex-shrink:0;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#235A49" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+    <span>Top Rated Choice</span>
+  </div>
+{%- endif -%}

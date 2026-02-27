@@ -1,0 +1,336 @@
+
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n4.3c0838aba1701047e60be6a99a1b0a40ce9b8419.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n4.c0575d1db21fc3821f17fd6617d3dee552312137.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n5.3b6b7df38aa5986536945796e1f947445832047c.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n5.f26bf6dcae278b0ed902605f6605fa3338e81dab.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n6.9d1ea52bb49a0a86cfd1b0383d00f83d3fcc14de.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n6.f0fcdea525a0e47b2ae4ab645832a8e8a96d31d3.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n9.c9185a1dab0680c9bce2d373c6fc665d10b5e421.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n9.60f18207a47942453faf8770b2e7e8f4757b2493.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n7.2fd9bfe01586148e644724096c9d75e8c7a90e55.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_n7.ea05de92d862f9594794ab281c4c3a67501ef5fc.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_i4.89f7a4275c064845c304a4cf8a4a586060656db2.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_i4.6f955aaaafc55a22ffc1f32ecf3756859a5ad3e2.woff") format("woff");
+}
+
+@font-face {
+  font-family: Figtree;
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/figtree/figtree_i7.06add7096a6f2ab742e09ec7e498115904eda1fe.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/figtree/figtree_i7.ee584b5fcaccdbb5518c0228158941f8df81b101.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Roboto Slab";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.anveshan.farm/cdn/fonts/roboto_slab/robotoslab_n4.d3a9266696fe77645ad2b6579a2b30c11742dc68.woff2") format("woff2"),
+       url("//www.anveshan.farm/cdn/fonts/roboto_slab/robotoslab_n4.ac73924d0e45cb28b8adb30cbb4ff26dbe125c23.woff") format("woff");
+}
+
+
+:root {
+   --font-body-family: Figtree, sans-serif;
+   --font-body-style: normal;
+   --font-body-weight: 400;
+   --font-body-weight-bold: 700;
+
+   --font-heading-family: "Roboto Slab", serif;
+   --font-heading-style: normal;
+   --font-heading-weight: 400;
+
+   --font-body-scale: 1.0;
+   --font-heading-scale: 1.0;
+
+   --media-padding: px;
+   --media-border-opacity: 0.05;
+   --media-border-width: 1px;
+   --media-radius: 0px;
+   --media-shadow-opacity: 0.0;
+   --media-shadow-horizontal-offset: 0px;
+   --media-shadow-vertical-offset: 4px;
+   --media-shadow-blur-radius: 5px;
+   --media-shadow-visible: 0;
+
+   --page-width: 140rem;
+   --page-width-margin: 0rem;
+
+   --product-card-image-padding: 0.0rem;
+   --product-card-corner-radius: 0.0rem;
+   --product-card-text-alignment: left;
+   --product-card-border-width: 0.0rem;
+   --product-card-border-opacity: 0.1;
+   --product-card-shadow-opacity: 0.0;
+   --product-card-shadow-visible: 0;
+   --product-card-shadow-horizontal-offset: 0.0rem;
+   --product-card-shadow-vertical-offset: 0.4rem;
+   --product-card-shadow-blur-radius: 0.5rem;
+
+   --collection-card-image-padding: 0.0rem;
+   --collection-card-corner-radius: 0.0rem;
+   --collection-card-text-alignment: left;
+   --collection-card-border-width: 0.0rem;
+   --collection-card-border-opacity: 0.1;
+   --collection-card-shadow-opacity: 0.0;
+   --collection-card-shadow-visible: 0;
+   --collection-card-shadow-horizontal-offset: 0.0rem;
+   --collection-card-shadow-vertical-offset: 0.4rem;
+   --collection-card-shadow-blur-radius: 0.5rem;
+
+   --blog-card-image-padding: 0.0rem;
+   --blog-card-corner-radius: 0.0rem;
+   --blog-card-text-alignment: left;
+   --blog-card-border-width: 0.0rem;
+   --blog-card-border-opacity: 0.1;
+   --blog-card-shadow-opacity: 0.0;
+   --blog-card-shadow-visible: 0;
+   --blog-card-shadow-horizontal-offset: 0.0rem;
+   --blog-card-shadow-vertical-offset: 0.4rem;
+   --blog-card-shadow-blur-radius: 0.5rem;
+
+   --badge-corner-radius: 4.0rem;
+
+   --popup-border-width: 1px;
+   --popup-border-opacity: 0.1;
+   --popup-corner-radius: 0px;
+   --popup-shadow-opacity: 0.05;
+   --popup-shadow-horizontal-offset: 0px;
+   --popup-shadow-vertical-offset: 4px;
+   --popup-shadow-blur-radius: 5px;
+
+   --drawer-border-width: 1px;
+   --drawer-border-opacity: 0.1;
+   --drawer-shadow-opacity: 0.0;
+   --drawer-shadow-horizontal-offset: 0px;
+   --drawer-shadow-vertical-offset: 4px;
+   --drawer-shadow-blur-radius: 5px;
+
+   --spacing-sections-desktop: 0px;
+   --spacing-sections-mobile: 0px;
+
+   --grid-desktop-vertical-spacing: 16px;
+   --grid-desktop-horizontal-spacing: 16px;
+   --grid-mobile-vertical-spacing: 8px;
+   --grid-mobile-horizontal-spacing: 8px;
+
+   --text-boxes-border-opacity: 0.1;
+   --text-boxes-border-width: 0px;
+   --text-boxes-radius: 0px;
+   --text-boxes-shadow-opacity: 0.0;
+   --text-boxes-shadow-visible: 0;
+   --text-boxes-shadow-horizontal-offset: 0px;
+   --text-boxes-shadow-vertical-offset: 4px;
+   --text-boxes-shadow-blur-radius: 5px;
+
+   --buttons-radius: 0px;
+   --buttons-radius-outset: 0px;
+   --buttons-border-width: 1px;
+   --buttons-border-opacity: 1.0;
+   --buttons-shadow-opacity: 0.0;
+   --buttons-shadow-visible: 0;
+   --buttons-shadow-horizontal-offset: 0px;
+   --buttons-shadow-vertical-offset: 4px;
+   --buttons-shadow-blur-radius: 5px;
+   --buttons-border-offset: 0px;
+
+   --inputs-radius: 0px;
+   --inputs-border-width: 1px;
+   --inputs-border-opacity: 0.55;
+   --inputs-shadow-opacity: 0.0;
+   --inputs-shadow-horizontal-offset: 0px;
+   --inputs-margin-offset: 0px;
+   --inputs-shadow-vertical-offset: 4px;
+   --inputs-shadow-blur-radius: 5px;
+   --inputs-radius-outset: 0px;
+
+   --variant-pills-radius: 40px;
+   --variant-pills-border-width: 1px;
+   --variant-pills-border-opacity: 0.55;
+   --variant-pills-shadow-opacity: 0.0;
+   --variant-pills-shadow-horizontal-offset: 0px;
+   --variant-pills-shadow-vertical-offset: 4px;
+   --variant-pills-shadow-blur-radius: 5px;
+
+  --theme-primy-color: #00584b;
+}
+      
+.section-header.shopify-section-group-group-header {
+  z-index: 3;
+}
+.announcement-bar-slider button {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+.utility-bar__grid.page-width {
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
+}
+.announcement-bar-section {
+  overflow: hidden;
+}
+.menu-drawer__navigation-container {
+  background: #f9faf9;
+}
+.menu-drawer__menu-item img {
+    margin-right: .5rem;
+}
+.js .menu-drawer__menu li {
+    border-bottom: #e8e8e8 solid 1px;
+}
+nav.menu-drawer__navigation {
+  padding: 0;
+}
+a.menu-drawer__menu-item, summary.menu-drawer__menu-item {
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  font-size: 1.5rem;
+}
+.app__download {
+    background: #e3e5e3;
+    margin: 0 -1.5rem;
+    padding: 1rem 1.5rem;
+}
+.app__download h4 {
+    margin: 0 0 .75rem;
+    font-family: var(--font-body-family);
+    font-weight: 600;
+}
+.app__download div {
+    display: flex;
+    justify-content: space-between;
+}
+.app__download a {
+    flex: 0 0 47%;
+}
+.header--has-social div.menu-drawer__utility-links{
+  padding: 1.5rem 1.5rem 0;
+}
+.app__download img {
+    width: 100%;
+    height: auto;
+}
+.js details>.header__submenu {
+  border: 0;
+}
+.header__submenu .header__menu-item {
+  justify-content: flex-start;
+}
+.header__menu-item:hover span, .header__submenu .header__menu-item {
+  text-decoration: none !important;
+}
+.button:before, .button:after {
+  display: none;
+}
+sticky-header { box-shadow: 0 2px 3px #0000000d; }
+.shopify-policy__container { max-width: var(--page-width); padding: 1.2rem 1.5rem 2rem; }
+.shopify-policy__container p,
+.shopify-policy__container ul,
+.shopify-policy__body { line-height: 1.4; }
+.shopify-policy__container li:not(:last-child) { padding-bottom: 5px; }
+.shopify-policy__container h5 { margin-bottom: 10px; font-size: 16px; }
+@media screen and (min-width: 750px) {
+  .shopify-policy__container { padding: 1.5rem 5rem 3rem; }
+  img.mobile { display: none !important; }
+  .addons-products::-webkit-scrollbar{width:4px;height:4px;background-color:#69ada3}
+  .addons-products::-webkit-scrollbar-thumb{background:#00584b}
+  ul.recommended-products::-webkit-scrollbar{width:4px;height:4px;background-color:#69ada3}
+  ul.recommended-products::-webkit-scrollbar-thumb{background:#00584b}
+}
+body::-webkit-scrollbar{width:8px;height:8px;background-color:#69ada3}
+body::-webkit-scrollbar-thumb{background:#00584b}
+.drawer__inner::-webkit-scrollbar{width:6px;height:6px;background-color:#69ada3}
+.drawer__inner::-webkit-scrollbar-thumb{background:#00584b}
+
+.header__submenu li:not(:last-child) {
+  border-bottom: #f9faf9 solid 1px;  
+}
+.header__submenu .header__menu-item {
+  padding: .75rem 1rem;
+}
+.header__submenu .header__menu-item img {
+  margin-right: 0.5rem;
+}
+@media (max-width: 800px) {
+  .section-header.shopify-section-group-group-header {
+    z-index: 99;
+  }
+  .header__heading-link {
+    padding-top: 0;
+  }
+}
+
+body .css-33t00c { background-color: #42c553 !important; }
+body .css-33t00c svg { width: 38px !important; height: 38px !important; }
+/* #HeaderMenu-healthy-gifting, #HeaderDrawer-healthy-gifting, */
+#HeaderDrawer-gir-999, #HeaderMenu-gir-999,
+#HeaderDrawer-flash-sale, #HeaderMenu-flash-sale,
+#HeaderDrawer-lightning-deal, #HeaderMenu-lightning-deal {
+   font-weight: 600;
+  background-image: linear-gradient(
+    -225deg,
+    #00584b 0%,
+    #ffe141 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+}
+
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}

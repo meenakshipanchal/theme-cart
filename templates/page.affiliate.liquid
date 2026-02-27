@@ -1,0 +1,2048 @@
+{% if template.name contains 'page' and page.handle == 'affiliate' %}
+  {{ 'affiliate.css' | asset_url | stylesheet_tag }}
+{% endif %}
+ 
+ 
+<script>
+  const API_BASE_URL = 'https://affiliate.anveshan.farm';
+  {% comment %} const API_BASE_URL = 'https://anveshan-backend.vercel.app'; {% endcomment %}
+  const currentUserEmail = '{{ customer.email }}';
+
+  // Global alert function - single definition
+  function showAlert(message, type = 'error') {
+    // Remove any existing alerts first
+    const existingAlerts = document.querySelectorAll('.custom-alert');
+    existingAlerts.forEach((alert) => {
+      if (document.body.contains(alert)) {
+        document.body.removeChild(alert);
+      }
+    });
+
+    const alertContainer = document.createElement('div');
+    alertContainer.className = 'custom-alert';
+    alertContainer.style.cssText = `
+      position: fixed; 
+      top: 20px; 
+      left: 50%; 
+      transform: translateX(-50%);
+      padding: 15px 30px; 
+      border-radius: 8px; 
+      z-index: 1000; 
+      font-size: 16px;
+      text-align: center; 
+      color: white; 
+      transition: opacity 0.5s; 
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+      font-family: Arial, sans-serif;
+      opacity: 1;
+    `;
+
+    const colors = {
+      success: '#28a745',
+      error: '#dc3545',
+      warning: '#ffc107',
+      info: '#17a2b8',
+    };
+
+    alertContainer.style.backgroundColor = colors[type] || colors.error;
+    alertContainer.innerHTML = message;
+    document.body.appendChild(alertContainer);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      alertContainer.style.opacity = '0';
+      setTimeout(() => {
+        if (document.body.contains(alertContainer)) {
+          document.body.removeChild(alertContainer);
+        }
+      }, 500);
+    }, 5000);
+  }
+
+  // Mobile-friendly IFSC Validation setup
+  function setupIFSCValidation() {
+    // Wait for DOM to be fully loaded
+    setTimeout(() => {
+      const ifscInput = document.getElementById('ifscCode');
+      const bankNameInput = document.getElementById('bankName');
+      const branchNameInput = document.getElementById('branchName');
+      const form = document.getElementById('bankDetailsForm');
+{% comment %} 
+      console.log('🔍 Setting up mobile-friendly IFSC validation...');
+      console.log('IFSC Input found:', !!ifscInput);
+      console.log('Bank Name Input found:', !!bankNameInput);
+      console.log('Branch Name Input found:', !!branchNameInput);
+      console.log('Form found:', !!form); {% endcomment %}
+
+      if (!ifscInput) {
+        console.error('❌ IFSC input not found. Available inputs with "ifsc" in ID or name:');
+        {% comment %} console.log(document.querySelectorAll('input[id*="ifsc"], input[name*="ifsc"]')); {% endcomment %}
+        return;
+      }
+
+      if (!form) {
+        console.error('❌ Bank details form not found');
+        return;
+      }
+
+      {% comment %} console.log('✅ All elements found, setting up IFSC validation...'); {% endcomment %}
+
+      // Create inline validation indicator
+      let validationIndicator = document.getElementById('ifscValidationIndicator');
+      if (!validationIndicator) {
+        validationIndicator = document.createElement('div');
+        validationIndicator.id = 'ifscValidationIndicator';
+        validationIndicator.style.cssText = `
+          margin-top: 8px;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 500;
+          display: none;
+          transition: all 0.3s ease;
+        `;
+        ifscInput.parentNode.appendChild(validationIndicator);
+      }
+
+      // Create verification button for mobile users
+      let verifyButton = document.getElementById('ifscVerifyBtn');
+      if (!verifyButton) {
+        verifyButton = document.createElement('button');
+        verifyButton.id = 'ifscVerifyBtn';
+        verifyButton.type = 'button';
+        verifyButton.textContent = 'Verify IFSC';
+        verifyButton.style.cssText = `
+          margin-top: 8px;
+          padding: 8px 16px;
+          background: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          display: none;
+          transition: background 0.2s;
+        `;
+        verifyButton.addEventListener('click', function () {
+          const ifsc = ifscInput.value.trim().toUpperCase();
+          if (ifsc.length === 11) {
+            validateIFSC(ifsc);
+          } else {
+            showValidationMessage('Please enter complete 11-digit IFSC code', 'error');
+          }
+        });
+        ifscInput.parentNode.appendChild(verifyButton);
+      }
+
+      function showValidationMessage(message, type) {
+        validationIndicator.style.display = 'block';
+        validationIndicator.textContent = message;
+
+        if (type === 'loading') {
+          validationIndicator.style.background = '#fff3cd';
+          validationIndicator.style.color = '#856404';
+          validationIndicator.style.border = '1px solid #ffeaa7';
+        } else if (type === 'success') {
+          validationIndicator.style.background = '#d4edda';
+          validationIndicator.style.color = '#155724';
+          validationIndicator.style.border = '1px solid #c3e6cb';
+        } else if (type === 'error') {
+          validationIndicator.style.background = '#f8d7da';
+          validationIndicator.style.color = '#721c24';
+          validationIndicator.style.border = '1px solid #f5c6cb';
+        }
+      }
+
+      function hideValidationMessage() {
+        validationIndicator.style.display = 'none';
+      }
+
+      // Remove any existing event listeners to prevent duplicates
+      const newIfscInput = ifscInput.cloneNode(true);
+      ifscInput.parentNode.replaceChild(newIfscInput, ifscInput);
+
+      // Multi-trigger IFSC validation for better mobile support
+      let validationTimeout;
+
+      // Real-time input formatting and validation trigger
+      newIfscInput.addEventListener('input', function () {
+        const ifsc = this.value.trim().toUpperCase();
+        this.value = ifsc; // Auto-convert to uppercase
+
+        // Clear previous validation timeout
+        if (validationTimeout) {
+          clearTimeout(validationTimeout);
+        }
+
+        // Hide previous messages
+        hideValidationMessage();
+
+        if (!ifsc) {
+          verifyButton.style.display = 'none';
+          return;
+        }
+
+        // Show verify button when user starts typing
+        if (ifsc.length > 4) {
+          verifyButton.style.display = 'inline-block';
+        }
+
+        // Basic format check
+        if (ifsc.length === 11) {
+          // Auto-validate after 1 second of no typing (for desktop users)
+          validationTimeout = setTimeout(() => {
+            validateIFSC(ifsc);
+          }, 1000);
+        } else if (ifsc.length > 11) {
+          showValidationMessage('IFSC code cannot be more than 11 characters', 'error');
+        }
+      });
+
+      // Blur event for additional validation (works better on desktop)
+      newIfscInput.addEventListener('blur', function () {
+        const ifsc = this.value.trim().toUpperCase();
+        if (ifsc.length === 11) {
+          // Small delay to ensure user has finished typing
+          setTimeout(() => {
+            validateIFSC(ifsc);
+          }, 300);
+        }
+      });
+
+      // Enhanced focus event for mobile users
+      newIfscInput.addEventListener('focus', function () {
+        const ifsc = this.value.trim();
+        if (ifsc.length > 4) {
+          verifyButton.style.display = 'inline-block';
+        }
+      });
+
+      // Handle Enter key for desktop users (mobile will use verify button)
+      newIfscInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const ifsc = this.value.trim().toUpperCase();
+
+          if (ifsc.length === 11) {
+            validateIFSC(ifsc);
+          } else {
+            showValidationMessage('Please complete the IFSC code first', 'error');
+          }
+        }
+      });
+
+      // Enhanced IFSC validation function
+      async function validateIFSC(ifsc) {
+        try {
+          // Update verify button state
+          verifyButton.textContent = 'Verifying...';
+          verifyButton.disabled = true;
+          verifyButton.style.background = '#6c757d';
+
+          showValidationMessage('🔍 Verifying IFSC code...', 'loading');
+
+          {% comment %} console.log('🔍 Validating IFSC:', ifsc); {% endcomment %}
+
+          const response = await fetch(`${API_BASE_URL}/api/ifsc?ifsc=${ifsc}`);
+          const result = await response.json();
+
+          {% comment %} console.log('IFSC API Response:', result); {% endcomment %}
+
+          if (result.success && result.data) {
+            // Auto-fill Bank Name
+            if (bankNameInput) {
+              bankNameInput.value = result.data.BANK || '';
+              // Add visual feedback for auto-filled field
+              bankNameInput.style.background = '#f8f9fa';
+              setTimeout(() => {
+                bankNameInput.style.background = '';
+              }, 2000);
+            }
+
+            // Auto-fill Branch Name
+            if (branchNameInput) {
+              branchNameInput.value = result.data.BRANCH || '';
+              // Add visual feedback for auto-filled field
+              branchNameInput.style.background = '#f8f9fa';
+              setTimeout(() => {
+                branchNameInput.style.background = '';
+              }, 2000);
+            }
+
+            // Auto-fill Address if available
+            const addressInput =
+              document.getElementById('branchAddress') || document.querySelector('input[name="branchAddress"]');
+            if (addressInput && result.data.ADDRESS) {
+              addressInput.value = result.data.ADDRESS;
+            }
+
+            // Set Account Type to Savings by default
+            const accountTypeSelect = document.getElementById('accountType');
+            if (accountTypeSelect && !accountTypeSelect.value) {
+              accountTypeSelect.value = 'Savings';
+            }
+
+            // Show success message
+            showValidationMessage(`✅ Verified: ${result.data.BANK}`, 'success');
+
+            // Update verify button state
+            verifyButton.textContent = '✓ Verified';
+            verifyButton.style.background = '#28a745';
+            verifyButton.disabled = true;
+
+            // Auto-hide success message and reset button after 3 seconds
+            setTimeout(() => {
+              hideValidationMessage();
+              verifyButton.textContent = 'Verify IFSC';
+              verifyButton.style.background = '#007bff';
+              verifyButton.disabled = false;
+              verifyButton.style.display = 'none';
+            }, 3000);
+{% comment %}   console.log('✅ Auto-filled details:', {
+              bank: result.data.BANK,
+              branch: result.data.BRANCH,
+              address: result.data.ADDRESS,
+            }); {% endcomment %}
+          } else {
+            // Clear auto-filled fields on invalid IFSC
+            if (bankNameInput) bankNameInput.value = '';
+            if (branchNameInput) branchNameInput.value = '';
+
+            showValidationMessage(result.message || '❌ Invalid IFSC code', 'error');
+
+            // Reset verify button
+            verifyButton.textContent = 'Verify IFSC';
+            verifyButton.style.background = '#dc3545';
+            verifyButton.disabled = false;
+
+            // Reset button color after 2 seconds
+            setTimeout(() => {
+              verifyButton.style.background = '#007bff';
+            }, 2000);
+          }
+        } catch (error) {
+          {% comment %} console.error('IFSC Fetch error:', error); {% endcomment %}
+          showValidationMessage('⚠️ Network error. Please try again.', 'error');
+
+          // Reset verify button
+          verifyButton.textContent = 'Retry';
+          verifyButton.style.background = '#ffc107';
+          verifyButton.disabled = false;
+
+          setTimeout(() => {
+            verifyButton.textContent = 'Verify IFSC';
+            verifyButton.style.background = '#007bff';
+          }, 2000);
+        }
+      }
+    }, 500); // Wait 500ms for DOM to be ready
+  }
+
+  // Main DOMContentLoaded listener
+  document.addEventListener('DOMContentLoaded', function () {
+    const affiliateStatus = '{{ customer.metafields.custom.affiliate_status }}';
+    {% comment %} console.log('Current affiliate status:', affiliateStatus);
+    console.log('Customer email:', currentUserEmail); {% endcomment %}
+
+    if (affiliateStatus === 'approved') {
+      loadDashboardData();
+      setupBankDetailsForm();
+      setupIFSCValidation(); // Setup mobile-friendly IFSC validation for approved users
+    }  else if (affiliateStatus === '' || affiliateStatus === 'rejected' || affiliateStatus === 'application deleted') {
+      setupFormEventListeners();
+    }
+  });
+
+  // Dashboard data loading (unchanged)
+  async function loadDashboardData() {
+    try {
+      {% comment %} console.log('Fetching dashboard data...'); {% endcomment %}
+      const response = await fetch(`${API_BASE_URL}/api/dashboard?email=${encodeURIComponent(currentUserEmail)}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      {% comment %} console.log('Received dashboard data:', data); {% endcomment %}
+
+      if (data.hasAccess) {
+        // Update earnings
+        const totalEarningsElement = document.getElementById('totalEarnings');
+        if (totalEarningsElement) {
+          totalEarningsElement.textContent = `₹${data.totalEarnings || 0}`;
+        }
+
+        // Update referrals
+        const totalReferralsElement = document.getElementById('totalReferrals');
+        if (totalReferralsElement) {
+          totalReferralsElement.textContent = data.totalReferrals || 0;
+        }
+
+        // Update affiliate code
+        const affiliateCodeElement = document.getElementById('affiliateCode');
+        if (affiliateCodeElement) {
+          affiliateCodeElement.textContent = data.affiliateCode || 'Loading...';
+        }
+
+        // Update approvedAt date
+        if (data.approvedAt) {
+          const statusDateElement = document.querySelector('.status-date');
+          if (statusDateElement) {
+            let formattedDate;
+            try {
+              // Firestore timestamp case
+              if (data.approvedAt._seconds) {
+                formattedDate = new Date(data.approvedAt._seconds * 1000).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                });
+              } else {
+                // ISO or normal date string case
+                formattedDate = new Date(data.approvedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                });
+              }
+            } catch (e) {
+              {% comment %} console.error('❌ Date parse error:', e); {% endcomment %}
+              formattedDate = data.approvedAt; // fallback raw value
+            }
+
+            statusDateElement.innerHTML = `
+              <span class="calendar-icon">🗓️</span>
+              Account Active Since: ${formattedDate}
+            `;
+          }
+        }
+
+        // Fetch total orders for this coupon
+        if (data.affiliateCode) {
+          await fetchOrdersForAffiliate(data.affiliateCode);
+        }
+      }
+    } catch (error) {
+      {% comment %} console.error('Error loading dashboard data:', error); {% endcomment %}
+      showAlert('Failed to load dashboard data. Please refresh the page.', 'error');
+    }
+  }
+
+  // Fetch orders for affiliate (unchanged)
+  async function fetchOrdersForAffiliate(affiliateCode) {
+    try {
+      {% comment %} console.log('Fetching orders for affiliate code:', affiliateCode); {% endcomment %}
+
+      const ordersResponse = await fetch(`${API_BASE_URL}/api/orders?coupon=${encodeURIComponent(affiliateCode)}`);
+
+      if (!ordersResponse.ok) {
+        throw new Error(`Orders API error! status: ${ordersResponse.status}`);
+      }
+
+      const ordersData = await ordersResponse.json();
+      {% comment %} console.log('Orders data received:', ordersData); {% endcomment %}
+
+      // Update total reach (order count)
+      const totalReachElement = document.getElementById('totalReach');
+      if (totalReachElement) {
+        {% comment %} console.log('Updating totalReach element with:', ordersData.orderCount); {% endcomment %}
+        totalReachElement.textContent = ordersData.orderCount || 0;
+      } else {
+        {% comment %} console.error('❌ totalReach element not found in DOM'); {% endcomment %}
+      }
+
+      // Update earnings from orders data
+      const totalEarningsElement = document.getElementById('totalEarnings');
+      if (totalEarningsElement && ordersData.userEarnings) {
+        totalEarningsElement.textContent = `₹${ordersData.userEarnings}`;
+        {% comment %} console.log('Updated earnings:', ordersData.userEarnings); {% endcomment %}
+      } else {
+        {% comment %} console.error('❌ totalEarnings element not found or no earnings data'); {% endcomment %}
+      }
+    } catch (error) {
+      {% comment %} console.error('Error fetching orders:', error); {% endcomment %}
+    }
+  }
+
+  function setupBankDetailsForm() {
+  const bankForm = document.getElementById('bankDetailsForm');
+  if (!bankForm) {
+    {% comment %} console.log('Bank form not found, skipping setup'); {% endcomment %}
+    return;
+  }
+
+  // Check if user already has bank details saved
+  checkExistingBankDetails();
+
+  bankForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // Enhanced form validation before submission
+    const requiredFields = [
+      { id: 'accountHolderName', name: 'Account holder name' },
+      { id: 'bankName', name: 'Bank name' },
+      { id: 'accountNumber', name: 'Account number' },
+      { id: 'ifscCode', name: 'IFSC code' },
+    ];
+
+    // Check all required fields
+    for (const field of requiredFields) {
+      const input = document.getElementById(field.id);
+      if (!input || !input.value.trim()) {
+        showAlert(`${field.name} is required`, 'error');
+        if (input) input.focus();
+        return;
+      }
+    }
+
+    // IFSC validation
+    const ifscCode = document.getElementById('ifscCode').value.trim();
+    if (ifscCode.length !== 11) {
+      showAlert('IFSC code must be exactly 11 characters', 'error');
+      document.getElementById('ifscCode').focus();
+      return;
+    }
+
+    // Account number validation
+    const accountNumber = document.getElementById('accountNumber').value.trim();
+    if (accountNumber.length < 9 || accountNumber.length > 18) {
+      showAlert('Please enter a valid account number (9-18 digits)', 'error');
+      document.getElementById('accountNumber').focus();
+      return;
+    }
+
+    const submitButton = bankForm.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.innerHTML = `
+        <span style="display: inline-flex; align-items: center; gap: 8px;">
+          <div style="width: 16px; height: 16px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          Saving Details...
+        </span>
+      `;
+    }
+
+    try {
+      const formData = new FormData(e.target);
+      const bankData = Object.fromEntries(formData);
+
+      const response = await fetch(`${API_BASE_URL}/api/update-bank-details`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: currentUserEmail,
+          bankDetails: bankData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        showAlert('Bank details saved successfully! Form is now locked for security.', 'success');
+        
+        // Lock the form after successful submission
+        setTimeout(() => {
+          lockBankForm();
+        }, 1500);
+        
+      } else {
+        showAlert(result.message || 'Failed to save bank details', 'error');
+      }
+    } catch (error) {
+      {% comment %} console.error('Bank details error:', error); {% endcomment %}
+      showAlert('Error saving bank details. Please try again.', 'error');
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = `
+          <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_2796_8089)">
+                <path d="M2.80511 0.932434C1.78793 0.932434 0.960938 1.75943 0.960938 2.77661V11.9975C0.960938 13.0147 1.78793 13.8416 2.80511 13.8416H12.026C13.0432 13.8416 13.8702 13.0147 13.8702 11.9975V5.00402C13.8702 4.51416 13.6771 4.04448 13.3313 3.69869L11.1039 1.47128C10.7581 1.1255 10.2884 0.932434 9.79856 0.932434H2.80511ZM2.80511 3.69869C2.80511 3.18866 3.21717 2.77661 3.7272 2.77661H9.25972C9.76975 2.77661 10.1818 3.18866 10.1818 3.69869V5.54287C10.1818 6.0529 9.76975 6.46495 9.25972 6.46495H3.7272C3.21717 6.46495 2.80511 6.0529 2.80511 5.54287V3.69869ZM7.41554 8.30913C7.90465 8.30913 8.37372 8.50342 8.71957 8.84927C9.06542 9.19512 9.25972 9.6642 9.25972 10.1533C9.25972 10.6424 9.06542 11.1115 8.71957 11.4573C8.37372 11.8032 7.90465 11.9975 7.41554 11.9975C6.92644 11.9975 6.45737 11.8032 6.11152 11.4573C5.76567 11.1115 5.57137 10.6424 5.57137 10.1533C5.57137 9.6642 5.76567 9.19512 6.11152 8.84927C6.45737 8.50342 6.92644 8.30913 7.41554 8.30913Z" fill="white"/>
+            </g>
+            <defs>
+                <clipPath id="clip0_2796_8089">
+                    <path d="M0.960938 0.0103149H13.8702V14.7637H0.960938V0.0103149Z" fill="white"/>
+                </clipPath>
+            </defs>
+          </svg>
+          Save Bank Details
+        `;
+      }
+    }
+  });
+ }
+
+ 
+  async function checkExistingBankDetails() {
+  try {
+    {% comment %} console.log('🔍 Checking existing bank details for:', currentUserEmail); {% endcomment %}
+    
+    const response = await fetch(`${API_BASE_URL}/api/get-bank-details?email=${encodeURIComponent(currentUserEmail)}`);
+    
+    if (!response.ok) {
+      {% comment %} console.log('No existing bank details found or user not found'); {% endcomment %}
+      return;
+    }
+
+    const result = await response.json();
+    
+    if (result.success && result.bankDetails) {
+      {% comment %} console.log('✅ Found existing bank details, pre-filling and locking form'); {% endcomment %}
+      
+      // Pre-fill the form with existing data
+      const bankDetails = result.bankDetails;
+      
+      Object.entries(bankDetails).forEach(([key, value]) => {
+        if (key !== 'updatedAt' && key !== 'verifiedAt') {
+          const input = document.getElementById(key);
+          if (input && value) {
+            input.value = value;
+          }
+        }
+      });
+      
+      // Lock the form since details already exist
+      setTimeout(() => {
+        lockBankForm(true); // true indicates this is existing data
+      }, 500);
+      
+    } else {
+      {% comment %} console.log('No existing bank details found for user'); {% endcomment %}
+    }
+    
+  } catch (error) {
+    {% comment %} console.error('Error checking existing bank details:', error); {% endcomment %}
+    // Don't show error to user, just continue normally
+  }
+}
+
+// Function to lock the bank form
+function lockBankForm(isExistingData = false) {
+  const bankForm = document.getElementById('bankDetailsForm');
+  if (!bankForm) return;
+
+  // Get all form inputs and selects
+  const formElements = bankForm.querySelectorAll('input, select, button');
+  
+  formElements.forEach(element => {
+    element.disabled = true;
+    element.style.backgroundColor = '#f5f5f5';
+    element.style.color = '#6b7280';
+    element.style.cursor = 'not-allowed';
+    element.style.border = '1px solid #d1d5db';
+    element.style.opacity = '0.8';
+  });
+
+  // Update submit button to show locked state
+  const submitButton = bankForm.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.innerHTML = `
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+      </svg>
+      Details Saved & Secured
+    `;
+    submitButton.style.backgroundColor = '#6b7280';
+    submitButton.style.cursor = 'not-allowed';
+  }
+
+  // Add a lock indicator to form header
+  const bankDetailsHeader = document.querySelector('.bank-details h4');
+  if (bankDetailsHeader && !bankDetailsHeader.querySelector('.lock-indicator')) {
+    const lockIndicator = document.createElement('span');
+    lockIndicator.className = 'lock-indicator';
+    lockIndicator.innerHTML = ' 🔒';
+    lockIndicator.style.color = '#6b7280';
+    lockIndicator.style.fontSize = '16px';
+    lockIndicator.title = 'Bank details are saved and locked for security';
+    bankDetailsHeader.appendChild(lockIndicator);
+  }
+
+  // Add status message under the header
+  const existingMessage = document.querySelector('.bank-form-status-message');
+  if (!existingMessage) {
+    const statusMessage = document.createElement('div');
+    statusMessage.className = 'bank-form-status-message';
+    
+    const messageText = isExistingData 
+      ? 'Your bank details are already saved and secured.' 
+      : 'Bank details successfully saved and secured.';
+    
+    statusMessage.innerHTML = `
+      <div style="background: #e1f5fe; color: #01579b; padding: 12px 16px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #0288d1; display: flex; align-items: center; gap: 10px; font-size: 14px;">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+        </svg>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">${messageText}</div>
+          <div style="font-size: 13px; opacity: 0.8;">Contact support if you need to make changes to these details.</div>
+        </div>
+      </div>
+    `;
+    bankForm.prepend(statusMessage);
+  }
+
+  {% comment %} console.log('🔒 Bank form locked successfully'); {% endcomment %}
+}
+
+// Function to unlock form (for admin/development purposes only)
+window.unlockBankForm = function() {
+  if (!confirm('Are you sure you want to unlock the bank form? This should only be done by administrators.')) {
+    return;
+  }
+  
+  const bankForm = document.getElementById('bankDetailsForm');
+  if (!bankForm) return;
+
+  // Re-enable all form elements
+  const formElements = bankForm.querySelectorAll('input, select, button');
+  
+  formElements.forEach(element => {
+    element.disabled = false;
+    element.style.backgroundColor = '';
+    element.style.color = '';
+    element.style.cursor = '';
+    element.style.border = '';
+    element.style.opacity = '';
+  });
+
+  // Restore submit button
+  const submitButton = bankForm.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.innerHTML = `
+      <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0_2796_8089)">
+            <path d="M2.80511 0.932434C1.78793 0.932434 0.960938 1.75943 0.960938 2.77661V11.9975C0.960938 13.0147 1.78793 13.8416 2.80511 13.8416H12.026C13.0432 13.8416 13.8702 13.0147 13.8702 11.9975V5.00402C13.8702 4.51416 13.6771 4.04448 13.3313 3.69869L11.1039 1.47128C10.7581 1.1255 10.2884 0.932434 9.79856 0.932434H2.80511ZM2.80511 3.69869C2.80511 3.18866 3.21717 2.77661 3.7272 2.77661H9.25972C9.76975 2.77661 10.1818 3.18866 10.1818 3.69869V5.54287C10.1818 6.0529 9.76975 6.46495 9.25972 6.46495H3.7272C3.21717 6.46495 2.80511 6.0529 2.80511 5.54287V3.69869ZM7.41554 8.30913C7.90465 8.30913 8.37372 8.50342 8.71957 8.84927C9.06542 9.19512 9.25972 9.6642 9.25972 10.1533C9.25972 10.6424 9.06542 11.1115 8.71957 11.4573C8.37372 11.8032 7.90465 11.9975 7.41554 11.9975C6.92644 11.9975 6.45737 11.8032 6.11152 11.4573C5.76567 11.1115 5.57137 10.6424 5.57137 10.1533C5.57137 9.6642 5.76567 9.19512 6.11152 8.84927C6.45737 8.50342 6.92644 8.30913 7.41554 8.30913Z" fill="white"/>
+        </g>
+        <defs>
+            <clipPath id="clip0_2796_8089">
+                <path d="M0.960938 0.0103149H13.8702V14.7637H0.960938V0.0103149Z" fill="white"/>
+            </clipPath>
+        </defs>
+      </svg>
+      Save Bank Details
+    `;
+    submitButton.style.backgroundColor = '';
+    submitButton.style.cursor = '';
+  }
+
+  // Remove lock indicator
+  const lockIndicator = document.querySelector('.lock-indicator');
+  if (lockIndicator) {
+    lockIndicator.remove();
+  }
+
+  // Remove status message
+  const statusMessage = document.querySelector('.bank-form-status-message');
+  if (statusMessage) {
+    statusMessage.remove();
+  }
+
+  {% comment %} console.log('🔓 Bank form unlocked'); {% endcomment %}
+}
+  // Form event listeners setup (unchanged)
+  function setupFormEventListeners() {
+    const form = document.querySelector('#affiliateApplicationForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const submitButton = form.querySelector('.submit-button');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+      }
+
+      try {
+        const formData = new FormData(e.target);
+        const data = {};
+
+        // Process form data properly
+        for (let [key, value] of formData.entries()) {
+          if (data[key]) {
+            // Handle multiple values for same key
+            if (Array.isArray(data[key])) {
+              data[key].push(value);
+            } else {
+              data[key] = [data[key], value];
+            }
+          } else {
+            data[key] = value;
+          }
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/affiliate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          showAlert('Application submitted successfully! Please wait while we update your status...', 'success');
+
+          // Wait for Shopify metafield updates before reloading
+          setTimeout(() => {
+            window.location.reload();
+          }, 5000);
+        } else {
+          showAlert(result.message || 'Application submission failed', 'error');
+          resetSubmitButton(submitButton);
+        }
+      } catch (error) {
+        {% comment %} console.error('Form submission error:', error); {% endcomment %}
+        showAlert('Error submitting application. Please try again.', 'error');
+        resetSubmitButton(submitButton);
+      }
+    });
+  }
+
+  // Reset submit button (unchanged)
+  function resetSubmitButton(button) {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Submit Application';
+    }
+  }
+
+  // Copy affiliate code function (unchanged)
+  function copyAffiliateCode() {
+    const affiliateCodeElement = document.getElementById('affiliateCode');
+    if (!affiliateCodeElement) {
+      showAlert('Affiliate code not found', 'error');
+      return;
+    }
+
+    const affiliateCode = affiliateCodeElement.textContent.trim();
+
+    if (affiliateCode === 'Loading...' || affiliateCode === 'Generating...') {
+      showAlert('Please wait for affiliate code to load', 'warning');
+      return;
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard
+        .writeText(affiliateCode)
+        .then(() => {
+          showAlert('Affiliate code copied to clipboard!', 'success');
+        })
+        .catch((error) => {
+          {% comment %} console.error('Clipboard error:', error); {% endcomment %}
+          fallbackCopyTextToClipboard(affiliateCode);
+        });
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      fallbackCopyTextToClipboard(affiliateCode);
+    }
+  }
+
+  // Fallback copy function (unchanged)
+  function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+      showAlert('Affiliate code copied to clipboard!', 'success');
+    } catch (err) {
+      {% comment %} console.error('Fallback copy failed:', err); {% endcomment %}
+      showAlert('Failed to copy code. Please copy manually: ' + text, 'error');
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  // Show reapply form (unchanged)
+  function showReapplyForm() {
+    const reapplyForm = document.getElementById('reapplyForm');
+    if (reapplyForm) {
+      reapplyForm.style.display = 'block';
+      setupFormEventListeners();
+    }
+  }
+
+  // Add CSS for spinner animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+<section class="affiliate-application-section">
+  <div class="container">
+    {% unless customer %}
+      <!-- Not logged in - show promotional content -->
+      <div class="top-banner">
+        <img
+          src="{{ 'affmobweb.webp' | file_url }}"
+          alt="Mobile Banner"
+          class="mobile-banner"
+        >
+        <img
+          src="{{ 'affwebp.webp' | file_url }}"
+          alt="desktop Banner"
+          class="desktop-banner"
+        >
+      </div>
+
+      <div class="purity-mission-banner">
+        <h1>Join Us On Our Purity Mission!</h1>
+      </div>
+      <div class="affiliate-header">
+        <p>
+          Creators and influencers, your voice can change how India eats. Share stories that
+guide people to real food with Anveshan and earn with every conversion.
+        </p>
+      </div>
+      <div class="section-with-stats">
+        <div class="stats-banner">
+          <div class="stat-item">
+            <div class="stat-value">10%</div>
+            <div class="stat-label">Minimum Commission</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">22%</div>
+            <div class="stat-label">Coupon Code Discount</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">50+</div>
+            <div class="stat-label">Active Affiliates</div>
+          </div>
+        </div>
+
+        <div class="green-background-section">
+          <div class="how-it-works-section">
+            <h2>How It Works – Simple Steps to Start Earning!</h2>
+            <div class="how-it-works-content">
+              <!-- TEXT -->
+              <div class="how-it-works-text">
+                <ol>
+                  <li>
+                    <h3>Apply in Seconds</h3>
+                    <p>Fill out a quick and easy form to join the Anveshan Affiliate Program.</p>
+                  </li>
+                  <li>
+                    <h3>Get Approved Fast</h3>
+                    <p>Our team will review your application and get you started in no time!</p>
+                  </li>
+                  <li>
+                    <h3>Get Your Unique Coupon Code</h3>
+                    <p>Receive your personalized code to track sales and start earning commissions.</p>
+                  </li>
+                  <li>
+                    <h3>Share & Earn</h3>
+                    <p>Share your code across your platforms, and start earning a commission with every order!</p>
+                  </li>
+                </ol>
+              </div>
+              <!-- IMAGE -->
+              <div class="how-it-works-image">
+                <img
+                  src="{{ 'in.jpg' | file_url }}"
+                  alt="Content creator showing their phone with social media reactions"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-banner" onclick="scrollToForm()">
+        <img src="{{ 'moweb.jpg' | file_url }}" alt="Mobile Banner" class="mobile-banner">
+        <img src="{{ 'web-in.jpg' | file_url }}" alt="Desktop Banner" class="desktop-banner">
+      </div>
+      <script>
+        function scrollToForm() {
+          document.getElementById('affiliate-form').scrollIntoView({
+            behavior: 'smooth',
+          });
+        }
+      </script>
+
+      <div class="purity-mission-bannerr">
+        <h1>Top Creators In The Anveshan Family</h1>
+
+        <div class="creators-wrapper">
+          <div class="creators-container">
+            <!-- 1st Set of Images -->
+            <div class="creator">
+              <img src="{{ '1pic.jpg' | file_url }}" alt="Creator 1">
+            </div>
+            <div class="creator">
+              <img src="{{ '2pic.jpg' | file_url }}" alt="Creator 2">
+            </div>
+            <div class="creator">
+              <img src="{{ '4pic.jpg' | file_url }}" alt="Creator 3">
+            </div>
+            <div class="creator">
+              <img src="{{ '3pic.jpg' | file_url }}" alt="Creator 4">
+            </div>
+
+            <!-- 2nd Set of Same Images (for seamless loop) -->
+            <div class="creator">
+              <img src="{{ '1pic.jpg' | file_url }}" alt="Creator 1">
+            </div>
+            <div class="creator">
+              <img src="{{ '4pic.jpg' | file_url }}" alt="Creator 2">
+            </div>
+            <div class="creator">
+              <img src="{{ '2pic.jpg' | file_url }}" alt="Creator 3">
+            </div>
+            <div class="creator">
+              <img src="{{ '3pic.jpg' | file_url }}" alt="Creator 4">
+            </div>
+          </div>
+        </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const wrapper = document.querySelector('.creators-wrapper');
+            if (wrapper) {
+              wrapper.addEventListener('wheel', function (e) {
+                if (e.deltaY !== 0) {
+                  e.preventDefault(); // stop vertical scroll
+                  wrapper.scrollLeft += e.deltaY; // scroll horizontally instead
+                }
+              });
+            }
+          });
+        </script>
+      </div>
+
+      <div class="affiliate-invite-section">
+        <h1>Join Our Affiliate Program</h1>
+        <p>
+          Creators and influencers, your voice can change how India eats. Share stories that
+guide people to real food with Anveshan and earn with every conversion.
+        </p>
+      </div>
+      <div class="login-prompt">
+        <h3>Please log in to apply</h3>
+        <p>You need to have an account to join our affiliate program.</p>
+
+        <a href="/account/login" class="btn btn-primary custom-btn">Log In</a>
+        <a href="/account/register" class="btn btn-secondary custom-btn">Create Account</a>
+      </div>
+
+    {% else %}
+      <!-- User is logged in - check metafield status -->
+      {% assign affiliate_status = customer.metafields.custom.affiliate_status %}
+
+      {% if affiliate_status == 'approved' %}
+        <!-- APPROVED USER - SHOW DASHBOARD -->
+        <div class="dashboard-container">
+          <div class="dashboard-header">
+            <h3>Welcome to Your Affiliate Dashboard</h3>
+            <p>Congratulations! Your affiliate application has been approved.</p>
+          </div>
+          <div>
+            <div class="earnings-summary">
+              <div class="earnings-summary-header">
+                <h3>Earnings & Referral Summary</h3>
+                <span class="eye-icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-eye"
+                  >
+                    <path d="M2.08 12.87c.18-1.07 1.05-2.07 2.1-2.88.94-.74 2.1-1.37 3.29-1.89 1.15-.5 2.51-1 3.93-1.05 1.58-.06 3.16.29 4.54.91 1.25.56 2.45 1.25 3.51 2.05 1.06.82 2.08 1.83 2.22 2.9.22 1.63-.64 3.03-2.14 4.07-1.33.91-3.13 1.53-4.99 1.87-1.6.3-3.26.26-4.9-.11-1.74-.4-3.41-1.09-4.88-2.16-.9-.67-1.68-1.5-2.26-2.4-.4-.63-.7-1.3-.9-2.01-.06-.17-.11-.34-.16-.51z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+              </div>
+
+              <div class="stats-grid-new">
+                <div class="stat-card-new">
+                  <div class="stat-card-header">
+                    <div class="stat-icon code">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-code"
+                      >
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
+                      </svg>
+                    </div>
+                    <p class="stat-label-new">Your Unique Code</p>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <p class="stat-value-new code-value" id="affiliateCode" style="margin: 0;">Loading..</p>
+                    <button class="copy-btn-new" onclick="copyAffiliateCode()">Copy Code</button>
+                  </div>
+                </div>
+                <div class="stat-card-new">
+                  <div class="stat-card-header">
+                    <div class="stat-icon earnings">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-indian-rupee"
+                      >
+                        <path d="M6 3h12" />
+                        <path d="M6 8h12" />
+                        <path d="M10 12h4" />
+                        <path d="M12 12v6" />
+                        <path d="M12 12a1 1 0 0 0-1-1" />
+                      </svg>
+                    </div>
+                    <p class="stat-label-new">Your Impact & Earnings</p>
+                  </div>
+                  <p class="stat-value-new" id="totalEarnings">Loading..</p>
+                </div>
+                <div class="stat-card-new">
+                  <div class="stat-card-header">
+                    <div class="stat-icon reach">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-users"
+                      >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </div>
+                    <p class="stat-label-new">Total Reach via Code</p>
+                  </div>
+                  <p class="stat-value-new" id="totalReach">Loading...</p>
+                </div>
+                {% comment %}
+                  <div class="stat-card-new">
+                    <div class="stat-card-header">
+                      <div class="stat-icon conversions">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-circle-check"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="m9 12 2 2 4-4" />
+                        </svg>
+                      </div>
+                      <p class="stat-label-new">Successful conversions</p>
+                    </div>
+                    <p class="stat-value-new" id="totalRevenue">Loading..</p>
+                  </div>
+                {% endcomment %}
+              </div>
+            </div>
+
+            <div class="flex-dashboard-sections">
+              <div class="dashboard-section account-status-section">
+                <h4>Account Status</h4>
+                <div class="status-box">
+                  <span class="status-text"> <span class="status-dot"></span> Status: Active </span>
+                  <span class="check-icon">✓</span>
+                </div>
+                <div class="status-date">
+                  <span class="calendar-icon">🗓️</span>
+                  Account Active Since: Loading...
+                </div>
+              </div>
+
+              <div class="dashboard-section profile-info-section">
+                <h4 class="section-title">Profile Information</h4>
+                <div class="profile-grid">
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7129)">
+                            <path d="M6.5132 8.07384C7.49141 8.07384 8.42956 7.68525 9.12126 6.99355C9.81295 6.30185 10.2015 5.3637 10.2015 4.38549C10.2015 3.40728 9.81295 2.46913 9.12126 1.77744C8.42956 1.08574 7.49141 0.697144 6.5132 0.697144C5.53499 0.697144 4.59684 1.08574 3.90515 1.77744C3.21345 2.46913 2.82485 3.40728 2.82485 4.38549C2.82485 5.3637 3.21345 6.30185 3.90515 6.99355C4.59684 7.68525 5.53499 8.07384 6.5132 8.07384ZM5.19635 9.45697C2.35805 9.45697 0.0585938 11.7564 0.0585938 14.5947C0.0585938 15.0673 0.441836 15.4505 0.914406 15.4505H12.112C12.5846 15.4505 12.9678 15.0673 12.9678 14.5947C12.9678 11.7564 10.6684 9.45697 7.83006 9.45697H5.19635Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7129">
+                                <path d="M0.0585938 0.697144H12.9678V15.4505H0.0585938V0.697144Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Name</label>
+                      <span>
+                        {{ customer.first_name }}
+                        {{ customer.last_name }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7137)">
+                            <path d="M1.44172 2.55487C0.678121 2.55487 0.0585938 3.1744 0.0585938 3.938C0.0585938 4.37311 0.263182 4.78229 0.611846 5.0445L6.88204 9.74715C7.21053 9.99208 7.66005 9.99208 7.98854 9.74715L14.2587 5.0445C14.6074 4.78229 14.812 4.37311 14.812 3.938C14.812 3.1744 14.1925 2.55487 13.4289 2.55487H1.44172ZM0.0585938 5.78217V11.7757C0.0585938 12.7929 0.88559 13.6199 1.90277 13.6199H12.9678C13.985 13.6199 14.812 12.7929 14.812 11.7757V5.78217L8.54179 10.4848C7.8848 10.9776 6.98577 10.9776 6.32878 10.4848L0.0585938 5.78217Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7137">
+                                <path d="M0.0585938 0.710693H14.812V15.4641H0.0585938V0.710693Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Email</label>
+                      <span>{{ customer.email }}</span>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7145)">
+                            <path d="M4.81022 1.43295C4.58835 0.896991 4.0034 0.61172 3.44438 0.764441L0.908642 1.45601C0.407258 1.59432 0.0585938 2.0496 0.0585938 2.56827C0.0585938 9.69716 5.83893 15.4775 12.9678 15.4775C13.4865 15.4775 13.9418 15.1288 14.0801 14.6274L14.7716 12.0917C14.9244 11.5327 14.6391 10.9477 14.1031 10.7259L11.3369 9.57325C10.8672 9.37731 10.3226 9.51274 10.0027 9.90751L8.83859 11.3281C6.81 10.3686 5.16753 8.72608 4.20798 6.69749L5.62857 5.53624C6.02334 5.21351 6.15877 4.67178 5.96283 4.2021L4.81022 1.43584V1.43295Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7145">
+                                <path d="M0.0585938 0.724121H14.812V15.4775H0.0585938V0.724121Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Phone</label>
+                      <span>{{ customer.default_address.phone }}</span>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7153)">
+                            <path d="M6.51434 4.80056C4.68169 4.80056 3.20347 6.27878 3.20347 8.11143C3.20347 9.94408 4.68169 11.4223 6.51434 11.4223C8.34698 11.4223 9.82521 9.94408 9.82521 8.11143C9.82521 6.27878 8.34698 4.80056 6.51434 4.80056ZM6.51434 10.2639C5.33003 10.2639 4.36184 9.29862 4.36184 8.11143C4.36184 6.92424 5.32715 5.95894 6.51434 5.95894C7.70152 5.95894 8.66683 6.92424 8.66683 8.11143C8.66683 9.29862 7.69864 10.2639 6.51434 10.2639ZM10.7329 4.66513C10.7329 5.09448 10.3871 5.43738 9.96064 5.43738C9.53129 5.43738 9.18839 5.0916 9.18839 4.66513C9.18839 4.23867 9.53417 3.89288 9.96064 3.89288C10.3871 3.89288 10.7329 4.23867 10.7329 4.66513ZM12.9257 5.44891C12.8767 4.41444 12.6405 3.49812 11.8826 2.74316C11.1277 1.9882 10.2113 1.75191 9.17686 1.70005C8.1107 1.63954 4.91509 1.63954 3.84893 1.70005C2.81735 1.74903 1.90102 1.98532 1.14318 2.74028C0.385342 3.49523 0.151939 4.41156 0.100071 5.44602C0.0395595 6.51219 0.0395595 9.70779 0.100071 10.774C0.149057 11.8084 0.385342 12.7247 1.14318 13.4797C1.90102 14.2347 2.81446 14.4709 3.84893 14.5228C4.91509 14.5833 8.1107 14.5833 9.17686 14.5228C10.2113 14.4738 11.1277 14.2375 11.8826 13.4797C12.6376 12.7247 12.8739 11.8084 12.9257 10.774C12.9862 9.70779 12.9862 6.51507 12.9257 5.44891ZM11.5484 11.9179C11.3236 12.4827 10.8885 12.9178 10.3208 13.1454C9.47078 13.4826 7.45371 13.4048 6.51434 13.4048C5.57496 13.4048 3.55502 13.4797 2.70785 13.1454C2.14307 12.9207 1.70796 12.4856 1.48032 11.9179C1.14318 11.0679 1.22098 9.05081 1.22098 8.11143C1.22098 7.17206 1.14606 5.15211 1.48032 4.30494C1.70508 3.74016 2.14019 3.30505 2.70785 3.07741C3.5579 2.74028 5.57496 2.81808 6.51434 2.81808C7.45371 2.81808 9.47366 2.74316 10.3208 3.07741C10.8856 3.30217 11.3207 3.73728 11.5484 4.30494C11.8855 5.15499 11.8077 7.17206 11.8077 8.11143C11.8077 9.05081 11.8855 11.0708 11.5484 11.9179Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7153">
+                                <path d="M0.0585938 0.737549H12.9678V15.4909H0.0585938V0.737549Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Primary Platform</label>
+                      <span>Instagram</span>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7161)">
+                            <path d="M4.66903 3.05635C4.66903 2.29274 5.28855 1.67322 6.05216 1.67322H6.97424C7.73785 1.67322 8.35737 2.29274 8.35737 3.05635V13.1993C8.35737 13.9629 7.73785 14.5824 6.97424 14.5824H6.05216C5.28855 14.5824 4.66903 13.9629 4.66903 13.1993V3.05635ZM0.0585938 8.58887C0.0585938 7.82526 0.678121 7.20574 1.44172 7.20574H2.36381C3.12741 7.20574 3.74694 7.82526 3.74694 8.58887V13.1993C3.74694 13.9629 3.12741 14.5824 2.36381 14.5824H1.44172C0.678121 14.5824 0.0585938 13.9629 0.0585938 13.1993V8.58887ZM10.6626 3.51739H11.5847C12.3483 3.51739 12.9678 4.13692 12.9678 4.90052V13.1993C12.9678 13.9629 12.3483 14.5824 11.5847 14.5824H10.6626C9.89899 14.5824 9.27946 13.9629 9.27946 13.1993V4.90052C9.27946 4.13692 9.89899 3.51739 10.6626 3.51739Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7161">
+                                <path d="M0.0585938 0.751099H12.9678V15.5045H0.0585938V0.751099Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Experience Level</label>
+                      <span>Beginner</span>
+                    </div>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-icon">
+                      <svg width="19" height="16" viewBox="0 0 19 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_2836_7169)">
+                            <path d="M4.20798 0.764526C4.81937 0.764526 5.40571 1.0074 5.83802 1.43971C6.27033 1.87202 6.5132 2.45836 6.5132 3.06974C6.5132 3.68112 6.27033 4.26747 5.83802 4.69978C5.40571 5.13209 4.81937 5.37496 4.20798 5.37496C3.5966 5.37496 3.01026 5.13209 2.57795 4.69978C2.14564 4.26747 1.90277 3.68112 1.90277 3.06974C1.90277 2.45836 2.14564 1.87202 2.57795 1.43971C3.01026 1.0074 3.5966 0.764526 4.20798 0.764526ZM14.812 0.764526C15.4234 0.764526 16.0097 1.0074 16.442 1.43971C16.8743 1.87202 17.1172 2.45836 17.1172 3.06974C17.1172 3.68112 16.8743 4.26747 16.442 4.69978C16.0097 5.13209 15.4234 5.37496 14.812 5.37496C14.2006 5.37496 13.6143 5.13209 13.1819 4.69978C12.7496 4.26747 12.5068 3.68112 12.5068 3.06974C12.5068 2.45836 12.7496 1.87202 13.1819 1.43971C13.6143 1.0074 14.2006 0.764526 14.812 0.764526ZM0.0585938 9.37163C0.0585938 7.67441 1.43596 6.29705 3.13318 6.29705H4.36359C4.82175 6.29705 5.25686 6.3979 5.64874 6.57655C5.61128 6.78402 5.594 7.00014 5.594 7.21913C5.594 8.31987 6.07809 9.30824 6.84169 9.98539C6.83593 9.98539 6.83017 9.98539 6.82152 9.98539H0.672358C0.33522 9.98539 0.0585938 9.70877 0.0585938 9.37163ZM11.7374 9.98539C11.7316 9.98539 11.7259 9.98539 11.7172 9.98539C12.4837 9.30824 12.9649 8.31987 12.9649 7.21913C12.9649 7.00014 12.9448 6.78691 12.9102 6.57655C13.3021 6.39502 13.7372 6.29705 14.1953 6.29705H15.4257C17.123 6.29705 18.5003 7.67441 18.5003 9.37163C18.5003 9.71165 18.2237 9.98539 17.8866 9.98539H11.7374ZM6.5132 7.21913C6.5132 6.48548 6.80465 5.78187 7.32342 5.26309C7.84219 4.74432 8.5458 4.45287 9.27946 4.45287C10.0131 4.45287 10.7167 4.74432 11.2355 5.26309C11.7543 5.78187 12.0457 6.48548 12.0457 7.21913C12.0457 7.95279 11.7543 8.6564 11.2355 9.17517C10.7167 9.69395 10.0131 9.98539 9.27946 9.98539C8.5458 9.98539 7.84219 9.69395 7.32342 9.17517C6.80465 8.6564 6.5132 7.95279 6.5132 7.21913ZM3.74694 14.7485C3.74694 12.6277 5.46721 10.9075 7.58801 10.9075H10.9709C13.0917 10.9075 14.812 12.6277 14.812 14.7485C14.812 15.1721 14.4691 15.5179 14.0426 15.5179H4.51631C4.09272 15.5179 3.74694 15.175 3.74694 14.7485Z" fill="#9CA3AF"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_2836_7169">
+                                <path d="M0.0585938 0.764526H18.5003V15.5179H0.0585938V0.764526Z" fill="white"/>
+                            </clipPath>
+                        </defs>
+                      </svg>
+                    </span>
+                    <div class="profile-item-content">
+                      <label>Followers</label>
+                      <span>1000-5000</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              id="alertBox"
+              class="alert-box"
+              style="display:none; padding:10px; margin:10px 0; border-radius:5px;"
+            ></div>
+            <style>
+                .alert-box {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                display: none;
+              }
+
+              .alert-success {
+                background: #d4edda;
+                color: #155724;
+              }
+
+              .alert-error {
+                background: #f8d7da;
+                color: #721c24;
+              }
+
+              .alert-warning {
+                background: #fff3cd;
+                color: #856404;
+              }
+            </style>
+            <!-- Bank Details Form -->
+            <div class="dashboard-section">
+              <div class="bank-details">
+                <h4>Bank Details for Payouts</h4>
+              </div>
+              <form id="bankDetailsForm" class="bank-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="accountHolderName">Account Holder Name *</label>
+                    <input
+                      type="text"
+                      id="accountHolderName"
+                      name="accountHolderName"
+                      placeholder="Enter account holder name"
+                      required
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="bankName">Bank Name *</label>
+                    <input
+                      type="text"
+                      id="bankName"
+                      name="bankName"
+                      placeholder="Enter bank name"
+                      required
+                    >
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="accountNumber">Account Number *</label>
+                    <input
+                      type="text"
+                      id="accountNumber"
+                      name="accountNumber"
+                      placeholder="Enter account number"
+                      required
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="ifscCode">IFSC Code *</label>
+                    <input
+                      type="text"
+                      id="ifscCode"
+                      name="ifscCode"
+                      placeholder="Enter IFSC code"
+                      required
+                    >
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="branchName">Branch Name</label>
+                    <input
+                      type="text"
+                      id="branchName"
+                      name="branchName"
+                      placeholder="Enter branch name"
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="accountType">Account Type</label>
+                    <select id="accountType" name="accountType">
+                      <option value="" disabled selected hidden>Select account type</option>
+                      <option value="Savings">Savings</option>
+                      <option value="Current">Current</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary bank-details-btn">
+                  <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2796_8089)">
+                        <path d="M2.80511 0.932434C1.78793 0.932434 0.960938 1.75943 0.960938 2.77661V11.9975C0.960938 13.0147 1.78793 13.8416 2.80511 13.8416H12.026C13.0432 13.8416 13.8702 13.0147 13.8702 11.9975V5.00402C13.8702 4.51416 13.6771 4.04448 13.3313 3.69869L11.1039 1.47128C10.7581 1.1255 10.2884 0.932434 9.79856 0.932434H2.80511ZM2.80511 3.69869C2.80511 3.18866 3.21717 2.77661 3.7272 2.77661H9.25972C9.76975 2.77661 10.1818 3.18866 10.1818 3.69869V5.54287C10.1818 6.0529 9.76975 6.46495 9.25972 6.46495H3.7272C3.21717 6.46495 2.80511 6.0529 2.80511 5.54287V3.69869ZM7.41554 8.30913C7.90465 8.30913 8.37372 8.50342 8.71957 8.84927C9.06542 9.19512 9.25972 9.6642 9.25972 10.1533C9.25972 10.6424 9.06542 11.1115 8.71957 11.4573C8.37372 11.8032 7.90465 11.9975 7.41554 11.9975C6.92644 11.9975 6.45737 11.8032 6.11152 11.4573C5.76567 11.1115 5.57137 10.6424 5.57137 10.1533C5.57137 9.6642 5.76567 9.19512 6.11152 8.84927C6.45737 8.50342 6.92644 8.30913 7.41554 8.30913Z" fill="white"/>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2796_8089">
+                            <path d="M0.960938 0.0103149H13.8702V14.7637H0.960938V0.0103149Z" fill="white"/>
+                        </clipPath>
+                    </defs>
+                  </svg>
+                  Save Bank Details
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      {% elsif affiliate_status == 'pending' %}
+        <!-- PENDING APPLICATION -->
+        <div class="status-container">
+          <img
+            src="{{ 'ghee_matki_with_under_view_copy_1.png' | file_url }}"
+            alt="Under Review"
+            class="status-jar"
+          >
+
+          <h3 class="status-title">Good Things Take a Moment</h3>
+          <p class="status-subtitle">Our team reviewing your profile to see if this collab is meant to be.</p>
+
+          <div class="status-details">
+            <p><strong>Status:</strong> <span class="status-badge pending">Under Review</span></p>
+            <p>
+              <strong>Submitted by:</strong> {{ customer.first_name }}
+              {{ customer.last_name }}
+            </p>
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+          </div>
+
+          <p class="status-message">
+            We typically review applications within 3-5 business days. You'll receive an email notification once your
+            application is processed.
+          </p>
+        </div>
+
+      {% elsif affiliate_status == 'rejected' %}
+        <!-- REJECTED APPLICATION -->
+
+        <div class="status-container">
+          <img
+            src="{{ 'ghee_matki_with_under_view_copy_1_1.png' | file_url }}"
+            alt="Under Review"
+            class="status-jar"
+          >
+
+          <h3 class="status-title">This Isn’t Goodbye</h3>
+          <p class="status-subtitle">
+            We’re pausing on your application for now, but we’d love to see you reapply in the future.
+          </p>
+
+          <div class="status-details">
+            <p><strong>Status:</strong> <span class="status-badge rejected">Rejected</span></p>
+            <p>
+              <strong>Submitted by:</strong> {{ customer.first_name }}
+              {{ customer.last_name }}
+            </p>
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+          </div>
+          <div class="reapply-section">
+            <button id="reapplyBtn" class="reapply-btn" onclick="showReapplyForm()">Reapply</button>
+          </div>
+        </div>
+
+        </div>
+
+        <!-- Hidden reapply form -->
+        {% comment %}
+          <div id="reapplyForm" class="form-container" style="display: none;">
+            <div class="affiliate-header">
+              <h1>Reapply for Affiliate Program</h1>
+              <p>Please submit your application again with updated information</p>
+            </div>
+            <form id="affiliateApplicationForm" class="affiliate-application-form">
+              <input type="hidden" name="customer_id" value="{{ customer.id }}">
+
+              <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" name="firstName" value="{{ customer.first_name }}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" name="lastName" value="{{ customer.last_name }}" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="currentUserEmail">Email *</label>
+                  <input type="email" name="currentUserEmail" value="{{ customer.email }}" readonly>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value="{{ customer.phone | default: customer.default_address.phone }}"
+                      required
+                    >
+                  </div>
+                  <div class="form-group">
+                    <label for="experienceLevel">Experience Level *</label>
+                    <select name="experienceLevel" required>
+                      <option value="">Select Experience Level</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="socialMediaPlatforms">Primary Platform *</label>
+                  <select name="socialMediaPlatforms" required>
+                    <option value="">Select Primary Platform</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Blog/Website">Blog/Website</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="followersCount">Followers Count *</label>
+                  <select name="followersCount" required>
+                    <option value="">Select Followers Range</option>
+                    <option value="1000-5000">1,000 - 5,000</option>
+                    <option value="5000-10000">5,000 - 10,000</option>
+                    <option value="10000-50000">10,000 - 50,000</option>
+                    <option value="50000-100000">50,000 - 100,000</option>
+                    <option value="100000+">100,000+</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary submit-button">Submit Application</button>
+            </form>
+          </div>
+        {% endcomment %}
+        <div style="max-width: 800px; margin: 0 auto;">
+          <div id="reapplyForm" class="form-container" style="display: none;">
+            <form id="affiliateApplicationForm" class="affiliate-application-form">
+              <input type="hidden" name="customer_id" value="{{ customer.id }}">
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/user.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Personal Information
+                </h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" name="firstName" value="{{ customer.first_name }}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" name="lastName" value="{{ customer.last_name }}" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="currentUserEmail">Email *</label>
+                  <input type="email" name="currentUserEmail" value="{{ customer.email }}" readonly>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value="{{ customer.phone | default: customer.default_address.phone }}"
+                      required
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/loc.png?v=1757437736"
+                    alt="Location Icon"
+                    class="form-icon"
+                  >
+                  Address Information
+                </h3>
+                <div class="form-group">
+                  <label for="address">Address *</label>
+                  <textarea
+                    name="address"
+                    placeholder="Enter your complete address"
+                    required
+                  >{{ customer.default_address | format_address }}</textarea>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" name="city" value="{{ customer.default_address.city }}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="pincode">Pincode *</label>
+                    <input type="text" name="pincode" value="{{ customer.default_address.zip }}" required>
+                  </div>
+                </div>
+              </div>
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/share.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Social Media / Platforms
+                </h3>
+                <div class="form-group">
+                  <label for="experienceLevel">Experience Level *</label>
+                  <select name="experienceLevel" required>
+                    <option value="">Select Experience Level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="socialMediaPlatforms">Primary Platform *</label>
+                  <select name="socialMediaPlatforms" required>
+                    <option value="">Select Primary Platform</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Blog/Website">Blog/Website</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="followersCount">Followers Count *</label>
+                  <select name="followersCount" required>
+                    <option value="">Select Followers Range</option>
+                    <option value="1000-5000">1,000 - 5,000</option>
+                    <option value="5000-10000">5,000 - 10,000</option>
+                    <option value="10000-50000">10,000 - 50,000</option>
+                    <option value="50000-100000">50,000 - 100,000</option>
+                    <option value="100000+">100,000+</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="instagramHandle">Instagram Handle</label>
+                  <input type="text" name="instagramHandle" placeholder="@yourusername">
+                </div>
+              </div>
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/moti.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Motivation
+                </h3>
+                <div class="form-group">
+                  <label for="whyJoin">Why do you want to join our affiliate program? *</label>
+                  <textarea
+                    name="whyJoin"
+                    placeholder="Tell us what interests you about our brand..."
+                    required
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/agree.png?v=1757437736"
+                    alt="Agreement Icon"
+                    class="form-icon"
+                  >
+                  Agreement
+                </h3>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="terms_agreement" value="1" required>
+                    I agree to the <a href="/pages/affiliate-terms" target="_blank">Affiliate Terms and Conditions</a> *
+                  </label>
+                </div>
+              </div>
+
+              {% comment %} <button type="submit" class="btn btn-primary submit-button">Submit Application</button> {% endcomment %}
+              <button
+                class="submit-button"
+                style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 1.5rem 1.5rem; border: none; border-radius: 9999px; background-color: #1e5a3c; color: #fff; font-size: 1.125rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); cursor: pointer; transition: background-color 0.3s ease; gap: 0.5rem;"
+              >
+                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16.3785 0.175119C16.6941 0.393869 16.8597 0.771994 16.8003 1.15012L14.8003 14.1501C14.7535 14.4532 14.5691 14.7189 14.3003 14.8689C14.0316 15.0189 13.7097 15.0376 13.4253 14.9189L9.68783 13.3657L7.5472 15.6814C7.26908 15.9845 6.83158 16.0845 6.4472 15.9345C6.06283 15.7845 5.81283 15.4126 5.81283 15.0001V12.3876C5.81283 12.2626 5.8597 12.1439 5.94408 12.0532L11.1816 6.33762C11.3628 6.14074 11.3566 5.83762 11.1691 5.65012C10.9816 5.46262 10.6784 5.45012 10.4816 5.62824L4.12533 11.2751L1.36595 9.89387C1.0347 9.72824 0.8222 9.39699 0.812825 9.02824C0.80345 8.65949 0.997201 8.31574 1.31595 8.13137L15.316 0.131369C15.6503 -0.0592555 16.0628 -0.0405055 16.3785 0.175119Z" fill="white"/>
+                </svg>
+                Submit Application
+              </button>
+            </form>
+          </div>
+        </div>
+
+      {% else %}
+        <!-- NEW USER - NO APPLICATION YET -->
+
+        <div class="top-banner">
+     <img
+          src="{{ 'affmo.jpg' | file_url }}"
+          alt="Mobile Banner"
+          class="mobile-banner"
+        >
+        <img
+          src="{{ 'affweb.jpg' | file_url }}"
+          alt="desktop Banner"
+          class="desktop-banner"
+        >
+        </div>
+
+        <div class="purity-mission-banner">
+          <h1>Join Us On Our Purity Mission!</h1>
+        </div>
+        <div class="affiliate-header">
+          <p>
+            We’re on a journey to rebuild India’s trust in food, and we’re looking for content creators just like you
+            who want to make a difference. Help spread the word about purity and trust in food. Earn a commission on
+            each sale as a thank you for your efforts.
+          </p>
+        </div>
+        <div class="section-with-stats">
+          <div class="stats-banner">
+            <div class="stat-item">
+              <div class="stat-value">10%</div>
+              <div class="stat-label">Minimum Commission</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">22%</div>
+              <div class="stat-label">Coupon Code Discount</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">50+</div>
+              <div class="stat-label">Active Affiliates</div>
+            </div>
+          </div>
+
+          <div class="green-background-section">
+            <div class="how-it-works-section">
+              <h2>How It Works – Simple Steps to Start Earning!</h2>
+              <div class="how-it-works-content">
+                <!-- TEXT -->
+                <div class="how-it-works-text">
+                  <ol>
+                    <li>
+                      <h3>Apply in Seconds</h3>
+                      <p>Fill out a quick and easy form to join the Anveshan Affiliate Program.</p>
+                    </li>
+                    <li>
+                      <h3>Get Approved Fast</h3>
+                      <p>Our team will review your application and get you started in no time!</p>
+                    </li>
+                    <li>
+                      <h3>Get Your Unique Coupon Code</h3>
+                      <p>Receive your personalized code to track sales and start earning commissions.</p>
+                    </li>
+                    <li>
+                      <h3>Share & Earn</h3>
+                      <p>Share your code across your platforms, and start earning a commission with every order!</p>
+                    </li>
+                  </ol>
+                </div>
+                <!-- IMAGE -->
+                <div class="how-it-works-image">
+                  <img
+                    src="{{ 'in.jpg' | file_url }}"
+                    alt="Content creator showing their phone with social media reactions"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="top-banner" onclick="scrollToForm()">
+       <img src="{{ 'moweb.jpg' | file_url }}" alt="Mobile Banner" class="mobile-banner">
+        <img src="{{ 'web-in.jpg' | file_url }}" alt="Desktop Banner" class="desktop-banner">
+        </div>
+        <script>
+          function scrollToForm() {
+            document.getElementById('affiliate-form').scrollIntoView({
+              behavior: 'smooth',
+            });
+          }
+        </script>
+
+        <div class="purity-mission-bannerr">
+          <h1>Top Creators In The Anveshan Family</h1>
+
+          <div class="creators-wrapper">
+             <div class="creators-container">
+            <!-- 1st Set of Images -->
+            <div class="creator">
+              <img src="{{ '1pic.jpg' | file_url }}" alt="Creator 1">
+            </div>
+            <div class="creator">
+              <img src="{{ '2pic.jpg' | file_url }}" alt="Creator 2">
+            </div>
+            <div class="creator">
+              <img src="{{ '4pic.jpg' | file_url }}" alt="Creator 3">
+            </div>
+            <div class="creator">
+              <img src="{{ '3pic.jpg' | file_url }}" alt="Creator 4">
+            </div>
+
+            <!-- 2nd Set of Same Images (for seamless loop) -->
+            <div class="creator">
+              <img src="{{ '1pic.jpg' | file_url }}" alt="Creator 1">
+            </div>
+            <div class="creator">
+              <img src="{{ '4pic.jpg' | file_url }}" alt="Creator 2">
+            </div>
+            <div class="creator">
+              <img src="{{ '2pic.jpg' | file_url }}" alt="Creator 3">
+            </div>
+            <div class="creator">
+              <img src="{{ '3pic.jpg' | file_url }}" alt="Creator 4">
+            </div>
+          </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              const wrapper = document.querySelector('.creators-wrapper');
+              if (wrapper) {
+                wrapper.addEventListener('wheel', function (e) {
+                  if (e.deltaY !== 0) {
+                    e.preventDefault(); // stop vertical scroll
+                    wrapper.scrollLeft += e.deltaY; // scroll horizontally instead
+                  }
+                });
+              }
+            });
+          </script>
+        </div>
+
+        <div id="affiliate-form" class="affiliate-invite-section">
+          <h1>Join Our Affiliate Program</h1>
+          <p>
+            We’re on a journey to rebuild India’s trust in food, and we’re looking for content creators just like you
+            who want to make a difference. Help spread the word about purity and trust in food. Earn a commission on
+            each sale as a thank you for your efforts.
+          </p>
+        </div>
+        <div style="max-width: 1200px; margin: 0 auto;">
+          <!-- Application Form for New Users -->
+          <div  style="padding:20px" class="form-container">
+            <form id="affiliateApplicationForm" class="affiliate-application-form">
+              <input type="hidden" name="customer_id" value="{{ customer.id }}">
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/user.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Personal Information
+                </h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" name="firstName" value="{{ customer.first_name }}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" name="lastName" value="{{ customer.last_name }}" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="currentUserEmail">Email *</label>
+                  <input type="email" name="currentUserEmail" value="{{ customer.email }}" readonly>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value="{{ customer.phone | default: customer.default_address.phone }}"
+                      required
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/loc.png?v=1757437736"
+                    alt="Location Icon"
+                    class="form-icon"
+                  >
+                  Address Information
+                </h3>
+                <div class="form-group">
+                  <label for="address">Address *</label>
+                  <textarea
+                    name="address"
+                    placeholder="Enter your complete address"
+                    required
+                  >{{ customer.default_address | format_address }}</textarea>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" name="city" value="{{ customer.default_address.city }}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="pincode">Pincode *</label>
+                    <input type="text" name="pincode" value="{{ customer.default_address.zip }}" required>
+                  </div>
+                </div>
+              </div>
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/share.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Social Media / Platforms
+                </h3>
+                <div class="form-group">
+                  <label for="experienceLevel">Experience Level *</label>
+                  <select name="experienceLevel" required>
+                    <option value="">Select Experience Level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="socialMediaPlatforms">Primary Platform *</label>
+                  <select name="socialMediaPlatforms" required>
+                    <option value="">Select Primary Platform</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Blog/Website">Blog/Website</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="followersCount">Followers Count *</label>
+                  <select name="followersCount" required>
+                    <option value="">Select Followers Range</option>
+                    <option value="1000-5000">1,000 - 5,000</option>
+                    <option value="5000-10000">5,000 - 10,000</option>
+                    <option value="10000-50000">10,000 - 50,000</option>
+                    <option value="50000-100000">50,000 - 100,000</option>
+                    <option value="100000+">100,000+</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="instagramHandle">Instagram Handle</label>
+                  <input type="text" name="instagramHandle" placeholder="@yourusername">
+                </div>
+              </div>
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/moti.png?v=1757437736"
+                    alt="User Icon"
+                    class="form-icon"
+                  >
+                  Motivation
+                </h3>
+                <div class="form-group">
+                  <label for="whyJoin">Why do you want to join our affiliate program? *</label>
+                  <textarea
+                    name="whyJoin"
+                    placeholder="Tell us what interests you about our brand..."
+                    required
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>
+                  <img
+                    src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/agree.png?v=1757437736"
+                    alt="Agreement Icon"
+                    class="form-icon"
+                  >
+                  Agreement
+                </h3>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="terms_agreement" value="1" required>
+                    I agree to the <a href="/pages/affiliate-terms" target="_blank">Affiliate Terms and Conditions</a> *
+                  </label>
+                </div>
+              </div>
+
+              {% comment %} <button type="submit" class="btn btn-primary submit-button">Submit Application</button> {% endcomment %}
+              <button
+                class="submit-button"
+                style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 1.5rem 1.5rem; border: none; border-radius: 9999px; background-color: #1e5a3c; color: #fff; font-size: 1.125rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); cursor: pointer; transition: background-color 0.3s ease; gap: 0.5rem;"
+              >
+                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16.3785 0.175119C16.6941 0.393869 16.8597 0.771994 16.8003 1.15012L14.8003 14.1501C14.7535 14.4532 14.5691 14.7189 14.3003 14.8689C14.0316 15.0189 13.7097 15.0376 13.4253 14.9189L9.68783 13.3657L7.5472 15.6814C7.26908 15.9845 6.83158 16.0845 6.4472 15.9345C6.06283 15.7845 5.81283 15.4126 5.81283 15.0001V12.3876C5.81283 12.2626 5.8597 12.1439 5.94408 12.0532L11.1816 6.33762C11.3628 6.14074 11.3566 5.83762 11.1691 5.65012C10.9816 5.46262 10.6784 5.45012 10.4816 5.62824L4.12533 11.2751L1.36595 9.89387C1.0347 9.72824 0.8222 9.39699 0.812825 9.02824C0.80345 8.65949 0.997201 8.31574 1.31595 8.13137L15.316 0.131369C15.6503 -0.0592555 16.0628 -0.0405055 16.3785 0.175119Z" fill="white"/>
+                </svg>
+                Submit Application
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+    {% endunless %}
+  </div>
+</section>

@@ -1,0 +1,55 @@
+<style>
+  .figure { padding: 0; margin: 0; }
+  .figure img { max-width: 100%; width: 100%; }
+  @media (min-width: 750px) {
+    .desk-show { display: block !important; }
+    .mob-show { display: none; }
+  }
+</style>
+<div class="page-width">
+  {% if section.settings.title %}<h2>{{ section.settings.title }}</h2>{% endif %}
+  {% assign image = section.settings.image %}
+  <figure class="figure">
+    <img width="100%" srcset="{%- if image.width >= 1020 -%}{{ image | image_url: width: 1020 }} 1020w,{%- endif -%}
+        {{ image | image_url: width: 1600 }} 1600w" src="{{ image | image_url: width: 100 }}"
+        alt="{{ section.settings.title | escape }}" class="desk-show" loading="lazy" {% if section.settings.mobimg %} style="display:none;"{% endif %}>
+    {% if section.settings.mobimg %}
+    {% assign image = section.settings.mobimg %}
+    <img width="100%" srcset="{%- if image.width >= 320 -%}{{ image | image_url: width: 320 }} 320w,{%- endif -%}
+        {%- if image.width >= 480 -%}{{ image | image_url: width: 480 }} 480w,{%- endif -%}
+        {{ image | image_url: width: 720 }} 720w" src="{{ image | image_url: width: 100 }}"
+        alt="{{ section.settings.title | escape }}" class="mob-show" loading="lazy">
+    {% endif %}
+  </figure>
+</div>
+{% schema %}
+  {
+    "name": "Product Single Banner",
+    "class":"single-banner",
+    "settings": [
+      {
+          "type": "text",
+          "id": "title",
+          "label": "Heading"
+      },
+      {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+      },
+      {
+          "type": "image_picker",
+          "id": "mobimg",
+          "label": "Mobile Image"
+      },
+      {
+        "type": "color",
+        "id": "background",
+        "label": "Background Color"
+      }
+    ],
+    "presets": [
+      { "name": "Product Single Banner" }
+    ]
+  }
+{% endschema %}

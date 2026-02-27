@@ -1,0 +1,150 @@
+<table cellpadding="0" cellspacing="0" id="oilsCompare">
+  <thead>
+    <tr>
+      <th></th>
+      <td>
+          <a href="{{ shop.url }}/products/wood-pressed-mustard-oil"
+          ><img src="{{ 'oils_campare_04.png'  | file_img_url: '200x' }}" loading="lazy" alt="Black Mustard Oil"/>Black Mustard Oil</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/wood-pressed-yellow-mustard-oil"
+          ><img src="{{ 'oils_campare_05.png' | file_img_url: '200x' }}" loading="lazy" alt="Yellow Mustard Oil"/>Yellow Mustard Oil</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/sunflower-oil"
+          ><img src="{{ 'oils_campare_02.png' | file_img_url: '200x' }}" loading="lazy" alt="Sunflower Oil"/>Sunflower Oil</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/wood-pressed-groundnut-oil"
+          ><img src="{{ 'oils_campare_03.png' | file_img_url: '200x' }}" loading="lazy" alt="Groundnut Oil"/>Groundnut Oil</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/wood-pressed-coconut-oil"
+          ><img src="{{ 'oils_campare_06.png' | file_img_url: '200x' }}" loading="lazy" alt="Coconut Oil"/>Coconut Oil</a
+        >
+      </td>
+      <td>
+        <a href="{{ shop.url }}/products/wood-pressed-black-sesame-oil"
+          ><img src="{{ 'oils_campare_01.png' | file_img_url: '200x' }}" loading="lazy" alt="Black Sesame Oil"/>Black Sesame Oil</a
+        >
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Uses</th>
+      <td>
+        <ol>
+          <li>Cooking &amp; Pickling</li>
+          <li>Massage</li>
+          <li>Oil Pulling</li>
+          <li>Skin &amp; Hair Care</li>
+        </ol>
+      </td>
+      <td>
+        <ol>
+          <li>Cooking</li>
+          <li>Massage</li>
+          <li>Good For Skin</li>
+          <li>Hair Care</li>
+        </ol>
+      </td>
+      <td>
+        <ol>
+          <li>Frying</li>
+          <li>Sautéing</li>
+          <li>Baking</li>
+          <li>Salad Dressings</li>
+        </ol>
+      </td>
+      <td>
+        <ol>
+          <li>Frying</li>
+          <li>Sautéing</li>
+          <li>Baking</li>
+          <li>Salad Dressings</li>
+        </ol>
+      </td>
+      <td>
+        <ol>
+          <li>Cooking</li>
+          <li>Massage</li>
+          <li>Oil Pulling</li>
+          <li>Skin &amp; Hair Care</li>
+          <li>Makeup Remover</li>
+        </ol>
+      </td>
+      <td>
+        <ol>
+          <li>Cooking</li>
+          <li>Massage</li>
+          <li>Traditional Healthcare</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <th>Suitable weather</th>
+      <td>Any Weather</td>
+      <td>Any Weather</td>
+      <td>Dry &amp; Warm Weather</td>
+      <td>Any Weather</td>
+      <td>Dry &amp; Cool Weather</td>
+      <td>Cool Weather</td>
+    </tr>
+    <tr>
+      <th>Good for</th>
+      <td>Supports Heart Health &amp; Gut Health</td>
+      <td>Supports Heart Health &amp; Gut Health</td>
+      <td>Reduces Cell Damage &amp; Aids Digestion</td>
+      <td>For Healthier Skin &amp; Improved Gut Health</td>
+      <td>Boosts Metabolism &amp; Nourishes Skin and Hair</td>
+      <td>Supports Bone Health &amp; Boosts Immunity</td>
+    </tr>
+    <tr>
+      <th>Aroma</th>
+      <td>Strong Pungent Aroma</td>
+      <td>Mild Pungent Aroma</td>
+      <td>Mild Nutty Aroma</td>
+      <td>Sweet Nutty Aroma</td>
+      <td>Sweet Cocojam Aroma</td>
+      <td>Strong Aroma</td>
+    </tr>
+    <tr>
+      <th>Nutrients (RDA)</th>
+      <td>29 % Unsaturated Fat, 5% Saturated Fat, 44% Vitamin E</td>
+      <td>30% Unsaturated Fat, 45% Vitamin E, 3.5% Saturated Fat</td>
+      <td>28% Unsaturated Fat, 40 mg Omega 3 (1 serving), 7% Saturated Fat</td>
+      <td>16% Vitamin E, 11% Saturated Fat, 25% Unsaturated Fat</td>
+      <td>3% Unsaturated Fat, 57% Saturated Fat, 20% Vitamin E</td>
+      <td>4% Vitamin K, 11% Saturated Fat, 26% Unsaturated Fat</td>
+    </tr>
+    <tr>
+      <th>Flavour</th>
+      <td>Strong Nutty Pungency</td>
+      <td>Mild Nutty Pungency</td>
+      <td>Mildly Nutty</td>
+      <td>Sweet &amp; Nutty</td>
+      <td>Nutty &amp; Sweet</td>
+      <td>Nutty</td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  const fruits = ["","wood-pressed-mustard-oil","wood-pressed-yellow-mustard-oil","sunflower-oil","wood-pressed-groundnut-oil","wood-pressed-coconut-oil","wood-pressed-black-sesame-oil"];
+  let index = fruits.indexOf('{{ product.handle }}');
+  const table = document.getElementById("oilsCompare");
+  const rows = table.rows;
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].cells;
+    // Get the cell to move
+    const cellToMove = cells[index];
+    // Remove the cell from its current position
+    rows[i].removeChild(cellToMove);
+    // Insert the cell into the target position
+    rows[i].insertBefore(cellToMove, cells[1]);
+  }
+</script>

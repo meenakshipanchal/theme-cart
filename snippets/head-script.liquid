@@ -1,0 +1,205 @@
+{% comment %}
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ibfb1sdxov");
+  </script>
+  {% if template contains 'product'  %}
+  <script>
+    window.addEventListener("MOE_LIFECYCLE",function(e){
+      if(e.detail.name === "SDK_INITIALIZATION_COMPLETED"){
+    // Moengage.track_event("EVENT_NAME_1"); // This event has no attributes
+  	// Track events with additional attributes
+      	Moengage.track_event("Product Viewed", {
+          	"Event Received Time": '{{ "now" | date: "%d %b %Y, %I:%M:%S %p" }}',
+      	    {% if customer.email %}"Email": "{{- customer.email -}}",{% endif %}
+      	    "Product Title": "{{ product.title }}",
+      	    "Variation ID": "{{ product.selected_or_first_available_variant.id }}",
+      	    "Total Variants": {{ product.variants.size }},
+      	    "Product Handle": "{{ product.handle }}",
+      	    "Available": {% if product.available %}true{% else %}false{% endif %},
+      	    "Currency": "INR",
+      	    "Product ID": "{{ product.id }}",
+      	    "Price": '{{ product.selected_or_first_available_variant.price | divided_by: 100 }}',
+      	     "Source": "Shopify",
+      	     "Quantity": 1,
+      	     "First Session": true,
+      	     "URL": "{{ product.url }}"
+      	});
+        }
+    })
+  </script>
+  {% endif %}
+  {% comment %}  Sale Script Here {% endcomment %}
+  {% if settings.enable_sale %}
+  <script>
+    function getNextResetTime() {
+      const now = new Date();
+      const currentTime = now.getTime();
+      const window1Start = new Date(now.setHours(12, 0, 0, 0));
+      if (currentTime < window1Start.getTime()) {
+        now.setHours(12, 0, 0, 0); // Set to 11:00 AM today
+      } else {
+        now.setHours(22, 0, 0, 0);
+      }
+      return now.getTime();
+    }
+
+    let endTime = getNextResetTime(); // Set initial countdown end time
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const remainingTime = endTime - now;
+
+      if (remainingTime > 0) {
+        const totalHours = String(Math.floor(remainingTime / (1000 * 60 * 60))).padStart(2, "0");
+        const minutes = String(Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+        const seconds = String(Math.floor((remainingTime % (1000 * 60)) / 1000)).padStart(2, "0");
+
+        document.querySelectorAll(".timer").forEach((timer) => {
+          timer.textContent = `${totalHours}h:${minutes}m:${seconds}s`;
+        });
+      } else {
+        document.querySelectorAll(".timer").forEach((timer) => {
+          timer.textContent = "Sale Expired!";
+        });
+        endTime = getNextResetTime(); // Reset timer for the next cycle
+      }
+    }
+
+    // Call the function every second
+    setInterval(updateTimer, 1000);
+    updateTimer(); // Initial call to display immediately
+  </script>
+  {% endif %}
+{% endcomment %}
+
+<!-- OPTIMIZED head-script.liquid for Core Web Vitals -->
+
+<!-- Microsoft Clarity - Delayed loading for performance -->
+<script type="text/javascript">
+  // Load Clarity after user interaction or 3 seconds (whichever comes first)
+  function loadClarity() {
+    if (window.clarityLoaded) return;
+    window.clarityLoaded = true;
+
+    (function (c, l, a, r, i, t, y) {
+      c[a] =
+        c[a] ||
+        function () {
+          (c[a].q = c[a].q || []).push(arguments);
+        };
+      t = l.createElement(r);
+      t.async = 1;
+      t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0];
+      y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', 'ibfb1sdxov');
+  }
+
+  // Load after 3 seconds OR on first user interaction
+  setTimeout(loadClarity, 3000);
+  document.addEventListener('click', loadClarity, { once: true });
+  document.addEventListener('scroll', loadClarity, { once: true });
+  document.addEventListener('keydown', loadClarity, { once: true });
+</script>
+
+<!-- MoEngage Product Tracking - Optimized -->
+{% comment %} {% if template contains 'product' %}
+  <script>
+    // Defer MoEngage tracking to avoid blocking main thread
+    setTimeout(() => {
+        window.addEventListener("MOE_LIFECYCLE", function(e){
+            if(e.detail.name === "SDK_INITIALIZATION_COMPLETED"){
+                // Use requestIdleCallback for better performance
+                const trackEvent = () => {
+                    Moengage.track_event("Product Viewed", {
+                        "Event Received Time": '{{ "now" | date: "%d %b %Y, %I:%M:%S %p" }}',
+                        {% if customer.email %}"Email": "{{- customer.email -}}",{% endif %}
+                        "Product Title": "{{ product.title }}",
+                        "Variation ID": "{{ product.selected_or_first_available_variant.id }}",
+                        "Total Variants": {{ product.variants.size }},
+                        "Product Handle": "{{ product.handle }}",
+                        "Available": {% if product.available %}true{% else %}false{% endif %},
+                        "Currency": "INR",
+                        "Product ID": "{{ product.id }}",
+                        "Price": '{{ product.selected_or_first_available_variant.price | divided_by: 100 }}',
+                        "Source": "Shopify",
+                        "Quantity": 1,
+                        "First Session": true,
+                        "URL": "{{ product.url }}"
+                    });
+                };
+
+                // Use requestIdleCallback if available, otherwise setTimeout
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(trackEvent);
+                } else {
+                    setTimeout(trackEvent, 100);
+                }
+            }
+        });
+    }, 1000);
+  </script>
+{% endif %} {% endcomment %}
+
+<!-- Sale Timer - Optimized Performance -->
+{% if settings.enable_sale %}
+  <script>
+    // Optimize timer to reduce CPU usage
+    let timerInterval;
+
+    function getNextResetTime() {
+      const now = new Date();
+      const currentTime = now.getTime();
+      const window1Start = new Date(now.setHours(12, 0, 0, 0));
+      if (currentTime < window1Start.getTime()) {
+        now.setHours(12, 0, 0, 0);
+      } else {
+        now.setHours(22, 0, 0, 0);
+      }
+      return now.getTime();
+    }
+
+    let endTime = getNextResetTime();
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const remainingTime = endTime - now;
+
+      const timerElements = document.querySelectorAll('.timer');
+      if (timerElements.length === 0) {
+        // No timer elements found, clear interval to save CPU
+        clearInterval(timerInterval);
+        return;
+      }
+
+      if (remainingTime > 0) {
+        const totalHours = String(Math.floor(remainingTime / (1000 * 60 * 60))).padStart(2, '0');
+        const minutes = String(Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+        const seconds = String(Math.floor((remainingTime % (1000 * 60)) / 1000)).padStart(2, '0');
+
+        const timerText = `${totalHours}h:${minutes}m:${seconds}s`;
+        timerElements.forEach((timer) => {
+          timer.textContent = timerText;
+        });
+      } else {
+        timerElements.forEach((timer) => {
+          timer.textContent = 'Sale Expired!';
+        });
+        endTime = getNextResetTime();
+      }
+    }
+
+    // Start timer only after page load
+    window.addEventListener('load', () => {
+      // Initial call
+      updateTimer();
+      // Set interval with reduced frequency on mobile
+      const interval = window.innerWidth <= 768 ? 2000 : 1000;
+      timerInterval = setInterval(updateTimer, interval);
+    });
+  </script>
+{% endif %}

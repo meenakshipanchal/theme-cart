@@ -1,0 +1,463 @@
+{% comment %} <div class="page-width" style="padding: 40px 20px; max-width: 1000px; margin: 0 auto;">
+  <h1 style="text-align: center; color: #2E7D32; margin-bottom: 30px;">{{ page.title }}</h1>
+  
+  {% if customer %}
+    <!-- Personal Wallet Header -->
+    <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>
+          <h2 style="margin: 0; font-size: 28px;">👋 Welcome {{ customer.first_name }}!</h2>
+          <p style="margin: 5px 0; opacity: 0.9; font-size: 16px;">{{ customer.email }}</p>
+          <p style="margin: 5px 0; opacity: 0.8; font-size: 14px;">Member since {{ customer.created_at | date: "%B %Y" }}</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 42px; font-weight: bold; margin-bottom: 5px;" id="currentBalance">Loading...</div>
+          <div style="font-size: 14px; opacity: 0.9;">Available Pop Coins</div>
+          <div style="font-size: 12px; opacity: 0.7;">Last updated: <span id="lastUpdated">Now</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wallet Actions -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+      <button onclick="fetchWalletData()" style="padding: 15px; background: #2196F3; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        🔄 Refresh Wallet Data
+      </button>
+      <button onclick="viewTransactionHistory()" style="padding: 15px; background: #FF9800; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        📋 View Transaction History
+      </button>
+      <button onclick="exportMyData()" style="padding: 15px; background: #9C27B0; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px;">
+        📊 Export My Data
+      </button>
+    </div>
+
+    <!-- Pop Coin Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+      <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #4CAF50;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0; color: #4CAF50;">💰 Total Earned</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #2E7D32;" id="totalEarned">₹0</div>
+          </div>
+          <div style="font-size: 30px;">📈</div>
+        </div>
+      </div>
+      
+      <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #f44336;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0; color: #f44336;">🛒 Total Used</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #c62828;" id="totalUsed">₹0</div>
+          </div>
+          <div style="font-size: 30px;">📉</div>
+        </div>
+      </div>
+      
+      <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #FF9800;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0; color: #FF9800;">⏳ Pending</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #f57c00;" id="pendingCoins">₹0</div>
+          </div>
+          <div style="font-size: 30px;">⏱️</div>
+        </div>
+      </div>
+      
+      <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #2196F3;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0; color: #2196F3;">📦 Total Orders</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #1976D2;" id="totalOrders">{{ customer.orders_count | default: 0 }}</div>
+          </div>
+          <div style="font-size: 30px;">🛍️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History Section -->
+    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0; color: #2E7D32;">📋 Recent Transaction History</h3>
+        <select id="transactionFilter" onchange="filterTransactions()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; background: white;">
+          <option value="all">All Transactions</option>
+          <option value="earned">Earned</option>
+          <option value="used">Used</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      
+      <div id="transactionsList" style="max-height: 400px; overflow-y: auto;">
+        <div style="text-align: center; padding: 40px; color: #666;">
+          <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
+          <p>Click "Refresh Wallet Data" to load your transaction history</p>
+        </div>
+      </div>
+      
+      <div id="loadMoreTransactions" style="text-align: center; margin-top: 15px; display: none;">
+        <button onclick="loadMoreTransactions()" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Load More Transactions
+        </button>
+      </div>
+    </div>
+
+    <!-- Shopify Order Integration -->
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 30px;">
+      <h3 style="color: #2E7D32; margin-bottom: 20px;">🛍️ Your Recent Orders & Pop Coin Earnings</h3>
+      <div id="recentOrders">
+        {% if customer.orders.size > 0 %}
+          {% for order in customer.orders limit: 5 %}
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>Order #{{ order.order_number }}</strong>
+                <br><small style="color: #666;">{{ order.created_at | date: "%B %d, %Y at %I:%M %p" }}</small>
+                <br><small style="color: #666;">Status: {{ order.fulfillment_status | default: "Processing" }}</small>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 18px; font-weight: bold;">{{ order.total_price | money }}</div>
+                <div style="color: #4CAF50; font-weight: bold;">+₹{{ order.total_price | divided_by: 100 | times: 0.1 | round }} Pop Coins</div>
+                <small style="color: #666;">{{ order.financial_status }}</small>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align: center; padding: 30px; color: #666;">
+            <p>No orders found. Start shopping to earn Pop Coins!</p>
+            <a href="/collections" style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; margin-top: 10px;">
+              Start Shopping
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Pop Coin Rules & Info -->
+    <div style="background: #e8f5e8; padding: 25px; border-radius: 15px; border-left: 5px solid #4CAF50;">
+      <h3 style="color: #2E7D32; margin-top: 0;">💡 How Pop Coins Work</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+        <div>
+          <h4 style="color: #388E3C;">🎁 Earning Pop Coins</h4>
+          <ul style="color: #666; margin: 0; padding-left: 20px;">
+            <li>Earn 10% of order value as Pop Coins</li>
+            <li>Bonus coins on first order</li>
+            <li>Special rewards for reviews</li>
+            <li>Referral bonuses</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #388E3C;">💸 Using Pop Coins</h4>
+          <ul style="color: #666; margin: 0; padding-left: 20px;">
+            <li>Use up to 18% of order value</li>
+            <li>1 Pop Coin = ₹1 value</li>
+            <li>No expiry on your coins</li>
+            <li>Can be combined with other offers</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Not logged in -->
+    <div style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 60px; margin-bottom: 20px;">🔒</div>
+      <h2 style="color: #2E7D32;">Login Required</h2>
+      <p style="color: #666; margin-bottom: 30px; font-size: 18px;">Please login to view your Pop Coin wallet and transaction history</p>
+      <a href="/account/login" style="display: inline-block; padding: 15px 30px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+        Login to Your Account
+      </a>
+    </div>
+  {% endif %}
+
+  <!-- Debug Console (Development Only) -->
+  <div style="background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 10px; margin-top: 30px;">
+    <h4 style="color: #68d391; margin-top: 0;">🔧 Debug Console</h4>
+    <div id="debugOutput" style="font-family: 'Courier New', monospace; font-size: 12px; max-height: 200px; overflow-y: auto; background: #1a202c; padding: 10px; border-radius: 5px;">
+      <div>[Ready] Personal wallet system initialized</div>
+      {% if customer %}
+        <div>[User] {{ customer.email }} logged in</div>
+        <div>[Orders] {{ customer.orders_count | default: 0 }} total orders found</div>
+        <div>[Spent] {{ customer.total_spent | money }} total spent</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+// Personal wallet data
+const currentUser = {
+  {% if customer %}
+    email: "{{ customer.email }}",
+    id: "{{ customer.id }}",
+    name: "{{ customer.first_name }} {{ customer.last_name }}",
+    ordersCount: {{ customer.orders_count | default: 0 }},
+    totalSpent: {{ customer.total_spent | divided_by: 100 | default: 0 }},
+    memberSince: "{{ customer.created_at | date: '%Y-%m-%d' }}"
+  {% else %}
+    email: null,
+    id: null,
+    name: "Guest User"
+  {% endif %}
+};
+
+let walletData = {
+  currentBalance: 0,
+  totalEarned: 0,
+  totalUsed: 0,
+  pendingCoins: 0,
+  transactions: [],
+  lastUpdated: new Date()
+};
+
+// Initialize wallet
+document.addEventListener('DOMContentLoaded', function() {
+  debugLog('🚀 Personal wallet system loaded');
+  
+  {% if customer %}
+    debugLog(`👤 User: ${currentUser.email}`);
+    debugLog(`📊 Orders: ${currentUser.ordersCount}, Spent: ₹${currentUser.totalSpent}`);
+    
+    // Auto-load wallet data
+    setTimeout(fetchWalletData, 1000);
+  {% else %}
+    debugLog('❌ No user logged in');
+  {% endif %}
+});
+
+// Fetch wallet data (this would connect to your Pop Coin database)
+async function fetchWalletData() {
+  debugLog('🔄 Fetching wallet data...');
+  
+  // Show loading state
+  document.getElementById('currentBalance').innerHTML = '<div style="font-size: 20px;">⏳ Loading...</div>';
+  
+  try {
+    // Simulate API call to Pop Coin database
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Generate realistic wallet data based on user's Shopify history
+    const simulatedData = generateWalletData();
+    
+    walletData = { ...walletData, ...simulatedData };
+    
+    updateWalletDisplay();
+    loadTransactionHistory();
+    
+    debugLog(`✅ Wallet loaded: ₹${walletData.currentBalance} current balance`);
+    
+  } catch (error) {
+    debugLog(`❌ Error: ${error.message}`);
+    document.getElementById('currentBalance').innerHTML = '<div style="color: #f44336;">Error</div>';
+  }
+}
+
+// Generate realistic wallet data based on Shopify orders
+function generateWalletData() {
+  const baseEarnings = currentUser.totalSpent * 0.1; // 10% of total spent
+  const randomUsage = Math.floor(baseEarnings * (0.2 + Math.random() * 0.4)); // Used 20-60%
+  const pendingAmount = Math.floor(baseEarnings * 0.1); // 10% pending
+  
+  return {
+    totalEarned: Math.floor(baseEarnings + pendingAmount),
+    totalUsed: randomUsage,
+    pendingCoins: pendingAmount,
+    currentBalance: Math.floor(baseEarnings - randomUsage),
+    lastUpdated: new Date()
+  };
+}
+
+// Update wallet display
+function updateWalletDisplay() {
+  document.getElementById('currentBalance').textContent = `₹${walletData.currentBalance.toLocaleString()}`;
+  document.getElementById('totalEarned').textContent = `₹${walletData.totalEarned.toLocaleString()}`;
+  document.getElementById('totalUsed').textContent = `₹${walletData.totalUsed.toLocaleString()}`;
+  document.getElementById('pendingCoins').textContent = `₹${walletData.pendingCoins.toLocaleString()}`;
+  document.getElementById('lastUpdated').textContent = formatTime(walletData.lastUpdated);
+}
+
+// Load transaction history
+function loadTransactionHistory() {
+  debugLog('📋 Loading transaction history...');
+  
+  // Generate realistic transaction history
+  const transactions = generateTransactionHistory();
+  walletData.transactions = transactions;
+  
+  displayTransactions(transactions);
+}
+
+// Generate realistic transaction history
+function generateTransactionHistory() {
+  const transactions = [];
+  const types = ['earned', 'used', 'pending'];
+  const descriptions = {
+    earned: ['Order purchase reward', 'Sign-up bonus', 'Review bonus', 'Referral reward', 'Special promotion'],
+    used: ['Order discount applied', 'Product purchase', 'Shipping discount', 'Special offer'],
+    pending: ['Order processing', 'Review pending approval', 'Referral verification']
+  };
+  
+  // Create transactions for last 6 months
+  for (let i = 0; i < 25; i++) {
+    const type = types[Math.floor(Math.random() * types.length)];
+    const amount = type === 'earned' ? 
+      Math.floor(Math.random() * 200) + 20 : 
+      Math.floor(Math.random() * 150) + 10;
+    
+    const date = new Date();
+    date.setDate(date.getDate() - Math.floor(Math.random() * 180));
+    
+    transactions.push({
+      id: `txn_${Date.now()}_${i}`,
+      type: type,
+      amount: amount,
+      description: descriptions[type][Math.floor(Math.random() * descriptions[type].length)],
+      date: date,
+      status: type === 'pending' ? 'pending' : 'completed',
+      orderId: type !== 'pending' ? `#${Math.floor(Math.random() * 9000) + 1000}` : null
+    });
+  }
+  
+  return transactions.sort((a, b) => b.date - a.date);
+}
+
+// Display transactions
+function displayTransactions(transactions) {
+  if (transactions.length === 0) {
+    document.getElementById('transactionsList').innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #666;">
+        <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+        <p>No transactions found</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  transactions.slice(0, 10).forEach(txn => {
+    const icon = getTransactionIcon(txn.type);
+    const color = getTransactionColor(txn.type);
+    const amount = txn.type === 'used' ? `-₹${txn.amount}` : `+₹${txn.amount}`;
+    
+    html += `
+      <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center;">
+          <div style="font-size: 24px; margin-right: 15px;">${icon}</div>
+          <div>
+            <div style="font-weight: 600; color: #333;">${txn.description}</div>
+            <div style="font-size: 12px; color: #666; margin-top: 2px;">
+              ${formatDate(txn.date)} ${txn.orderId ? `• ${txn.orderId}` : ''}
+            </div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: bold; color: ${color}; font-size: 16px;">${amount}</div>
+          <div style="font-size: 11px; color: #666; margin-top: 2px;">
+            ${txn.status === 'pending' ? '⏳ Pending' : '✅ Completed'}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  document.getElementById('transactionsList').innerHTML = html;
+  
+  if (transactions.length > 10) {
+    document.getElementById('loadMoreTransactions').style.display = 'block';
+  }
+  
+  debugLog(`📋 Displayed ${Math.min(transactions.length, 10)} transactions`);
+}
+
+// Filter transactions
+function filterTransactions() {
+  const filter = document.getElementById('transactionFilter').value;
+  let filteredTransactions = walletData.transactions;
+  
+  if (filter !== 'all') {
+    filteredTransactions = walletData.transactions.filter(txn => txn.type === filter);
+  }
+  
+  displayTransactions(filteredTransactions);
+  debugLog(`🔍 Filtered transactions: ${filter} (${filteredTransactions.length} results)`);
+}
+
+// View transaction history
+function viewTransactionHistory() {
+  filterTransactions();
+  document.getElementById('transactionsList').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Export user data
+function exportMyData() {
+  const exportData = {
+    user: currentUser,
+    wallet: walletData,
+    exportDate: new Date().toISOString()
+  };
+  
+  const jsonContent = JSON.stringify(exportData, null, 2);
+  downloadFile(jsonContent, `${currentUser.email}-wallet-data.json`, 'application/json');
+  
+  debugLog('📊 Personal wallet data exported');
+}
+
+// Utility functions
+function getTransactionIcon(type) {
+  switch(type) {
+    case 'earned': return '💰';
+    case 'used': return '🛒';
+    case 'pending': return '⏳';
+    default: return '💫';
+  }
+}
+
+function getTransactionColor(type) {
+  switch(type) {
+    case 'earned': return '#4CAF50';
+    case 'used': return '#f44336';
+    case 'pending': return '#FF9800';
+    default: return '#666';
+  }
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type: type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadMoreTransactions() {
+  // Load next 10 transactions
+  const currentCount = document.querySelectorAll('#transactionsList > div').length;
+  const nextTransactions = walletData.transactions.slice(0, currentCount + 10);
+  displayTransactions(nextTransactions);
+}
+
+function debugLog(message) {
+  const output = document.getElementById('debugOutput');
+  const timestamp = new Date().toLocaleTimeString();
+  output.innerHTML += `<div style="margin: 2px 0; opacity: 0.8;">[${timestamp}] ${message}</div>`;
+  output.scrollTop = output.scrollHeight;
+}
+</script> {% endcomment %}

@@ -1,0 +1,4399 @@
+<div class="orders-container">
+  {% paginate customer.orders by 9 %}
+    {%- if customer.orders.size > 0 -%}
+      <div class="orders-header">
+        <h2 class="orders-title">Your Orders</h2>
+        <span class="orders-count">
+          {{- customer.orders.size }} order{{ customer.orders.size | pluralize: '', 's' -}}
+        </span>
+      </div>
+      <div class="desktop-table">
+        <div class="orders-table-wrapper">
+          <div class="orders-table">
+            <div class="table-header">
+              <div class="header-cell order-info-header">Order Details</div>
+              <div class="header-cell status-header">Status</div>
+              <div class="header-cell products-header">Products</div>
+              <div class="header-cell total-header">Total</div>
+              <div class="header-cell actions-header">Actions</div>
+            </div>
+            <div class="table-body">
+              {%- for order in customer.orders -%}
+                <div class="table-row" data-order-id="{{ order.id }}">
+                  <div class="table-cell order-info-cell">
+                    <div class="order-number">
+                      <span class="order-label">Order #</span><span class="order-value">{{ order.name }}</span>
+                    </div>
+                    <div class="order-date">
+                      <svg class="date-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                      </svg>
+                      <span class="date-text">{{ order.created_at | date: '%B %d, %Y' }}</span>
+                    </div>
+                  </div>
+                  <div class="table-cell status-cell">
+                    <div class="status-badges">
+                      <span class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}"
+                        ><span class="status-dot"></span
+                        ><span class="status-text">{{ order.financial_status_label }}</span></span
+                      ><span class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}"
+                        ><span class="status-dot"></span
+                        ><span class="status-text">
+                          {{- order.fulfillment_status_label | default: 'Pending' -}}
+                        </span></span
+                      >
+                    </div>
+                  </div>
+                  <div class="table-cell products-cell">
+                    <div class="products-preview">
+                      {% assign first_items = order.line_items | slice: 0, 4 %}
+                      <div class="product-images-row">
+                        {% for line_item in first_items %}
+                          <div class="product-image-wrapper">
+                            {% if line_item.image -%}
+                              <img
+                                src="{{ line_item.image | image_url: width: 60 }}"
+                                alt="{{ line_item.image.alt | escape }}"
+                                loading="lazy"
+                                width="40"
+                                height="40"
+                                class="product-image"
+                              >
+                            {%- else %}
+                              <div class="product-placeholder">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                                </svg>
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endfor -%}
+                        {%- if order.line_items.size > 4 %}
+                          <div class="more-products">+{{ order.line_items.size | minus: 4 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="products-info">
+                        <div class="products-count">
+                          {{ order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' }}
+                        </div>
+                        <div class="first-product-name">
+                          {{ order.line_items.first.title | truncate: 30 -}}
+                          {%- if order.line_items.size > 1 %}
+                            <span class="and-more">& {{ order.line_items.size | minus: 1 }} more</span>
+                          {%- endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-cell total-cell">
+                    <div class="order-total">
+                      <span class="currency">{{ order.total_net_amount | money_with_currency }}</span>
+                    </div>
+                  </div>
+                  <div class="table-cell actions-cell">
+                    <div class="action-buttons">
+                      <a href="{{ order.customer_url }}" class="btn-view-details" role="button" aria-expanded="false">
+                        <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                        </svg>
+                        <span class="btn-text">View</span></a
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="order-details-wrapper" id="order-details-{{ order.id }}">
+                  <div class="order-details-content">
+                    <div class="details-grid">
+                      <div class="details-section line-items-section">
+                        <h4>Products</h4>
+                        <table class="details-line-items-table">
+                          <thead>
+                            <tr>
+                              <th>Product</th>
+                              <th>SKU</th>
+                              <th>Price</th>
+                              <th>Qty</th>
+                              <th class="text-right">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for line_item in order.line_items %}
+                              <tr>
+                                <td>{{ line_item.title }}</td>
+                                <td>{{ line_item.sku | default: 'N/A' }}</td>
+                                <td>{{ line_item.original_price | money }}</td>
+                                <td>{{ line_item.quantity }}</td>
+                                <td class="text-right">{{ line_item.final_line_price | money }}</td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="details-section summary-section">
+                        <h4>Order Summary</h4>
+                        <div class="summary-card">
+                          <div class="summary-rows">
+                            <div class="summary-row">
+                              <span class="summary-row-label">Subtotal</span
+                              ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                            </div>
+                            {% if order.total_discounts > 0 %}
+                              <div class="summary-row discount">
+                                <span class="summary-row-label">
+                                  <svg
+                                    class="summary-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a1 1 0 011-1h5a1 1 0 01.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                  </svg>
+                                  Discounts</span
+                                ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                              </div>
+                            {% endif -%}
+                            {%- for shipping_method in order.shipping_methods %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">
+                                  <svg
+                                    class="summary-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v5.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1V8a1 1 0 00-1-1h-5z" />
+                                  </svg>
+                                  Shipping <span class="summary-note">({{ shipping_method.title }})</span></span
+                                ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                              </div>
+                            {% endfor -%}
+                            {%- for tax_line in order.tax_lines %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">
+                                  <svg
+                                    class="summary-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                                  </svg>
+                                  Tax
+                                  <span class="summary-note"
+                                    >({{ tax_line.title }}
+                                    {{ tax_line.rate | times: 100 }}%)</span
+                                  ></span
+                                ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <div class="summary-total">
+                            <span class="summary-row-label">Total Paid</span
+                            ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {%- comment -%} Collect unique tracking numbers with company names {%- endcomment -%}
+                      {%- assign unique_tracking_data = '' -%}
+                      {%- for line_item in order.line_items -%}
+                        {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                          {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                          {%- unless unique_tracking_data contains tracking_num -%}
+                            {%- if unique_tracking_data == '' -%}
+                              {%- assign unique_tracking_data = tracking_num -%}
+                            {%- else -%}
+                              {%- assign unique_tracking_data = unique_tracking_data
+                                | append: '||'
+                                | append: tracking_num
+                              -%}
+                            {%- endif -%}
+                          {%- endunless -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- assign tracking_array = unique_tracking_data | split: '||' -%}
+                      {%- assign shipment_count = tracking_array.size -%}
+
+                      <div
+                        class="details-section shipping-details-mobile"
+                        style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                      >
+                        <div
+                          class="mobile-section-header"
+                          style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                        >
+                          <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                          <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                        </div>
+
+                        {%- if shipment_count > 1 -%}
+                          <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                            <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                            This order is shipped in {{ shipment_count }} different shipments
+                          </div>
+                        {%- elsif shipment_count == 1 -%}
+                          <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                            <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                            All products will be shipped in 1 shipment
+                          </div>
+                        {%- endif -%}
+
+                        {%- for line_item in order.line_items -%}
+                          {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                            {%- assign current_tracking = line_item.fulfillment.tracking_number -%}
+                            {%- assign already_displayed = false -%}
+                            {%- for displayed_item in order.line_items -%}
+                              {%- if displayed_item.fulfillment
+                                and displayed_item.fulfillment.tracking_number == current_tracking
+                              -%}
+                                {%- if displayed_item.id < line_item.id -%}
+                                  {%- assign already_displayed = true -%}
+                                  {%- break -%}
+                                {%- endif -%}
+                              {%- endif -%}
+                            {%- endfor -%}
+
+                            {%- unless already_displayed -%}
+                              <div
+                                class="mobile-tracking"
+                                style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                              >
+                                <div
+                                  class="mobile-info"
+                                  style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                                >
+                                  <!-- Logistics Partner Name -->
+                                  <div
+                                    class="mobile-row"
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #333; font-weight: 600;"
+                                  >
+                                    <i class="fas fa-truck" style="color: #6c757d; font-size: 14px;"></i>
+                                    <span>{{ line_item.fulfillment.tracking_company | default: 'Shiprocket' }}</span>
+                                  </div>
+
+                                  <!-- Tracking Number -->
+                                  <div
+                                    class="mobile-row"
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                  >
+                                    <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                    <span
+                                      class="tracking-num"
+                                      style="font-family: monospace; font-weight: 500; color: #000;"
+                                    >
+                                      {{- line_item.fulfillment.tracking_number -}}
+                                    </span>
+                                  </div>
+                                </div>
+                                {%- assign shiprocket_url = 'https://shiprocket.co/tracking/'
+                                  | append: line_item.fulfillment.tracking_number
+                                -%}
+                                <a
+                                  href="{{ shiprocket_url }}"
+                                  class="mobile-track-btn"
+                                  target="_blank"
+                                  style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                                >
+                                  <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                                  Track
+                                </a>
+                              </div>
+                            {%- endunless -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+
+                        <div class="details-section address-section">
+                          <h4>Shipping Address</h4>
+                          <p>{{ order.shipping_address | format_address }}</p>
+                        </div>
+                        <div class="details-section address-section">
+                          <h4>Billing Address</h4>
+                          <p>{{ order.billing_address | format_address }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} MOBILE VIEW {%- endcomment -%}
+      <div class="mobile-cards">
+        {%- for order in customer.orders -%}
+          <div class="order-card" data-order-id="{{ order.id }}">
+            <div class="card-header">
+              <div class="order-date">
+                <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                </svg>
+                {{ order.created_at | date: '%B %d, %Y' }}
+              </div>
+              <div class="order-number">{{ order.name }}</div>
+            </div>
+            <div class="card-content">
+              <div class="mobile-row">
+                <div class="products-section">
+                  <div class="products-preview-mobile">
+                    {% assign first_items = order.line_items | slice: 0, 3 %}
+                    <div class="mobile-product-images">
+                      {% for line_item in first_items -%}
+                        {%- if line_item.image -%}
+                          <img
+                            src="{{ line_item.image | image_url: width: 64 }}"
+                            alt="{{ line_item.image.alt | escape }}"
+                            loading="lazy"
+                            class="product-image-mobile"
+                          >
+                        {%- else %}
+                          <div class="product-placeholder-mobile">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                            </svg>
+                          </div>
+                        {% endif -%}
+                      {%- endfor -%}
+                      {%- if order.line_items.size > 3 %}
+                        <div class="more-products-mobile">+{{ order.line_items.size | minus: 3 }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="products-info-mobile">
+                      <div class="first-product-name-mobile">{{ order.line_items.first.title | truncate: 25 }}</div>
+                      <div class="product-count-mobile">
+                        {% if order.line_items.size > 1 -%}
+                          and {{ order.line_items.size | minus: 1 }} more item
+                          {{- order.line_items.size | minus: 1 | pluralize: '', 's' -}}
+                        {%- else -%}
+                          {{- order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' -}}
+                        {%- endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="status-section">
+                  <div class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}">
+                    <div class="status-dot"></div>
+                    <span class="status-text">{{ order.financial_status_label }}</span>
+                  </div>
+                  <div class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}">
+                    <div class="status-dot"></div>
+                    <span class="status-text">{{ order.fulfillment_status_label | default: 'Pending' }}</span>
+                  </div>
+                </div>
+                <div class="price-action-section">
+                  <div class="order-total-mobile">{{ order.total_net_amount | money_with_currency }}</div>
+                  <a href="{{ order.customer_url }}" class="btn-view-details-mobile" role="button" aria-expanded="false"
+                    ><span class="btn-text">View</span>
+                    <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-details-wrapper" id="mobile-order-details-{{ order.id }}">
+              <div class="mobile-details-container">
+                <div class="details-tabs-nav">
+                  <button class="tab-button active" data-tab-target="#tab-items-{{ order.id }}">
+                    Items ({{ order.line_items.size }})
+                  </button>
+                  <button class="tab-button" data-tab-target="#tab-details-{{ order.id }}">Details</button>
+                </div>
+                <div class="details-tabs-content">
+                  <div class="tab-panel active" id="tab-items-{{ order.id }}">
+                    <ul class="compact-product-list">
+                      {% for line_item in order.line_items %}
+                        <li class="compact-product-item">
+                          {% if line_item.image %}
+                            <img
+                              src="{{ line_item.image | image_url: width: 120 }}"
+                              alt="{{ line_item.image.alt | escape }}"
+                              class="compact-product-image"
+                            >
+                          {% else %}
+                            <div class="compact-product-placeholder">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                              </svg>
+                            </div>
+                          {% endif %}
+                          <div class="compact-product-info">
+                            <span class="compact-product-title">{{ line_item.title }}</span>
+                            <span class="compact-product-sku">{{ line_item.sku | default: ' ' }}</span>
+                            <span class="compact-product-price">
+                              {{- line_item.quantity }} x {{ line_item.final_price | money -}}
+                            </span>
+                          </div>
+                          <span class="compact-product-line-price">{{ line_item.final_line_price | money }}</span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <div class="tab-panel" id="tab-details-{{ order.id }}">
+                    <div class="details-section summary-section">
+                      <div class="summary-card">
+                        <div class="summary-rows">
+                          <div class="summary-row">
+                            <span class="summary-row-label">Subtotal</span
+                            ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                          </div>
+                          {% if order.total_discounts > 0 %}
+                            <div class="summary-row discount">
+                              <span class="summary-row-label">Discounts</span
+                              ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                            </div>
+                          {% endif %}
+                          {% for shipping_method in order.shipping_methods %}
+                            <div class="summary-row">
+                              <span class="summary-row-label">Shipping</span
+                              ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                            </div>
+                          {% endfor %}
+                          {% for tax_line in order.tax_lines %}
+                            <div class="summary-row">
+                              <span class="summary-row-label">Tax</span
+                              ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                            </div>
+                          {% endfor %}
+                        </div>
+                        <div class="summary-total">
+                          <span class="summary-row-label">Total</span
+                          ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {%- comment -%} Collect unique tracking numbers for mobile {%- endcomment -%}
+                    {%- assign unique_tracking_numbers = '' -%}
+                    {%- for line_item in order.line_items -%}
+                      {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                        {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                        {%- unless unique_tracking_numbers contains tracking_num -%}
+                          {%- if unique_tracking_numbers == '' -%}
+                            {%- assign unique_tracking_numbers = tracking_num -%}
+                          {%- else -%}
+                            {%- assign unique_tracking_numbers = unique_tracking_numbers
+                              | append: '||'
+                              | append: tracking_num
+                            -%}
+                          {%- endif -%}
+                        {%- endunless -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+
+                    {%- assign tracking_array = unique_tracking_numbers | split: '||' -%}
+                    {%- assign shipment_count = tracking_array.size -%}
+
+                    {%- assign billing_address_compact = order.billing_address
+                      | format_address
+                      | replace: '<p>', ''
+                      | replace: '</p>', ''
+                      | replace: '<br>', ''
+                    -%}
+                    {%- assign shipping_address_compact = order.shipping_address
+                      | format_address
+                      | replace: '<p>', ''
+                      | replace: '</p>', ''
+                      | replace: '<br>', ''
+                    -%}
+
+                    {%- comment -%} Display shipping section for mobile {%- endcomment -%}
+                    <div
+                      class="details-section shipping-details-mobile"
+                      style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                    >
+                      <div
+                        class="mobile-section-header"
+                        style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                      >
+                        <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                        <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                      </div>
+
+                      {%- if shipment_count > 1 -%}
+                        <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                          <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                          This order is shipped in {{ shipment_count }} different shipments
+                        </div>
+                      {%- elsif shipment_count == 1 -%}
+                        <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                          <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                          All products will be shipped in 1 shipment
+                        </div>
+                      {%- endif -%}
+
+                      {%- for line_item in order.line_items -%}
+                        {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                          {%- assign current_tracking = line_item.fulfillment.tracking_number -%}
+                          {%- assign already_displayed = false -%}
+                          {%- for displayed_item in order.line_items -%}
+                            {%- if displayed_item.fulfillment
+                              and displayed_item.fulfillment.tracking_number == current_tracking
+                            -%}
+                              {%- if displayed_item.id < line_item.id -%}
+                                {%- assign already_displayed = true -%}
+                                {%- break -%}
+                              {%- endif -%}
+                            {%- endif -%}
+                          {%- endfor -%}
+
+                          {%- unless already_displayed -%}
+                            <div
+                              class="mobile-tracking"
+                              style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                            >
+                              <div
+                                class="mobile-info"
+                                style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                              >
+                                <!-- Logistics Partner Name -->
+                                <div
+                                  class="mobile-row"
+                                  style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #333; font-weight: 600;"
+                                >
+                                  <i class="fas fa-truck" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span
+                                    >
+                                    {{ line_item.fulfillment.tracking_company | default: 'Delivery Partner' -}}
+                                  </span>
+                                </div>
+
+                                <!-- Tracking Number -->
+                                <div
+                                  class="mobile-row"
+                                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                >
+                                  <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span
+                                    class="tracking-num"
+                                    style="font-family: monospace; font-weight: 500; color: #000;"
+                                  >
+                                    {{- line_item.fulfillment.tracking_number -}}
+                                  </span>
+                                </div>
+                              </div>
+                              {%- assign shiprocket_url = 'https://shiprocket.co/tracking/'
+                                | append: line_item.fulfillment.tracking_number
+                              -%}
+                              <a
+                                href="{{ shiprocket_url }}"
+                                class="mobile-track-btn"
+                                target="_blank"
+                                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                              >
+                                <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                                Track
+                              </a>
+                            </div>
+                          {%- endunless -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      <div class="details-section address-section">
+                        <h4>Shipping Address</h4>
+                        <p>{{ order.shipping_address | format_address }}</p>
+                      </div>
+
+                      {% if billing_address_compact != shipping_address_compact %}
+                        <div class="details-section address-section">
+                          <h4>Billing Address</h4>
+                          <p>{{ order.billing_address | format_address }}</p>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="enhanced-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+          <div class="pagination-info">
+            Showing {{ paginate.current_offset | plus: 1 }}-
+            {{- paginate.current_offset | plus: paginate.page_size | at_most: paginate.items }}
+            of {{ paginate.items }} orders
+          </div>
+          <ul class="pagination-controls" role="list">
+            {%- if paginate.previous -%}
+              <li>
+                <a
+                  href="{{ paginate.previous.url }}"
+                  class="pagination-btn prev-btn"
+                  aria-label="{{ 'general.pagination.previous' | t }}"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" fill="currentColor"/>
+                  </svg>
+                  Previous</a
+                >
+              </li>
+            {%- endif -%}
+            {%- for part in paginate.parts -%}
+              <li>
+                {%- if part.is_link -%}
+                  <a
+                    href="{{ part.url }}"
+                    class="pagination-btn page-btn"
+                    aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+                  >
+                    {{- part.title -}}
+                  </a>
+                {%- else -%}
+                  {%- if part.title == paginate.current_page -%}
+                    <span class="pagination-btn page-btn current" aria-current="page">{{ part.title }}</span>
+                  {%- else -%}
+                    <span class="pagination-btn page-btn disabled">{{ part.title }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+            {%- if paginate.next -%}
+              <li>
+                <a
+                  href="{{ paginate.next.url }}"
+                  class="pagination-btn next-btn"
+                  aria-label="{{ 'general.pagination.next' | t }}"
+                  >Next
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                  </svg>
+                </a>
+              </li>
+            {%- endif -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+    {%- else -%}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+            <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h3 class="empty-state-title">No orders yet</h3>
+        <p class="empty-state-message">{{ 'customer.orders.none' | t }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="btn-start-shopping">Start Shopping</a>
+      </div>
+    {%- endif -%}
+  {% endpaginate %}
+</div>
+
+{% comment %}
+   <div class="orders-container">
+    {% paginate customer.orders by 9 %}
+      {%- if customer.orders.size > 0 -%}
+        <div class="orders-header">
+          <h2 class="orders-title">Your Orders</h2>
+          <span class="orders-count">
+            {{- customer.orders.size }} order{{ customer.orders.size | pluralize: '', 's' -}}
+          </span>
+        </div>
+        <div class="desktop-table">
+          <div class="orders-table-wrapper">
+            <div class="orders-table">
+              <div class="table-header">
+                <div class="header-cell order-info-header">Order Details</div>
+                <div class="header-cell status-header">Status</div>
+                <div class="header-cell products-header">Products</div>
+                <div class="header-cell total-header">Total</div>
+                <div class="header-cell actions-header">Actions</div>
+              </div>
+              <div class="table-body">
+                {%- for order in customer.orders -%}
+                  <div class="table-row" data-order-id="{{ order.id }}">
+                    <div class="table-cell order-info-cell">
+                      <div class="order-number">
+                        <span class="order-label">Order #</span><span class="order-value">{{ order.name }}</span>
+                      </div>
+                      <div class="order-date">
+                        <svg class="date-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                        </svg>
+                        <span class="date-text">{{ order.created_at | date: '%B %d, %Y' }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell status-cell">
+                      <div class="status-badges">
+                        <span class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">{{ order.financial_status_label }}</span></span
+                        ><span class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">
+                            {{- order.fulfillment_status_label | default: 'Pending' -}}
+                          </span></span
+                        >
+                      </div>
+                    </div>
+                    <div class="table-cell products-cell">
+                      <div class="products-preview">
+                        {% assign first_items = order.line_items | slice: 0, 4 %}
+                        <div class="product-images-row">
+                          {% for line_item in first_items %}
+                            <div class="product-image-wrapper">
+                              {% if line_item.image -%}
+                                <img
+                                  src="{{ line_item.image | image_url: width: 60 }}"
+                                  alt="{{ line_item.image.alt | escape }}"
+                                  loading="lazy"
+                                  width="40"
+                                  height="40"
+                                  class="product-image"
+                                >
+                              {%- else %}
+                                <div class="product-placeholder">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                                  </svg>
+                                </div>
+                              {% endif %}
+                            </div>
+                          {% endfor -%}
+                          {%- if order.line_items.size > 4 %}
+                            <div class="more-products">+{{ order.line_items.size | minus: 4 }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="products-info">
+                          <div class="products-count">
+                            {{ order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' }}
+                          </div>
+                          <div class="first-product-name">
+                            {{ order.line_items.first.title | truncate: 30 -}}
+                            {%- if order.line_items.size > 1 %}
+                              <span class="and-more">& {{ order.line_items.size | minus: 1 }} more</span>
+                            {%- endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="table-cell total-cell">
+                      <div class="order-total">
+                        <span class="currency">{{ order.total_net_amount | money_with_currency }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell actions-cell">
+                      <div class="action-buttons">
+                        <a href="{{ order.customer_url }}" class="btn-view-details" role="button" aria-expanded="false">
+                          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                          </svg>
+                          <span class="btn-text">View</span></a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="order-details-wrapper" id="order-details-{{ order.id }}">
+                    <div class="order-details-content">
+                      <div class="details-grid">
+                        <div class="details-section line-items-section">
+                          <h4>Products</h4>
+                          <table class="details-line-items-table">
+                            <thead>
+                              <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th class="text-right">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for line_item in order.line_items %}
+                                <tr>
+                                  <td>{{ line_item.title }}</td>
+                                  <td>{{ line_item.sku | default: 'N/A' }}</td>
+                                  <td>{{ line_item.original_price | money }}</td>
+                                  <td>{{ line_item.quantity }}</td>
+                                  <td class="text-right">{{ line_item.final_line_price | money }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="details-section summary-section">
+                          <h4>Order Summary</h4>
+                          <div class="summary-card">
+                            <div class="summary-rows">
+                              <div class="summary-row">
+                                <span class="summary-row-label">Subtotal</span
+                                ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                              </div>
+                              {% if order.total_discounts > 0 %}
+                                <div class="summary-row discount">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a1 1 0 011-1h5a1 1 0 01.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Discounts</span
+                                  ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                                </div>
+                              {% endif -%}
+                              {%- for shipping_method in order.shipping_methods %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v5.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1V8a1 1 0 00-1-1h-5z" />
+                                    </svg>
+                                    Shipping <span class="summary-note">({{ shipping_method.title }})</span></span
+                                  ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                                </div>
+                              {% endfor -%}
+                              {%- for tax_line in order.tax_lines %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                                    </svg>
+                                    Tax
+                                    <span class="summary-note"
+                                      >({{ tax_line.title }}
+                                      {{ tax_line.rate | times: 100 }}%)</span
+                                    ></span
+                                  ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                                </div>
+                              {% endfor %}
+                            </div>
+                            <div class="summary-total">
+                              <span class="summary-row-label">Total Paid</span
+                              ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {%- comment -%} Collect unique tracking numbers {%- endcomment -%}
+                        {%- assign unique_tracking_numbers = '' -%}
+                        {%- for line_item in order.line_items -%}
+                          {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                            {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                            {%- unless unique_tracking_numbers contains tracking_num -%}
+                              {%- if unique_tracking_numbers == '' -%}
+                                {%- assign unique_tracking_numbers = tracking_num -%}
+                              {%- else -%}
+                                {%- assign unique_tracking_numbers = unique_tracking_numbers | append: '||' | append: tracking_num -%}
+                              {%- endif -%}
+                            {%- endunless -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+
+                        {%- assign tracking_array = unique_tracking_numbers | split: '||' -%}
+                        {%- assign shipment_count = tracking_array.size -%}
+
+                        <div
+                          class="details-section shipping-details-mobile"
+                          style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                        >
+                          <div
+                            class="mobile-section-header"
+                            style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                          >
+                            <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                          </div>
+
+                          {%- if shipment_count > 1 -%}
+                            <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                              <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                              This order is shipped in {{ shipment_count }} different shipments
+                            </div>
+                          {%- elsif shipment_count == 1 -%}
+                            <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                              <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                              All products will be shipped in 1 shipment
+                            </div>
+                          {%- endif -%}
+
+                          {%- for tracking_num in tracking_array -%}
+                            <div
+                              class="mobile-tracking"
+                              style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                            >
+                              <div
+                                class="mobile-info"
+                                style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                              >
+                                <div
+                                  class="mobile-row"
+                                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                >
+                                  <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span
+                                    class="tracking-num"
+                                    style="font-family: monospace; font-weight: 500; color: #000;"
+                                  >
+                                    {{- tracking_num -}}
+                                  </span>
+                                </div>
+                              </div>
+                              {%- assign shiprocket_url = 'https://shiprocket.co/tracking/' | append: tracking_num -%}
+                              <a
+                                href="{{ shiprocket_url }}"
+                                class="mobile-track-btn"
+                                target="_blank"
+                                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                              >
+                                <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                                Track
+                              </a>
+                            </div>
+                          {%- endfor -%}
+
+                          <div class="details-section address-section">
+                            <h4>Shipping Address</h4>
+                            <p>{{ order.shipping_address | format_address }}</p>
+                          </div>
+                          <div class="details-section address-section">
+                            <h4>Billing Address</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {%- comment -%} MOBILE VIEW {%- endcomment -%}
+        <div class="mobile-cards">
+          {%- for order in customer.orders -%}
+            <div class="order-card" data-order-id="{{ order.id }}">
+              <div class="card-header">
+                <div class="order-date">
+                  <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                  </svg>
+                  {{ order.created_at | date: '%B %d, %Y' }}
+                </div>
+                <div class="order-number">{{ order.name }}</div>
+              </div>
+              <div class="card-content">
+                <div class="mobile-row">
+                  <div class="products-section">
+                    <div class="products-preview-mobile">
+                      {% assign first_items = order.line_items | slice: 0, 3 %}
+                      <div class="mobile-product-images">
+                        {% for line_item in first_items -%}
+                          {%- if line_item.image -%}
+                            <img
+                              src="{{ line_item.image | image_url: width: 64 }}"
+                              alt="{{ line_item.image.alt | escape }}"
+                              loading="lazy"
+                              class="product-image-mobile"
+                            >
+                          {%- else %}
+                            <div class="product-placeholder-mobile">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                              </svg>
+                            </div>
+                          {% endif -%}
+                        {%- endfor -%}
+                        {%- if order.line_items.size > 3 %}
+                          <div class="more-products-mobile">+{{ order.line_items.size | minus: 3 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="products-info-mobile">
+                        <div class="first-product-name-mobile">{{ order.line_items.first.title | truncate: 25 }}</div>
+                        <div class="product-count-mobile">
+                          {% if order.line_items.size > 1 -%}
+                            and {{ order.line_items.size | minus: 1 }} more item
+                            {{- order.line_items.size | minus: 1 | pluralize: '', 's' -}}
+                          {%- else -%}
+                            {{- order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' -}}
+                          {%- endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="status-section">
+                    <div class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.financial_status_label }}</span>
+                    </div>
+                    <div class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.fulfillment_status_label | default: 'Pending' }}</span>
+                    </div>
+                  </div>
+                  <div class="price-action-section">
+                    <div class="order-total-mobile">{{ order.total_net_amount | money_with_currency }}</div>
+                    <a href="{{ order.customer_url }}" class="btn-view-details-mobile" role="button" aria-expanded="false"
+                      ><span class="btn-text">View</span>
+                      <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-details-wrapper" id="mobile-order-details-{{ order.id }}">
+                <div class="mobile-details-container">
+                  <div class="details-tabs-nav">
+                    <button class="tab-button active" data-tab-target="#tab-items-{{ order.id }}">
+                      Items ({{ order.line_items.size }})
+                    </button>
+                    <button class="tab-button" data-tab-target="#tab-details-{{ order.id }}">Details</button>
+                  </div>
+                  <div class="details-tabs-content">
+                    <div class="tab-panel active" id="tab-items-{{ order.id }}">
+                      <ul class="compact-product-list">
+                        {% for line_item in order.line_items %}
+                          <li class="compact-product-item">
+                            {% if line_item.image %}
+                              <img
+                                src="{{ line_item.image | image_url: width: 120 }}"
+                                alt="{{ line_item.image.alt | escape }}"
+                                class="compact-product-image"
+                              >
+                            {% else %}
+                              <div class="compact-product-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                </svg>
+                              </div>
+                            {% endif %}
+                            <div class="compact-product-info">
+                              <span class="compact-product-title">{{ line_item.title }}</span>
+                              <span class="compact-product-sku">{{ line_item.sku | default: ' ' }}</span>
+                              <span class="compact-product-price">
+                                {{- line_item.quantity }} x {{ line_item.final_price | money -}}
+                              </span>
+                            </div>
+                            <span class="compact-product-line-price">{{ line_item.final_line_price | money }}</span>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    <div class="tab-panel" id="tab-details-{{ order.id }}">
+                      <div class="details-section summary-section">
+                        <div class="summary-card">
+                          <div class="summary-rows">
+                            <div class="summary-row">
+                              <span class="summary-row-label">Subtotal</span
+                              ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                            </div>
+                            {% if order.total_discounts > 0 %}
+                              <div class="summary-row discount">
+                                <span class="summary-row-label">Discounts</span
+                                ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                              </div>
+                            {% endif %}
+                            {% for shipping_method in order.shipping_methods %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Shipping</span
+                                ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                            {% for tax_line in order.tax_lines %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Tax</span
+                                ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <div class="summary-total">
+                            <span class="summary-row-label">Total</span
+                            ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {%- comment -%} Collect unique tracking numbers for mobile {%- endcomment -%}
+                      {%- assign unique_tracking_numbers = '' -%}
+                      {%- for line_item in order.line_items -%}
+                        {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                          {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                          {%- unless unique_tracking_numbers contains tracking_num -%}
+                            {%- if unique_tracking_numbers == '' -%}
+                              {%- assign unique_tracking_numbers = tracking_num -%}
+                            {%- else -%}
+                              {%- assign unique_tracking_numbers = unique_tracking_numbers | append: '||' | append: tracking_num -%}
+                            {%- endif -%}
+                          {%- endunless -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- assign tracking_array = unique_tracking_numbers | split: '||' -%}
+                      {%- assign shipment_count = tracking_array.size -%}
+
+                      {%- assign billing_address_compact = order.billing_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+                      {%- assign shipping_address_compact = order.shipping_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+
+                      {%- comment -%} Display shipping section for mobile {%- endcomment -%}
+                      <div
+                        class="details-section shipping-details-mobile"
+                        style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                      >
+                        <div
+                          class="mobile-section-header"
+                          style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                        >
+                          <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                          <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                        </div>
+
+                        {%- if shipment_count > 1 -%}
+                          <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                            <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                            This order is shipped in {{ shipment_count }} different shipments
+                          </div>
+                        {%- elsif shipment_count == 1 -%}
+                          <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                            <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                            All products will be shipped in 1 shipment
+                          </div>
+                        {%- endif -%}
+
+                        {%- for tracking_num in tracking_array -%}
+                          <div
+                            class="mobile-tracking"
+                            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                          >
+                            <div
+                              class="mobile-info"
+                              style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                            >
+                               <div class="mobile-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #333; font-weight: 600;">
+            <i class="fas fa-truck" style="color: #6c757d; font-size: 14px;"></i>
+            <span>{{ line_item.fulfillment.tracking_company | default: 'Shiprocket' }}</span>
+          </div>
+                              <div
+                                class="mobile-row"
+                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                              >
+                                <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                <span
+                                  class="tracking-num"
+                                  style="font-family: monospace; font-weight: 500; color: #000;"
+                                >
+                                  {{- tracking_num -}}
+                                </span>
+                              </div>
+                            </div>
+                            {%- assign shiprocket_url = 'https://shiprocket.co/tracking/' | append: tracking_num -%}
+                            <a
+                              href="{{ shiprocket_url }}"
+                              class="mobile-track-btn"
+                              target="_blank"
+                              style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                            >
+                              <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                              Track
+                            </a>
+                          </div>
+                        {%- endfor -%}
+
+                        <div class="details-section address-section">
+                          <h4>Shipping Address</h4>
+                          <p>{{ order.shipping_address | format_address }}</p>
+                        </div>
+
+                        {% if billing_address_compact != shipping_address_compact %}
+                          <div class="details-section address-section">
+                            <h4>Billing Address</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="enhanced-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+            <div class="pagination-info">
+              Showing {{ paginate.current_offset | plus: 1 }}-
+              {{- paginate.current_offset | plus: paginate.page_size | at_most: paginate.items }}
+              of {{ paginate.items }} orders
+            </div>
+            <ul class="pagination-controls" role="list">
+              {%- if paginate.previous -%}
+                <li>
+                  <a
+                    href="{{ paginate.previous.url }}"
+                    class="pagination-btn prev-btn"
+                    aria-label="{{ 'general.pagination.previous' | t }}"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                    Previous</a
+                  >
+                </li>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                <li>
+                  {%- if part.is_link -%}
+                    <a
+                      href="{{ part.url }}"
+                      class="pagination-btn page-btn"
+                      aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+                    >
+                      {{- part.title -}}
+                    </a>
+                  {%- else -%}
+                    {%- if part.title == paginate.current_page -%}
+                      <span class="pagination-btn page-btn current" aria-current="page">{{ part.title }}</span>
+                    {%- else -%}
+                      <span class="pagination-btn page-btn disabled">{{ part.title }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <li>
+                  <a
+                    href="{{ paginate.next.url }}"
+                    class="pagination-btn next-btn"
+                    aria-label="{{ 'general.pagination.next' | t }}"
+                    >Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                  </a>
+                </li>
+              {%- endif -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3 class="empty-state-title">No orders yet</h3>
+          <p class="empty-state-message">{{ 'customer.orders.none' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn-start-shopping">Start Shopping</a>
+        </div>
+      {%- endif -%}
+    {% endpaginate %}
+  </div>
+{% endcomment %}
+
+<style>
+  .order-shipping-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    color: #333;
+  }
+
+  .order-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
+  }
+
+  .order-section-title h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .order-tracking-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+  }
+
+  .order-tracking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+  }
+
+  .tracking-info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .tracking-number-text {
+    font-family: monospace;
+    font-weight: 500;
+    color: #000;
+  }
+
+  .order-track-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .order-track-button:hover {
+    background-color: #0056b3;
+  }
+
+  .order-address-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 12px;
+  }
+
+  .address-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 3px solid #ddd;
+    padding-left: 8px;
+  }
+
+  .address-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .address-text {
+    font-size: 12px;
+    color: #777;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .fas {
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+  .order-details-dropdown {
+    grid-column: 1 / -1;
+    background: #f8fafc;
+    border-left: 4px solid #235A49;
+    animation: slideDown 0.3s ease-out;
+    overflow: hidden;
+  }
+
+  .order-details-content {
+    padding: 24px;
+    max-width: 100%;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+
+  .details-section {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+
+  .info-row, .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .info-row:last-child, .total-row:last-child {
+    border-bottom: none;
+  }
+
+  .label, .total-label {
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  .value, .total-value {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .cancelled {
+    color: #dc2626;
+  }
+
+  .final-total {
+    font-weight: 700;
+    font-size: 16px;
+    border-top: 2px solid #e5e7eb;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  .products-table {
+    width: 100%;
+  }
+
+  .products-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 0.5fr 1fr;
+    gap: 8px;
+    padding: 8px 0;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 12px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .product-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 0.5fr 1fr;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    align-items: center;
+  }
+
+  .product-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .product-image-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .product-image-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder-small {
+    width: 30px;
+    height: 30px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+  }
+
+  .product-name {
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .address-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .address-card {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .address-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+  }
+
+  .payment-status, .fulfillment-status {
+    font-size: 12px;
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #e5e7eb;
+  }
+
+  .address-details {
+    font-size: 12px;
+    color: #374151;
+    line-height: 1.4;
+  }
+
+  .address-details div {
+    margin-bottom: 2px;
+  }
+
+  .close-details {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .btn-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+
+  .btn-close:hover {
+    background: #4b5563;
+  }
+
+  .dropdown-arrow {
+    transition: transform 0.3s ease;
+    margin-left: 4px;
+  }
+
+  .btn-view-details.active .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 1000px;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .orders-container {
+  }
+
+  .orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f3f4;
+  }
+
+  .orders-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .orders-count {
+    font-size: 16px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .desktop-table {
+    display: block;
+  }
+
+  .orders-table-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+  }
+
+  .orders-table {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 2fr 1fr 1.2fr;
+    gap: 16px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 20px 24px;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+    font-size: 14px;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 800px;
+  }
+
+  .table-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 800px;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 2fr 1fr 1.2fr;
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-width: 800px;
+  }
+
+  .table-row:hover {
+    background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  }
+
+  .table-row:last-child {
+    border-bottom: none;
+  }
+
+  .table-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 60px;
+  }
+
+  .order-info-cell {
+    gap: 6px;
+  }
+
+  .order-number {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .order-label {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .order-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .order-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .date-icon {
+    color: #9ca3af;
+    width: 12px;
+    height: 12px;
+  }
+
+  .date-text {
+    white-space: nowrap;
+  }
+
+  .status-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    width: fit-content;
+  }
+
+  .status-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-text {
+    white-space: nowrap;
+  }
+
+  .payment-status.paid {
+    background: #dcfce7;
+    color: #166534;
+  }
+  .payment-status.paid .status-dot {
+    background: #235A49;
+  }
+
+  .payment-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .payment-status.pending .status-dot {
+    background: #f59e0b;
+  }
+
+  .payment-status.failed,
+  .payment-status.voided,
+  .payment-status.refunded {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .payment-status.failed .status-dot,
+  .payment-status.voided .status-dot,
+  .payment-status.refunded .status-dot {
+    background: #ef4444;
+  }
+
+  .fulfillment-status.fulfilled {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .fulfillment-status.fulfilled .status-dot {
+    background: #3b82f6;
+  }
+
+  .fulfillment-status.partial {
+    background: #f3e8ff;
+    color: #7c3aed;
+  }
+  .fulfillment-status.partial .status-dot {
+    background: #8b5cf6;
+  }
+
+  .fulfillment-status.unfulfilled,
+  .fulfillment-status {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .fulfillment-status.unfulfilled .status-dot,
+  .fulfillment-status .status-dot {
+    background: #94a3b8;
+  }
+
+  .products-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-images-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+
+  .product-image {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+  }
+
+  .product-image-wrapper:hover .product-image {
+    transform: scale(1.1);
+  }
+
+  .product-placeholder {
+    width: 32px;
+    height: 32px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    border-radius: 6px;
+  }
+
+  .product-placeholder svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .more-products {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .products-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .products-count {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .first-product-name {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .and-more {
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  .order-total {
+    text-align: center;
+  }
+
+  .order-total .currency {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    white-space: nowrap;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .btn-view-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #235A49 0%, #235A49 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    white-space: nowrap;
+  }
+
+  .btn-view-details:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, #16a34a 0%, #16a34a 100%);
+  }
+
+  .btn-icon {
+    transition: transform 0.2s ease;
+    width: 12px;
+    height: 12px;
+  }
+
+  .btn-view-details:hover .btn-icon {
+    transform: translateX(1px);
+  }
+
+  .mobile-cards {
+    display: none;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .order-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .card-header .order-date {
+    font-size: 11px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+
+  .card-header .order-number {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .card-content {
+    padding: 12px 14px;
+  }
+
+  .mobile-row {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .products-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .products-preview-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-product-images {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .product-image-mobile {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    object-fit: cover;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-placeholder-mobile {
+    width: 26px;
+    height: 26px;
+    background: #f3f4f6;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+  }
+
+  .product-placeholder-mobile svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .more-products-mobile {
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  .products-info-mobile {
+    margin-top: 3px;
+  }
+
+  .first-product-name-mobile {
+    color: #374151;
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.4em;
+  }
+
+  .product-count-mobile {
+    color: #6b7280;
+    font-size: 9px;
+    margin-top: 2px;
+  }
+
+  .status-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .status-section .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    width: fit-content;
+  }
+
+  .status-section .status-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .price-action-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .order-total-mobile {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .btn-view-details-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 10px;
+    background: linear-gradient(135deg, #235A49 0%, #235A49 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 6px rgba(34, 197, 94, 0.25);
+    white-space: nowrap;
+    width: fit-content;
+  }
+
+  .btn-view-details-mobile:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(34, 197, 94, 0.35);
+    background: linear-gradient(135deg, #16a34a 0%, #16a34a 100%);
+  }
+
+  .btn-view-details-mobile svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .enhanced-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding: 20px 0;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .pagination-info {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    list-style: none;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .pagination-btn:hover:not(.disabled):not(.current) {
+    border-color: #235A49;
+    background: #eff6ff;
+    color: #235A49;
+  }
+
+  .pagination-btn.current {
+    background: #235A49;
+    border-color: #235A49;
+    color: white;
+  }
+
+  .pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 32px;
+    background: #fafbfc;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+  }
+
+  .empty-state-icon {
+    color: #9ca3af;
+    margin-bottom: 20px;
+  }
+
+  .empty-state-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+
+  .empty-state-message {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0 0 24px 0;
+  }
+
+  .btn-start-shopping {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgb(15, 98, 36) 0%, rgb(22, 111, 33) 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-start-shopping:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .text-truncate-2-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .order-details-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+    background-color: #f8fafc;
+  }
+
+  .order-details-wrapper.is-visible {
+    max-height: 2000px;
+  }
+
+  .table-row + .order-details-wrapper {
+    grid-column: 1 / -1;
+  }
+
+  .order-details-content {
+    padding: 24px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-areas: "items summary" "shipping billing";
+    gap: 24px;
+  }
+
+  .line-items-section {
+    grid-area: items;
+  }
+
+  .address-section p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #475569;
+    margin: 0;
+  }
+
+  .details-line-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .details-line-items-table th,
+  .details-line-items-table td {
+    padding: 8px 4px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .details-line-items-table th {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .details-line-items-table td {
+    color: #475569;
+  }
+
+  .details-line-items-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .text-right {
+    text-align: right !important;
+  }
+
+  .summary-section {
+    grid-area: summary;
+  }
+
+  .details-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .summary-card {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .summary-rows {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .summary-row-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+  }
+
+  .summary-icon {
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+  }
+
+  .summary-note {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  .summary-row-value {
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .summary-row.discount .summary-row-value {
+    color: #16a34a;
+    background-color: #dcfce7;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f1f5f9;
+    padding: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .summary-total .summary-row-label {
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .summary-total .summary-row-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #235A49;
+  }
+
+  @media screen and (max-width: 1024px) {
+    .orders-title {
+      font-size: 24px;
+    }
+
+    .table-header,
+    .table-row {
+      gap: 12px;
+      padding: 20px 16px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .desktop-table {
+      display: none;
+    }
+
+    .mobile-cards {
+      display: block;
+    }
+
+    .orders-container {
+      overflow-x: visible;
+    }
+
+    .orders-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+    }
+
+    .orders-title {
+      font-size: 16px;
+    }
+
+    .orders-count {
+      font-size: 11px;
+      padding: 4px 10px;
+    }
+
+    /* Compact Mobile Top Icons and Account Tabs */
+    .header-icons,
+    .account-icons,
+    .top-navigation-icons {
+      font-size: 14px !important;
+    }
+
+    .header-icons svg,
+    .account-icons svg,
+    .top-navigation-icons svg {
+      width: 16px !important;
+      height: 16px !important;
+    }
+
+    .account-tab,
+    .order-history-tab,
+    .navigation-tab {
+      padding: 6px 10px !important;
+      font-size: 11px !important;
+      min-height: 32px !important;
+    }
+
+    .account-tab svg,
+    .order-history-tab svg,
+    .navigation-tab svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    .order-card.card-is-active {
+      border-color: #235A49;
+      box-shadow: 0 4px 20px rgba(35, 90, 73, 0.15);
+    }
+
+    .order-card .order-details-wrapper {
+      background-color: #f8fafc;
+    }
+
+    .mobile-details-container {
+      padding: 0;
+    }
+
+    .details-tabs-nav {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      background-color: #fff;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 8px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-button.active {
+      color: #235A49;
+      border-bottom-color: #235A49;
+    }
+
+    .details-tabs-content {
+      padding: 10px;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.4s;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .compact-product-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .compact-product-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .compact-product-item:last-child {
+      border-bottom: none;
+    }
+
+    .compact-product-image {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .compact-product-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      background-color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+    }
+
+    .compact-product-placeholder svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .compact-product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .compact-product-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.3;
+    }
+
+    .compact-product-sku {
+      font-size: 9px;
+      color: #94a3b8;
+      margin: 1px 0;
+    }
+
+    .compact-product-price {
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .compact-product-line-price {
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .order-card .details-section {
+      margin-bottom: 10px;
+    }
+
+    .order-card .details-section h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      margin: 0 0 6px 0;
+      padding: 0;
+      border: none;
+    }
+
+    .order-card .address-section p {
+      font-size: 11px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .summary-card {
+      border-radius: 6px;
+    }
+
+    .summary-rows {
+      padding: 10px;
+      gap: 8px;
+    }
+
+    .summary-row {
+      font-size: 11px;
+    }
+
+    .summary-row.discount .summary-row-value {
+      font-size: 10px;
+    }
+
+    .summary-total {
+      padding: 10px;
+    }
+
+    .summary-total .summary-row-value {
+      font-size: 14px;
+    }
+
+    .summary-note {
+      display: none;
+    }
+
+    .enhanced-pagination {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px 0;
+    }
+
+    .pagination-info {
+      font-size: 11px;
+    }
+
+    .pagination-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .pagination-btn {
+      padding: 4px 6px;
+      font-size: 10px;
+    }
+
+    .prev-btn,
+    .next-btn {
+      order: -1;
+      margin: 0 3px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .orders-container {
+      padding: 6px;
+    }
+
+    .orders-title {
+      font-size: 14px;
+    }
+
+    .orders-count {
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+
+    /* Extra Compact Mobile Top Icons and Account Tabs */
+    .header-icons,
+    .account-icons,
+    .top-navigation-icons {
+      font-size: 12px !important;
+    }
+
+    .header-icons svg,
+    .account-icons svg,
+    .top-navigation-icons svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    .account-tab,
+    .order-history-tab,
+    .navigation-tab {
+      padding: 4px 8px !important;
+      font-size: 10px !important;
+      min-height: 28px !important;
+    }
+
+    .account-tab svg,
+    .order-history-tab svg,
+    .navigation-tab svg {
+      width: 12px !important;
+      height: 12px !important;
+    }
+
+    .order-card {
+      margin-bottom: 6px;
+    }
+
+    .card-header {
+      padding: 6px 10px;
+    }
+
+    .card-content {
+      padding: 8px 10px;
+    }
+
+    .mobile-row {
+      gap: 6px;
+      grid-template-columns: 2fr 0.8fr 0.8fr;
+    }
+
+    .order-total-mobile {
+      font-size: 12px;
+    }
+
+    .btn-view-details-mobile {
+      padding: 3px 6px;
+      font-size: 7px;
+    }
+
+    .product-image-mobile,
+    .product-placeholder-mobile,
+    .more-products-mobile {
+      width: 20px;
+      height: 20px;
+    }
+
+    .more-products-mobile {
+      font-size: 6px;
+    }
+
+    .first-product-name-mobile {
+      font-size: 9px;
+    }
+
+    .product-count-mobile {
+      font-size: 7px;
+    }
+
+    .status-section .status-badge {
+      font-size: 6px;
+      padding: 1px 3px;
+    }
+
+    .card-header .order-date {
+      font-size: 9px;
+    }
+
+    .card-header .order-number {
+      font-size: 11px;
+    }
+
+    .empty-state {
+      padding: 24px 12px;
+    }
+
+    .empty-state-title {
+      font-size: 14px;
+    }
+
+    .empty-state-message {
+      font-size: 12px;
+    }
+
+    .tab-button {
+      padding: 6px 4px;
+      font-size: 9px;
+    }
+
+    .compact-product-image {
+      width: 35px;
+      height: 35px;
+    }
+
+    .compact-product-placeholder {
+      width: 35px;
+      height: 35px;
+    }
+
+    .compact-product-placeholder svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .compact-product-title {
+      font-size: 10px;
+    }
+
+    .compact-product-sku {
+      font-size: 8px;
+    }
+
+    .compact-product-price {
+      font-size: 9px;
+    }
+
+    .compact-product-line-price {
+      font-size: 10px;
+    }
+  }
+
+  @media screen and (max-width: 360px) {
+    .orders-container {
+      padding: 4px;
+    }
+
+    /* Ultra Compact Mobile Top Icons and Account Tabs */
+    .header-icons,
+    .account-icons,
+    .top-navigation-icons {
+      font-size: 10px !important;
+    }
+
+    .header-icons svg,
+    .account-icons svg,
+    .top-navigation-icons svg {
+      width: 12px !important;
+      height: 12px !important;
+    }
+
+    .account-tab,
+    .order-history-tab,
+    .navigation-tab {
+      padding: 3px 6px !important;
+      font-size: 8px !important;
+      min-height: 24px !important;
+    }
+
+    .account-tab svg,
+    .order-history-tab svg,
+    .navigation-tab svg {
+      width: 10px !important;
+      height: 10px !important;
+    }
+
+    .mobile-row {
+      grid-template-columns: 1.5fr 1fr 0.8fr;
+      gap: 4px;
+    }
+
+    .product-image-mobile,
+    .product-placeholder-mobile,
+    .more-products-mobile {
+      width: 18px;
+      height: 18px;
+    }
+
+    .first-product-name-mobile {
+      font-size: 8px;
+    }
+
+    .order-total-mobile {
+      font-size: 11px;
+    }
+
+    .btn-view-details-mobile {
+      padding: 2px 4px;
+      font-size: 6px;
+    }
+
+    .status-section .status-badge {
+      font-size: 5px;
+      padding: 1px 2px;
+    }
+
+    .tab-button {
+      padding: 4px 2px;
+      font-size: 8px;
+    }
+
+    .compact-product-image {
+      width: 30px;
+      height: 30px;
+    }
+
+    .compact-product-placeholder {
+      width: 30px;
+      height: 30px;
+    }
+
+    .compact-product-placeholder svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .compact-product-title {
+      font-size: 9px;
+    }
+
+    .compact-product-sku {
+      font-size: 7px;
+    }
+
+    .compact-product-price {
+      font-size: 8px;
+    }
+
+    .compact-product-line-price {
+      font-size: 9px;
+    }
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Main accordion logic for opening/closing order details
+    const viewButtons = document.querySelectorAll('.btn-view-details, .btn-view-details-mobile');
+    viewButtons.forEach((button) => {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        const isMobile = this.classList.contains('btn-view-details-mobile');
+        const orderWrapper = this.closest('.order-card, .table-row');
+        const orderId = orderWrapper.dataset.orderId;
+        const findIdFromPanel = (panel) => panel.id.match(/\d+$/)?.[0] || null;
+        const detailsPanel = document.getElementById(
+          isMobile ? `mobile-order-details-${orderId}` : `order-details-${orderId}`
+        );
+        const btnText = this.querySelector('.btn-text');
+
+        document.querySelectorAll('.order-details-wrapper.is-visible').forEach((openPanel) => {
+          if (openPanel !== detailsPanel) {
+            openPanel.classList.remove('is-visible');
+            const otherOrderId = findIdFromPanel(openPanel);
+            if (otherOrderId) {
+              const correspondingWrapper = document.querySelector(`[data-order-id="${otherOrderId}"]`);
+              if (correspondingWrapper) {
+                correspondingWrapper.classList.remove('card-is-active');
+                const otherButton = correspondingWrapper.querySelector('[aria-expanded="true"]');
+                if (otherButton) {
+                  otherButton.setAttribute('aria-expanded', 'false');
+                  if (otherButton.querySelector('.btn-text')) {
+                    otherButton.querySelector('.btn-text').textContent = 'View';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        const isVisible = detailsPanel.classList.toggle('is-visible');
+        this.setAttribute('aria-expanded', isVisible);
+        if (isMobile) {
+          orderWrapper.classList.toggle('card-is-active', isVisible);
+        }
+        if (btnText) {
+          btnText.textContent = isVisible ? 'Hide' : 'View';
+        }
+      });
+    });
+
+    // New logic for handling tabs within each mobile dropdown
+    const allTabContainers = document.querySelectorAll('.mobile-details-container');
+    allTabContainers.forEach((container) => {
+      const tabButtons = container.querySelectorAll('.tab-button');
+      const tabPanels = container.querySelectorAll('.tab-panel');
+
+      tabButtons.forEach((button) => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); // prevent card from closing
+          const targetPanelId = button.dataset.tabTarget;
+
+          // Update button states
+          tabButtons.forEach((btn) => btn.classList.remove('active'));
+          button.classList.add('active');
+
+          // Update panel visibility
+          tabPanels.forEach((panel) => {
+            if ('#' + panel.id === targetPanelId) {
+              panel.classList.add('active');
+            } else {
+              panel.classList.remove('active');
+            }
+          });
+        });
+      });
+    });
+  });
+</script>
+
+{% comment %}
+  <div class="orders-container">
+    {% paginate customer.orders by 9 %}
+      {%- if customer.orders.size > 0 -%}
+        <div class="orders-header">
+          <h2 class="orders-title">Your Orders</h2>
+          <span class="orders-count">
+            {{- customer.orders.size }} order{{ customer.orders.size | pluralize: '', 's' -}}
+          </span>
+        </div>
+        <div class="desktop-table">
+          <div class="orders-table-wrapper">
+            <div class="orders-table">
+              <div class="table-header">
+                <div class="header-cell order-info-header">Order Details</div>
+                <div class="header-cell status-header">Status</div>
+                <div class="header-cell products-header">Products</div>
+                <div class="header-cell total-header">Total</div>
+                <div class="header-cell actions-header">Actions</div>
+              </div>
+              <div class="table-body">
+                {%- for order in customer.orders -%}
+                  <div class="table-row" data-order-id="{{ order.id }}">
+                    <div class="table-cell order-info-cell">
+                      <div class="order-number">
+                        <span class="order-label">Order #</span><span class="order-value">{{ order.name }}</span>
+                      </div>
+                      <div class="order-date">
+                        <svg class="date-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                        </svg>
+                        <span class="date-text">{{ order.created_at | date: '%B %d, %Y' }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell status-cell">
+                      <div class="status-badges">
+                        <span class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">{{ order.financial_status_label }}</span></span
+                        ><span class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">
+                            {{- order.fulfillment_status_label | default: 'Pending' -}}
+                          </span></span
+                        >
+                      </div>
+                    </div>
+                    <div class="table-cell products-cell">
+                      <div class="products-preview">
+                        {% assign first_items = order.line_items | slice: 0, 4 %}
+                        <div class="product-images-row">
+                          {% for line_item in first_items %}
+                            <div class="product-image-wrapper">
+                              {% if line_item.image -%}
+                                <img
+                                  src="{{ line_item.image | image_url: width: 60 }}"
+                                  alt="{{ line_item.image.alt | escape }}"
+                                  loading="lazy"
+                                  width="40"
+                                  height="40"
+                                  class="product-image"
+                                >
+                              {%- else %}
+                                <div class="product-placeholder">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                                  </svg>
+                                </div>
+                              {% endif %}
+                            </div>
+                          {% endfor -%}
+                          {%- if order.line_items.size > 4 %}
+                            <div class="more-products">+{{ order.line_items.size | minus: 4 }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="products-info">
+                          <div class="products-count">
+                            {{ order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' }}
+                          </div>
+                          <div class="first-product-name">
+                            {{ order.line_items.first.title | truncate: 30 -}}
+                            {%- if order.line_items.size > 1 %}
+                              <span class="and-more">& {{ order.line_items.size | minus: 1 }} more</span>
+                            {%- endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="table-cell total-cell">
+                      <div class="order-total">
+                        <span class="currency">{{ order.total_net_amount | money_with_currency }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell actions-cell">
+                      <div class="action-buttons">
+                        <a href="{{ order.customer_url }}" class="btn-view-details" role="button" aria-expanded="false">
+                          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                          </svg>
+                          <span class="btn-text">View</span></a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="order-details-wrapper" id="order-details-{{ order.id }}">
+                    <div class="order-details-content">
+                      <div class="details-grid">
+                        <div class="details-section line-items-section">
+                          <h4>Products</h4>
+                          <table class="details-line-items-table">
+                            <thead>
+                              <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th class="text-right">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for line_item in order.line_items %}
+                                <tr>
+                                  <td>{{ line_item.title }}</td>
+                                  <td>{{ line_item.sku | default: 'N/A' }}</td>
+                                  <td>{{ line_item.original_price | money }}</td>
+                                  <td>{{ line_item.quantity }}</td>
+                                  <td class="text-right">{{ line_item.final_line_price | money }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="details-section summary-section">
+                          <h4>Order Summary</h4>
+                          <div class="summary-card">
+                            <div class="summary-rows">
+                              <div class="summary-row">
+                                <span class="summary-row-label">Subtotal</span
+                                ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                              </div>
+                              {% if order.total_discounts > 0 %}
+                                <div class="summary-row discount">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a1 1 0 011-1h5a1 1 0 01.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Discounts</span
+                                  ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                                </div>
+                              {% endif -%}
+                              {%- for shipping_method in order.shipping_methods %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v5.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1V8a1 1 0 00-1-1h-5z" />
+                                    </svg>
+                                    Shipping <span class="summary-note">({{ shipping_method.title }})</span></span
+                                  ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                                </div>
+                              {% endfor -%}
+                              {%- for tax_line in order.tax_lines %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                                    </svg>
+                                    Tax
+                                    <span class="summary-note"
+                                      >({{ tax_line.title }}
+                                      {{ tax_line.rate | times: 100 }}%)</span
+                                    ></span
+                                  ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                                </div>
+                              {% endfor %}
+                            </div>
+                            <div class="summary-total">
+                              <span class="summary-row-label">Total Paid</span
+                              ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {% comment %}
+                          <div class="details-section address-section"><h4>Shipping Address</h4><p>{{ order.shipping_address | format_address }}</p></div>
+                          <div class="details-section address-section"><h4>Billing Address</h4><p>{{ order.billing_address | format_address }}</p></div>
+                        {% endcomment %}
+
+                        <!-- Desktop View Replacement Code -->
+                        {% comment %}
+                          <div class="details-section shipping-details-section">
+                            <div class="section-header">
+                              <i class="fas fa-shipping-fast"></i>
+                              <h4>Shipping Details</h4>
+                            </div>
+
+                            {%- for line_item in order.line_items -%}
+                              {%- if line_item.fulfillment -%}
+                                <div class="tracking-card">
+                                  <div class="tracking-info">
+                                    <div class="info-row">
+                                      <i class="fas fa-info-circle"></i>
+                                      <span>{{ line_item.fulfillment.status | capitalize }}</span>
+                                    </div>
+                                    <div class="info-row">
+                                      <i class="fas fa-truck"></i>
+                                      <span>{{ line_item.fulfillment.tracking_company }}</span>
+                                    </div>
+                                    <div class="info-row">
+                                      <i class="fas fa-hashtag"></i>
+                                      <span>{{ line_item.fulfillment.tracking_number }}</span>
+                                    </div>
+                                  </div>
+                                  {%- if line_item.fulfillment.tracking_number -%}
+                                    {%- assign tracking_number = line_item.fulfillment.tracking_number -%}
+                                    {%- assign shiprocket_url = 'https://shiprocket.co/tracking/' | append: tracking_number -%}
+                                    <a href="{{ shiprocket_url }}" class="track-btn" target="_blank">
+                                      <i class="fas fa-external-link-alt"></i>
+                                      Track Order
+                                    </a>
+                                  {%- endif -%}
+                                </div>
+                              {%- endif -%}
+                            {%- endfor -%}
+
+                            <div class="address-grid">
+                              <div class="address-card">
+                                <div class="address-header">
+                                  <i class="fas fa-map-marker-alt"></i>
+                                  <h5>Shipping Address</h5>
+                                </div>
+                                <p>{{ order.shipping_address | format_address }}</p>
+                              </div>
+                              <div class="address-card">
+                                <div class="address-header">
+                                  <i class="fas fa-file-invoice"></i>
+                                  <h5>Billing Address</h5>
+                                </div>
+                                <p>{{ order.billing_address | format_address }}</p>
+                              </div>
+                            </div>
+                          </div>
+                        {% endcomment %}
+                        <div
+                          class="details-section shipping-details-mobile"
+                          style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);    color: #333;"
+                        >
+                          <div
+                            class="mobile-section-header"
+                            style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                          >
+                            <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                          </div>
+
+                          {%- for line_item in order.line_items -%}
+                            {%- if line_item.fulfillment -%}
+                              <div
+                                class="mobile-tracking"
+                                style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                              >
+                                <div
+                                  class="mobile-info"
+                                  style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                                >
+                                  {% comment %}
+                                    <div class="mobile-row" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;">
+                                      <i class="fas fa-circle" style="color: #6c757d; font-size: 14px;"></i>
+                                      <span>{{ line_item.fulfillment.status | capitalize }}</span>
+                                    </div>
+                                  {% endcomment %}
+                                  {% comment %}
+                                    <div class="mobile-row" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;">
+                                      <i class="fas fa-truck" style="color: #6c757d; font-size: 14px;"></i>
+                                      <span>{{ line_item.fulfillment.tracking_company }}</span>
+                                    </div>
+                                  {% endcomment %}
+                                  <div
+                                    class="mobile-row"
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                  >
+                                    <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                    <span
+                                      class="tracking-num"
+                                      style="font-family: monospace; font-weight: 500; color: #000;"
+                                    >
+                                      {{- line_item.fulfillment.tracking_number -}}
+                                    </span>
+                                  </div>
+                                </div>
+                                {%- if line_item.fulfillment.tracking_number -%}
+                                  {%- assign tracking_number = line_item.fulfillment.tracking_number -%}
+                                  {%- assign shiprocket_url = 'https://shiprocket.co/tracking/'
+                                    | append: tracking_number
+                                  -%}
+                                  <a
+                                    href="{{ shiprocket_url }}"
+                                    class="mobile-track-btn"
+                                    target="_blank"
+                                    style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                                  >
+                                    <i class="fas fa-external-link-alt" style="color: #6c757d; font-size: 14px;"></i>
+                                    Track
+                                  </a>
+                                {%- endif -%}
+                              </div>
+                            {%- endif -%}
+                          {%- endfor -%}
+                          <div class="details-section address-section">
+                            <h4>Shipping Address</h4>
+                            <p>{{ order.shipping_address | format_address }}</p>
+                          </div>
+                          <div class="details-section address-section">
+                            <h4>BillingAddress</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                          {% comment %}
+                            <div class="mobile-addresses" style="display: flex; flex-direction: row; gap: 10px; padding: 0;">
+                              <div class="mobile-addr" style="display: flex; flex-direction: column; gap: 4px;   background-color: #f9f9f9; border-radius: 6px; flex: 1;">
+                                <div class="mobile-addr-header" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #333;">
+                                  <i class="fas fa-map-marker-alt" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span>Shipping</span>
+                                </div>
+                                <p style="font-size: 9px; color: #777; margin: 0">{{ order.shipping_address | format_address }}</p>
+                              </div>
+                              <div class="mobile-addr" style="display: flex; flex-direction: column; gap: 4px;   background-color: #f9f9f9; border-radius: 6px; flex: 1;">
+                                <div class="mobile-addr-header" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #333;">
+                                  <i class="fas fa-file-invoice" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span>Billing</span>
+                                </div>
+                                <p style="font-size: 9px; color: #777; margin: 0">{{ order.billing_address | format_address }}</p>
+                              </div>
+                            </div>
+                          {% endcomment %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-cards">
+          {%- for order in customer.orders -%}
+            <div class="order-card" data-order-id="{{ order.id }}">
+              <div class="card-header">
+                <div class="order-date">
+                  <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                  </svg>
+                  {{ order.created_at | date: '%B %d, %Y' }}
+                </div>
+                <div class="order-number">{{ order.name }}</div>
+              </div>
+              <div class="card-content">
+                <div class="mobile-row">
+                  <div class="products-section">
+                    <div class="products-preview-mobile">
+                      {% assign first_items = order.line_items | slice: 0, 3 %}
+                      <div class="mobile-product-images">
+                        {% for line_item in first_items -%}
+                          {%- if line_item.image -%}
+                            <img
+                              src="{{ line_item.image | image_url: width: 64 }}"
+                              alt="{{ line_item.image.alt | escape }}"
+                              loading="lazy"
+                              class="product-image-mobile"
+                            >
+                          {%- else %}
+                            <div class="product-placeholder-mobile">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                              </svg>
+                            </div>
+                          {% endif -%}
+                        {%- endfor -%}
+                        {%- if order.line_items.size > 3 %}
+                          <div class="more-products-mobile">+{{ order.line_items.size | minus: 3 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="products-info-mobile">
+                        <div class="first-product-name-mobile">{{ order.line_items.first.title | truncate: 25 }}</div>
+                        <div class="product-count-mobile">
+                          {% if order.line_items.size > 1 -%}
+                            and {{ order.line_items.size | minus: 1 }} more item
+                            {{- order.line_items.size | minus: 1 | pluralize: '', 's' -}}
+                          {%- else -%}
+                            {{- order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' -}}
+                          {%- endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="status-section">
+                    <div class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.financial_status_label }}</span>
+                    </div>
+                    <div class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.fulfillment_status_label | default: 'Pending' }}</span>
+                    </div>
+                  </div>
+                  <div class="price-action-section">
+                    <div class="order-total-mobile">{{ order.total_net_amount | money_with_currency }}</div>
+                    <a href="{{ order.customer_url }}" class="btn-view-details-mobile" role="button" aria-expanded="false"
+                      ><span class="btn-text">View</span>
+                      <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-details-wrapper" id="mobile-order-details-{{ order.id }}">
+                <div class="mobile-details-container">
+                  <div class="details-tabs-nav">
+                    <button class="tab-button active" data-tab-target="#tab-items-{{ order.id }}">
+                      Items ({{ order.line_items.size }})
+                    </button>
+                    <button class="tab-button" data-tab-target="#tab-details-{{ order.id }}">Details</button>
+                  </div>
+                  <div class="details-tabs-content">
+                    <div class="tab-panel active" id="tab-items-{{ order.id }}">
+                      <ul class="compact-product-list">
+                        {% for line_item in order.line_items %}
+                          <li class="compact-product-item">
+                            {% if line_item.image %}
+                              <img
+                                src="{{ line_item.image | image_url: width: 120 }}"
+                                alt="{{ line_item.image.alt | escape }}"
+                                class="compact-product-image"
+                              >
+                            {% else %}
+                              <div class="compact-product-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                </svg>
+                              </div>
+                            {% endif %}
+                            <div class="compact-product-info">
+                              <span class="compact-product-title">{{ line_item.title }}</span>
+                              <span class="compact-product-sku">{{ line_item.sku | default: ' ' }}</span>
+                              <span class="compact-product-price">
+                                {{- line_item.quantity }} x {{ line_item.final_price | money -}}
+                              </span>
+                            </div>
+                            <span class="compact-product-line-price">{{ line_item.final_line_price | money }}</span>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    <div class="tab-panel" id="tab-details-{{ order.id }}">
+                      <div class="details-section summary-section">
+                        <div class="summary-card">
+                          <div class="summary-rows">
+                            <div class="summary-row">
+                              <span class="summary-row-label">Subtotal</span
+                              ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                            </div>
+                            {% if order.total_discounts > 0 %}
+                              <div class="summary-row discount">
+                                <span class="summary-row-label">Discounts</span
+                                ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                              </div>
+                            {% endif %}
+                            {% for shipping_method in order.shipping_methods %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Shipping</span
+                                ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                            {% for tax_line in order.tax_lines %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Tax</span
+                                ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <div class="summary-total">
+                            <span class="summary-row-label">Total</span
+                            ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {%- assign billing_address_compact = order.billing_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+                      {%- assign shipping_address_compact = order.shipping_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+                      {% if billing_address_compact == shipping_address_compact %}
+                        <div class="details-section address-section">
+                          <h4>Billing & Shipping Address</h4>
+                          <p>{{ order.shipping_address | format_address }}</p>
+                        </div>
+                      {% else %}
+                        {% comment %}
+                          <div class="details-section address-section"><h4>Shipping Address</h4><p>{{ order.shipping_address | format_address }}</p></div>
+                          <div class="details-section address-section"><h4>Billing Address</h4><p>{{ order.billing_address | format_address }}</p></div>
+                        {% endcomment %}
+                        <!-- Mobile View Replacement Code -->
+                        <div
+                          class="details-section shipping-details-mobile"
+                          style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);    color: #333;"
+                        >
+                          <div
+                            class="mobile-section-header"
+                            style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                          >
+                            <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                          </div>
+
+                          {%- for line_item in order.line_items -%}
+                            {%- if line_item.fulfillment -%}
+                              <div
+                                class="mobile-tracking"
+                                style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                              >
+                                <div
+                                  class="mobile-info"
+                                  style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                                >
+                                  {% comment %}
+                                    <div class="mobile-row" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;">
+                                      <i class="fas fa-circle" style="color: #6c757d; font-size: 14px;"></i>
+                                      <span>{{ line_item.fulfillment.status | capitalize }}</span>
+                                    </div>
+                                  {% endcomment %}
+                                  {% comment %}
+                                    <div class="mobile-row" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;">
+                                      <i class="fas fa-truck" style="color: #6c757d; font-size: 14px;"></i>
+                                      <span>{{ line_item.fulfillment.tracking_company }}</span>
+                                    </div>
+                                  {% endcomment %}
+                                  <div
+                                    class="mobile-row"
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                  >
+                                    <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                    <span
+                                      class="tracking-num"
+                                      style="font-family: monospace; font-weight: 500; color: #000;"
+                                    >
+                                      {{- line_item.fulfillment.tracking_number -}}
+                                    </span>
+                                  </div>
+                                </div>
+                                {%- if line_item.fulfillment.tracking_number -%}
+                                  {%- assign tracking_number = line_item.fulfillment.tracking_number -%}
+                                  {%- assign shiprocket_url = 'https://shiprocket.co/tracking/'
+                                    | append: tracking_number
+                                  -%}
+                                  <a
+                                    href="{{ shiprocket_url }}"
+                                    class="mobile-track-btn"
+                                    target="_blank"
+                                    style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                                  >
+                                    <i class="fas fa-external-link-alt" style="color: #6c757d; font-size: 14px;"></i>
+                                    Track
+                                  </a>
+                                {%- endif -%}
+                              </div>
+                            {%- endif -%}
+                          {%- endfor -%}
+                          <div class="details-section address-section">
+                            <h4>Shipping Address</h4>
+                            <p>{{ order.shipping_address | format_address }}</p>
+                          </div>
+                          <div class="details-section address-section">
+                            <h4>BillingAddress</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                          {% comment %}
+                            <div class="mobile-addresses" style="display: flex; flex-direction: row; gap: 10px; padding: 0;">
+                              <div class="mobile-addr" style="display: flex; flex-direction: column; gap: 4px;   background-color: #f9f9f9; border-radius: 6px; flex: 1;">
+                                <div class="mobile-addr-header" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #333;">
+                                  <i class="fas fa-map-marker-alt" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span>Shipping</span>
+                                </div>
+                                <p style="font-size: 9px; color: #777; margin: 0">{{ order.shipping_address | format_address }}</p>
+                              </div>
+                              <div class="mobile-addr" style="display: flex; flex-direction: column; gap: 4px;   background-color: #f9f9f9; border-radius: 6px; flex: 1;">
+                                <div class="mobile-addr-header" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #333;">
+                                  <i class="fas fa-file-invoice" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span>Billing</span>
+                                </div>
+                                <p style="font-size: 9px; color: #777; margin: 0">{{ order.billing_address | format_address }}</p>
+                              </div>
+                            </div>
+                          {% endcomment %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- if paginate.pages > 1 -%}
+          <nav class="enhanced-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+            <div class="pagination-info">
+              Showing {{ paginate.current_offset | plus: 1 }}-
+              {{- paginate.current_offset | plus: paginate.page_size | at_most: paginate.items }}
+              of {{ paginate.items }} orders
+            </div>
+            <ul class="pagination-controls" role="list">
+              {%- if paginate.previous -%}
+                <li>
+                  <a
+                    href="{{ paginate.previous.url }}"
+                    class="pagination-btn prev-btn"
+                    aria-label="{{ 'general.pagination.previous' | t }}"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                    Previous</a
+                  >
+                </li>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                <li>
+                  {%- if part.is_link -%}
+                    <a
+                      href="{{ part.url }}"
+                      class="pagination-btn page-btn"
+                      aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+                    >
+                      {{- part.title -}}
+                    </a>
+                  {%- else -%}
+                    {%- if part.title == paginate.current_page -%}
+                      <span class="pagination-btn page-btn current" aria-current="page">{{ part.title }}</span>
+                    {%- else -%}
+                      <span class="pagination-btn page-btn disabled">{{ part.title }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <li>
+                  <a
+                    href="{{ paginate.next.url }}"
+                    class="pagination-btn next-btn"
+                    aria-label="{{ 'general.pagination.next' | t }}"
+                    >Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                  </a>
+                </li>
+              {%- endif -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3 class="empty-state-title">No orders yet</h3>
+          <p class="empty-state-message">{{ 'customer.orders.none' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn-start-shopping">Start Shopping</a>
+        </div>
+      {%- endif -%}
+    {% endpaginate %}
+  </div>
+{% endcomment %}
+{% comment %}
+  <div class="orders-container">
+    {% paginate customer.orders by 9 %}
+      {%- if customer.orders.size > 0 -%}
+        <div class="orders-header">
+          <h2 class="orders-title">Your Orders</h2>
+          <span class="orders-count">
+            {{- customer.orders.size }} order{{ customer.orders.size | pluralize: '', 's' -}}
+          </span>
+        </div>
+        <div class="desktop-table">
+          <div class="orders-table-wrapper">
+            <div class="orders-table">
+              <div class="table-header">
+                <div class="header-cell order-info-header">Order Details</div>
+                <div class="header-cell status-header">Status</div>
+                <div class="header-cell products-header">Products</div>
+                <div class="header-cell total-header">Total</div>
+                <div class="header-cell actions-header">Actions</div>
+              </div>
+              <div class="table-body">
+                {%- for order in customer.orders -%}
+                  <div class="table-row" data-order-id="{{ order.id }}">
+                    <div class="table-cell order-info-cell">
+                      <div class="order-number">
+                        <span class="order-label">Order #</span><span class="order-value">{{ order.name }}</span>
+                      </div>
+                      <div class="order-date">
+                        <svg class="date-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                        </svg>
+                        <span class="date-text">{{ order.created_at | date: '%B %d, %Y' }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell status-cell">
+                      <div class="status-badges">
+                        <span class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">{{ order.financial_status_label }}</span></span
+                        ><span class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}"
+                          ><span class="status-dot"></span
+                          ><span class="status-text">
+                            {{- order.fulfillment_status_label | default: 'Pending' -}}
+                          </span></span
+                        >
+                      </div>
+                    </div>
+                    <div class="table-cell products-cell">
+                      <div class="products-preview">
+                        {% assign first_items = order.line_items | slice: 0, 4 %}
+                        <div class="product-images-row">
+                          {% for line_item in first_items %}
+                            <div class="product-image-wrapper">
+                              {% if line_item.image -%}
+                                <img
+                                  src="{{ line_item.image | image_url: width: 60 }}"
+                                  alt="{{ line_item.image.alt | escape }}"
+                                  loading="lazy"
+                                  width="40"
+                                  height="40"
+                                  class="product-image"
+                                >
+                              {%- else %}
+                                <div class="product-placeholder">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                                  </svg>
+                                </div>
+                              {% endif %}
+                            </div>
+                          {% endfor -%}
+                          {%- if order.line_items.size > 4 %}
+                            <div class="more-products">+{{ order.line_items.size | minus: 4 }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="products-info">
+                          <div class="products-count">
+                            {{ order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' }}
+                          </div>
+                          <div class="first-product-name">
+                            {{ order.line_items.first.title | truncate: 30 -}}
+                            {%- if order.line_items.size > 1 %}
+                              <span class="and-more">& {{ order.line_items.size | minus: 1 }} more</span>
+                            {%- endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="table-cell total-cell">
+                      <div class="order-total">
+                        <span class="currency">{{ order.total_net_amount | money_with_currency }}</span>
+                      </div>
+                    </div>
+                    <div class="table-cell actions-cell">
+                      <div class="action-buttons">
+                        <a href="{{ order.customer_url }}" class="btn-view-details" role="button" aria-expanded="false">
+                          <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                          </svg>
+                          <span class="btn-text">View</span></a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="order-details-wrapper" id="order-details-{{ order.id }}">
+                    <div class="order-details-content">
+                      <div class="details-grid">
+                        <div class="details-section line-items-section">
+                          <h4>Products</h4>
+                          <table class="details-line-items-table">
+                            <thead>
+                              <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th class="text-right">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for line_item in order.line_items %}
+                                <tr>
+                                  <td>{{ line_item.title }}</td>
+                                  <td>{{ line_item.sku | default: 'N/A' }}</td>
+                                  <td>{{ line_item.original_price | money }}</td>
+                                  <td>{{ line_item.quantity }}</td>
+                                  <td class="text-right">{{ line_item.final_line_price | money }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="details-section summary-section">
+                          <h4>Order Summary</h4>
+                          <div class="summary-card">
+                            <div class="summary-rows">
+                              <div class="summary-row">
+                                <span class="summary-row-label">Subtotal</span
+                                ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                              </div>
+                              {% if order.total_discounts > 0 %}
+                                <div class="summary-row discount">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a1 1 0 011-1h5a1 1 0 01.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                    Discounts</span
+                                  ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                                </div>
+                              {% endif -%}
+                              {%- for shipping_method in order.shipping_methods %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v5.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1V8a1 1 0 00-1-1h-5z" />
+                                    </svg>
+                                    Shipping <span class="summary-note">({{ shipping_method.title }})</span></span
+                                  ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                                </div>
+                              {% endfor -%}
+                              {%- for tax_line in order.tax_lines %}
+                                <div class="summary-row">
+                                  <span class="summary-row-label">
+                                    <svg
+                                      class="summary-icon"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                                    </svg>
+                                    Tax
+                                    <span class="summary-note"
+                                      >({{ tax_line.title }}
+                                      {{ tax_line.rate | times: 100 }}%)</span
+                                    ></span
+                                  ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                                </div>
+                              {% endfor %}
+                            </div>
+                            <div class="summary-total">
+                              <span class="summary-row-label">Total Paid</span
+                              ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {%- comment -%} Collect unique tracking numbers {%- endcomment -%}
+                        {%- assign unique_tracking_numbers = '' -%}
+                        {%- for line_item in order.line_items -%}
+                          {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                            {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                            {%- unless unique_tracking_numbers contains tracking_num -%}
+                              {%- if unique_tracking_numbers == '' -%}
+                                {%- assign unique_tracking_numbers = tracking_num -%}
+                              {%- else -%}
+                                {%- assign unique_tracking_numbers = unique_tracking_numbers | append: '||' | append: tracking_num -%}
+                              {%- endif -%}
+                            {%- endunless -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+
+                        {%- assign tracking_array = unique_tracking_numbers | split: '||' -%}
+                        {%- assign shipment_count = tracking_array.size -%}
+
+                        <div
+                          class="details-section shipping-details-mobile"
+                          style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                        >
+                          <div
+                            class="mobile-section-header"
+                            style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                          >
+                            <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                          </div>
+
+                          {%- if shipment_count > 1 -%}
+                            <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                              <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                              This order is shipped in {{ shipment_count }} different shipments
+                            </div>
+                          {%- elsif shipment_count == 1 -%}
+                            <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                              <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                              All products will be shipped in 1 shipment
+                            </div>
+                          {%- endif -%}
+
+                          {%- for tracking_num in tracking_array -%}
+                            <div
+                              class="mobile-tracking"
+                              style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                            >
+                              <div
+                                class="mobile-info"
+                                style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                              >
+                                <div
+                                  class="mobile-row"
+                                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                >
+                                  <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span
+                                    class="tracking-num"
+                                    style="font-family: monospace; font-weight: 500; color: #000;"
+                                  >
+                                    {{- tracking_num -}}
+                                  </span>
+                                </div>
+                              </div>
+                              {%- assign shiprocket_url = 'https://shiprocket.co/tracking/' | append: tracking_num -%}
+                              <a
+                                href="{{ shiprocket_url }}"
+                                class="mobile-track-btn"
+                                target="_blank"
+                                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                              >
+                                <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                                Track
+                              </a>
+                            </div>
+                          {%- endfor -%}
+
+                          <div class="details-section address-section">
+                            <h4>Shipping Address</h4>
+                            <p>{{ order.shipping_address | format_address }}</p>
+                          </div>
+                          <div class="details-section address-section">
+                            <h4>Billing Address</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {%- comment -%} MOBILE VIEW {%- endcomment -%}
+        <div class="mobile-cards">
+          {%- for order in customer.orders -%}
+            <div class="order-card" data-order-id="{{ order.id }}">
+              <div class="card-header">
+                <div class="order-date">
+                  <svg fill="currentColor" width="12" height="12" viewBox="0 0 24 24">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/>
+                  </svg>
+                  {{ order.created_at | date: '%B %d, %Y' }}
+                </div>
+                <div class="order-number">{{ order.name }}</div>
+              </div>
+              <div class="card-content">
+                <div class="mobile-row">
+                  <div class="products-section">
+                    <div class="products-preview-mobile">
+                      {% assign first_items = order.line_items | slice: 0, 3 %}
+                      <div class="mobile-product-images">
+                        {% for line_item in first_items -%}
+                          {%- if line_item.image -%}
+                            <img
+                              src="{{ line_item.image | image_url: width: 64 }}"
+                              alt="{{ line_item.image.alt | escape }}"
+                              loading="lazy"
+                              class="product-image-mobile"
+                            >
+                          {%- else %}
+                            <div class="product-placeholder-mobile">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                              </svg>
+                            </div>
+                          {% endif -%}
+                        {%- endfor -%}
+                        {%- if order.line_items.size > 3 %}
+                          <div class="more-products-mobile">+{{ order.line_items.size | minus: 3 }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="products-info-mobile">
+                        <div class="first-product-name-mobile">{{ order.line_items.first.title | truncate: 25 }}</div>
+                        <div class="product-count-mobile">
+                          {% if order.line_items.size > 1 -%}
+                            and {{ order.line_items.size | minus: 1 }} more item
+                            {{- order.line_items.size | minus: 1 | pluralize: '', 's' -}}
+                          {%- else -%}
+                            {{- order.line_items.size }} item{{ order.line_items.size | pluralize: '', 's' -}}
+                          {%- endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="status-section">
+                    <div class="status-badge payment-status {{ order.financial_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.financial_status_label }}</span>
+                    </div>
+                    <div class="status-badge fulfillment-status {{ order.fulfillment_status | downcase | replace: ' ', '-' }}">
+                      <div class="status-dot"></div>
+                      <span class="status-text">{{ order.fulfillment_status_label | default: 'Pending' }}</span>
+                    </div>
+                  </div>
+                  <div class="price-action-section">
+                    <div class="order-total-mobile">{{ order.total_net_amount | money_with_currency }}</div>
+                    <a href="{{ order.customer_url }}" class="btn-view-details-mobile" role="button" aria-expanded="false"
+                      ><span class="btn-text">View</span>
+                      <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-details-wrapper" id="mobile-order-details-{{ order.id }}">
+                <div class="mobile-details-container">
+                  <div class="details-tabs-nav">
+                    <button class="tab-button active" data-tab-target="#tab-items-{{ order.id }}">
+                      Items ({{ order.line_items.size }})
+                    </button>
+                    <button class="tab-button" data-tab-target="#tab-details-{{ order.id }}">Details</button>
+                  </div>
+                  <div class="details-tabs-content">
+                    <div class="tab-panel active" id="tab-items-{{ order.id }}">
+                      <ul class="compact-product-list">
+                        {% for line_item in order.line_items %}
+                          <li class="compact-product-item">
+                            {% if line_item.image %}
+                              <img
+                                src="{{ line_item.image | image_url: width: 120 }}"
+                                alt="{{ line_item.image.alt | escape }}"
+                                class="compact-product-image"
+                              >
+                            {% else %}
+                              <div class="compact-product-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                </svg>
+                              </div>
+                            {% endif %}
+                            <div class="compact-product-info">
+                              <span class="compact-product-title">{{ line_item.title }}</span>
+                              <span class="compact-product-sku">{{ line_item.sku | default: ' ' }}</span>
+                              <span class="compact-product-price">
+                                {{- line_item.quantity }} x {{ line_item.final_price | money -}}
+                              </span>
+                            </div>
+                            <span class="compact-product-line-price">{{ line_item.final_line_price | money }}</span>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    <div class="tab-panel" id="tab-details-{{ order.id }}">
+                      <div class="details-section summary-section">
+                        <div class="summary-card">
+                          <div class="summary-rows">
+                            <div class="summary-row">
+                              <span class="summary-row-label">Subtotal</span
+                              ><span class="summary-row-value">{{ order.line_items_subtotal_price | money }}</span>
+                            </div>
+                            {% if order.total_discounts > 0 %}
+                              <div class="summary-row discount">
+                                <span class="summary-row-label">Discounts</span
+                                ><span class="summary-row-value">-{{ order.total_discounts | money }}</span>
+                              </div>
+                            {% endif %}
+                            {% for shipping_method in order.shipping_methods %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Shipping</span
+                                ><span class="summary-row-value">{{ shipping_method.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                            {% for tax_line in order.tax_lines %}
+                              <div class="summary-row">
+                                <span class="summary-row-label">Tax</span
+                                ><span class="summary-row-value">{{ tax_line.price | money }}</span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <div class="summary-total">
+                            <span class="summary-row-label">Total</span
+                            ><span class="summary-row-value">{{ order.total_price | money_with_currency }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {%- comment -%} Collect unique tracking numbers for mobile {%- endcomment -%}
+                      {%- assign unique_tracking_numbers = '' -%}
+                      {%- for line_item in order.line_items -%}
+                        {%- if line_item.fulfillment and line_item.fulfillment.tracking_number -%}
+                          {%- assign tracking_num = line_item.fulfillment.tracking_number -%}
+                          {%- unless unique_tracking_numbers contains tracking_num -%}
+                            {%- if unique_tracking_numbers == '' -%}
+                              {%- assign unique_tracking_numbers = tracking_num -%}
+                            {%- else -%}
+                              {%- assign unique_tracking_numbers = unique_tracking_numbers | append: '||' | append: tracking_num -%}
+                            {%- endif -%}
+                          {%- endunless -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- assign tracking_array = unique_tracking_numbers | split: '||' -%}
+                      {%- assign shipment_count = tracking_array.size -%}
+
+                      {%- assign billing_address_compact = order.billing_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+                      {%- assign shipping_address_compact = order.shipping_address
+                        | format_address
+                        | replace: '<p>', ''
+                        | replace: '</p>', ''
+                        | replace: '<br>', ''
+                      -%}
+                      {% if billing_address_compact == shipping_address_compact %}
+                        <div class="details-section address-section">
+                          <h4>Billing & Shipping Address</h4>
+                          <p>{{ order.shipping_address | format_address }}</p>
+                        </div>
+                      {% else %}
+                        <div
+                          class="details-section shipping-details-mobile"
+                          style="display: flex; flex-direction: column; gap: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); color: #333;"
+                        >
+                          <div
+                            class="mobile-section-header"
+                            style="display: flex; align-items: center; gap: 8px; padding: 0 4px;"
+                          >
+                            <i class="fas fa-shipping-fast" style="color: #6c757d; font-size: 14px;"></i>
+                            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #1a1a1a;">Shipping</h4>
+                          </div>
+
+                          {%- if shipment_count > 1 -%}
+                            <div style="padding: 8px 12px; background-color: #e0f2fe; border-radius: 6px; font-size: 12px; color: #0369a1;">
+                              <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                              This order is shipped in {{ shipment_count }} different shipments
+                            </div>
+                          {%- elsif shipment_count == 1 -%}
+                            <div style="padding: 8px 12px; background-color: #dcfce7; border-radius: 6px; font-size: 12px; color: #166534;">
+                              <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+                              All products will be shipped in 1 shipment
+                            </div>
+                          {%- endif -%}
+
+                          {%- for tracking_num in tracking_array -%}
+                            <div
+                              class="mobile-tracking"
+                              style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background-color: #f9f9f9;"
+                            >
+                              <div
+                                class="mobile-info"
+                                style="display: flex; flex-direction: column; gap: 4px; text-align: left;"
+                              >
+                                <div
+                                  class="mobile-row"
+                                  style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555;"
+                                >
+                                  <i class="fas fa-hashtag" style="color: #6c757d; font-size: 14px;"></i>
+                                  <span
+                                    class="tracking-num"
+                                    style="font-family: monospace; font-weight: 500; color: #000;"
+                                  >
+                                    {{- tracking_num -}}
+                                  </span>
+                                </div>
+                              </div>
+                              {%- assign shiprocket_url = 'https://shiprocket.co/tracking/' | append: tracking_num -%}
+                              <a
+                                href="{{ shiprocket_url }}"
+                                class="mobile-track-btn"
+                                target="_blank"
+                                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; text-decoration: none; color: #fff; background-color: #007bff; border-radius: 20px; white-space: nowrap;"
+                              >
+                                <i class="fas fa-external-link-alt" style="color: #fff; font-size: 12px;"></i>
+                                Track
+                              </a>
+                            </div>
+                          {%- endfor -%}
+
+                          <div class="details-section address-section">
+                            <h4>Shipping Address</h4>
+                            <p>{{ order.shipping_address | format_address }}</p>
+                          </div>
+                          <div class="details-section address-section">
+                            <h4>Billing Address</h4>
+                            <p>{{ order.billing_address | format_address }}</p>
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="enhanced-pagination" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+            <div class="pagination-info">
+              Showing {{ paginate.current_offset | plus: 1 }}-
+              {{- paginate.current_offset | plus: paginate.page_size | at_most: paginate.items }}
+              of {{ paginate.items }} orders
+            </div>
+            <ul class="pagination-controls" role="list">
+              {%- if paginate.previous -%}
+                <li>
+                  <a
+                    href="{{ paginate.previous.url }}"
+                    class="pagination-btn prev-btn"
+                    aria-label="{{ 'general.pagination.previous' | t }}"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                    Previous</a
+                  >
+                </li>
+              {%- endif -%}
+              {%- for part in paginate.parts -%}
+                <li>
+                  {%- if part.is_link -%}
+                    <a
+                      href="{{ part.url }}"
+                      class="pagination-btn page-btn"
+                      aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+                    >
+                      {{- part.title -}}
+                    </a>
+                  {%- else -%}
+                    {%- if part.title == paginate.current_page -%}
+                      <span class="pagination-btn page-btn current" aria-current="page">{{ part.title }}</span>
+                    {%- else -%}
+                      <span class="pagination-btn page-btn disabled">{{ part.title }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+              {%- if paginate.next -%}
+                <li>
+                  <a
+                    href="{{ paginate.next.url }}"
+                    class="pagination-btn next-btn"
+                    aria-label="{{ 'general.pagination.next' | t }}"
+                    >Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                  </a>
+                </li>
+              {%- endif -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3 class="empty-state-title">No orders yet</h3>
+          <p class="empty-state-message">{{ 'customer.orders.none' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn-start-shopping">Start Shopping</a>
+        </div>
+      {%- endif -%}
+    {% endpaginate %}
+  </div>
+{% endcomment %}

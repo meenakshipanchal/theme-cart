@@ -1,0 +1,134 @@
+.collection-banner img {
+  height: auto;
+  max-width: 100%;
+}
+.collection-banner figure {
+  margin: 0;
+}
+.collection-banner a {
+  border-radius: 35px;
+}
+#collection_1 {
+  background-image: linear-gradient(#ffefb5, #fafcfa);
+}
+#collection_2 {
+  background-image: linear-gradient(#fafcfa, #ffcdba, #fafcfa);
+}
+#collection_3 {
+  background-image: linear-gradient(#fafcfa, #00584b4a, #fafcfa);
+  padding-bottom: 1px;
+}
+#collection_4 {
+  background-image: linear-gradient(#fafcfa, #ffefb5, #fff);
+  padding-bottom: 1px;
+}
+main {
+  z-index: 1;
+}
+@media (min-width: 580px) {
+  .collection-banner {
+    display: flex;
+    justify-content: space-between;
+    font-size: 2.5rem;
+  }
+  .collection-banner .h0 {
+    font-size: 4.8rem;
+    margin-bottom: 0;
+  }
+  .collection-banner figure {
+    flex: 0 0 50%
+  }
+  .collection-content {
+    align-self: center;
+  }
+  .collection:nth-child(2n + 1) .collection-banner {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+}
+@media (max-width: 579px) {
+  .collection-banner {
+    text-align: center;
+    padding-top: 5px;
+  }
+  .collection-banner .h0 {
+    margin-bottom: -1rem;
+  }
+  .collection-banner a {
+    border-radius: 35px;
+    min-height: 36px;
+    padding: 0 25px;
+    letter-spacing: 0.5px;
+  }
+  .collection-banner figure {
+    margin: 1.5rem 0;
+  }
+  .collection-banner img {
+    max-width: 80%;
+  }
+}
+
+  div.quick-add {
+    width: 100%;
+    min-width: 90%;
+  }
+  div.quick-add button {
+    min-width: auto;
+    margin: auto;
+    display: block;
+  }
+  .save-variant-change {
+    display: flex;
+    margin-bottom: 15px;
+    border: #00584b solid 1px;
+    border-radius: 25px;
+  }
+  .save-variant-change > span { max-width: 100px;
+    text-align: center;
+    line-height: 1;
+    background: #00584b;
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 7px 3px 15px; border-radius: 22px 0 0 22px; }
+  .save-variant-change .select-varint-options {
+    flex: 1;
+    border: 0;
+    margin: 0 12px 0 5px;
+    max-width: 100%;
+    position: relative;
+  }
+  .select-varint-options select{
+    border: 0;
+    width: 100%;
+    height: -webkit-fill-available;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+  }
+  .save-variant-change > span > span { display: block; text-align: center; }
+  .data-varint {
+    width: 100%;
+    display: block;
+    line-height: 30px;
+  }
+  @media (max-width: 750px) {
+    .save-variant-change > span {
+      display: none;
+    }
+    .save-variant-change .select-varint-options {
+      margin: 0 5px 0 8px;
+      z-index: 3;
+      position: relative;
+    }
+    .select-varint-options select {
+      height: 28px;
+    }
+  }
+
+span.hide-saving {
+  width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}

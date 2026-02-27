@@ -1,0 +1,150 @@
+{%- comment -%}
+  Renders: Avail Purity Coins message in cart drawer
+  Shows user's redeemable coins from wallet
+  Usage: {% render 'purity-coins-cart' %}
+{%- endcomment -%}
+
+<div id="purity-coins-cart-wrapper" class="purity-coins-wrapper" style="
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 8px 15px;
+  background: #fff;
+">
+  <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Group_7176.png?v=1767773245"
+       alt="Purity Coins"
+       style="width: 36px; height: 28px; flex-shrink: 0; margin-right: -6px; z-index: 1; position: relative;">
+  <div class="purity-coins-earn" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px 8px 20px;
+    background: #E8F5E9;
+    border-radius: 8px;
+  ">
+    <p id="purity-coins-cart-text" style="margin: 0; font-size: 12px; font-weight: 500; color: #1B5E20; white-space: nowrap;">
+      Hurray! You have <span id="purity-coins-cart-amount" style="color: #1B5E20; font-weight: 700;">0</span> Purity Coins claim it at checkout.
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const API_BASE = 'https://puritycoins.anveshan.farm/api/v1';
+  const API_KEY = '242b8492f3e718988f127bc4e94fbd7d3274d2cc6c8ca328d324ab7825d100b3';
+
+  function detectPhone() {
+    let phone = null;
+
+    // Method 1: Shopify customer object
+    {% if customer and customer.phone %}
+      phone = '{{ customer.phone }}';
+      if (phone) return formatPhone(phone);
+    {% endif %}
+
+    // Method 2: localStorage
+    const stored = localStorage.getItem('customer_phone') || localStorage.getItem('userPhone') || localStorage.getItem('anveshan_user_phone');
+    if (stored) return formatPhone(stored);
+
+    // Method 3: window.customer
+    if (window.customer && window.customer.phone) {
+      return formatPhone(window.customer.phone);
+    }
+
+    return null;
+  }
+
+  function formatPhone(phone) {
+    if (!phone) return null;
+    let cleaned = phone.toString().replace(/\D/g, '');
+    if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      cleaned = cleaned.substring(2);
+    } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    } else if (cleaned.length > 10) {
+      cleaned = cleaned.slice(-10);
+    }
+    return cleaned.length === 10 ? cleaned : null;
+  }
+
+  async function fetchRedeemableCoins() {
+    const phone = detectPhone();
+    console.log('🪙 Purity Cart: Phone detected:', phone);
+    if (!phone) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/user/${phone}/wallet`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-API-Key': API_KEY,
+          'X-User-Phone': phone
+        }
+      });
+
+      console.log('🪙 Purity Cart: API status:', response.status);
+      if (!response.ok) return;
+
+      const data = await response.json();
+      console.log('🪙 Purity Cart: API data:', data);
+
+      // Match the same structure as anveshan-coins-widget
+      let redeemable = 0;
+      if (data.wallet && data.wallet.redeemableAmount) {
+        redeemable = data.wallet.redeemableAmount;
+      } else if (data.data && data.data.redeemableAmount) {
+        redeemable = data.data.redeemableAmount;
+      } else if (data.data && data.data.wallet && data.data.wallet.redeemableAmount) {
+        redeemable = data.data.wallet.redeemableAmount;
+      }
+
+      // Also check currentBalance as fallback
+      if (redeemable === 0) {
+        if (data.wallet && data.wallet.currentBalance) {
+          redeemable = data.wallet.currentBalance;
+        } else if (data.data && data.data.currentBalance) {
+          redeemable = data.data.currentBalance;
+        }
+      }
+
+      console.log('🪙 Purity Cart: Redeemable coins:', redeemable);
+
+      const wrapper = document.getElementById('purity-coins-cart-wrapper');
+      const textEl = document.getElementById('purity-coins-cart-text');
+
+      if (wrapper && textEl) {
+        if (redeemable > 0) {
+          textEl.innerHTML = 'Hurray! You have <span style="color: #1B5E20; font-weight: 700;">' + Math.floor(redeemable) + '</span> Purity Coins claim it at checkout.';
+        } else {
+          textEl.textContent = "Login to get Anveshan's Purity Coins";
+        }
+        wrapper.style.display = 'flex';
+      }
+    } catch (err) {
+      console.error('🪙 Purity Cart: Error fetching wallet', err);
+    }
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchRedeemableCoins);
+  } else {
+    fetchRedeemableCoins();
+  }
+
+  // Also run when cart drawer opens
+  const cartDrawer = document.querySelector('cart-drawer');
+  if (cartDrawer) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class' || mutation.attributeName === 'open') {
+          fetchRedeemableCoins();
+        }
+      });
+    });
+    observer.observe(cartDrawer, { attributes: true });
+  }
+})();
+</script>

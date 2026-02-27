@@ -1,0 +1,55 @@
+{%- assign banners = page.metafields.custom.go_ghee_banners.value -%}
+
+{%- if banners != blank -%}
+  {%- for banner in banners -%}
+    {%- assign link_url = banner.link_url.value | default: '' -%}
+    {%- if link_url != blank -%}<a href="{{ link_url }}" style="display:block;">{%- endif -%}
+      <picture>
+        <source
+          media="(min-width:750px)"
+          srcset="
+            {{ banner.desktop_image.value | image_url: width: 1200 }} 1200w,
+            {{ banner.desktop_image.value | image_url: width: 1800 }} 1800w,
+            {{ banner.desktop_image.value | image_url: width: 2400 }} 2400w
+          "
+          sizes="100vw"
+        >
+        <img
+          src="{{ banner.mobile_image.value | image_url: width: 750 }}"
+          srcset="
+            {{ banner.mobile_image.value | image_url: width: 375 }} 375w,
+            {{ banner.mobile_image.value | image_url: width: 550 }} 550w,
+            {{ banner.mobile_image.value | image_url: width: 750 }} 750w
+          "
+          sizes="100vw"
+          alt="{{ banner.alt_text.value | default: 'Anveshan x Go-Ghee' | escape }}"
+          width="100%"
+          height="auto"
+          style="width:100%;height:auto;display:block;"
+          loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+        >
+      </picture>
+    {%- if link_url != blank -%}</a>{%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- if request.design_mode -%}
+    <div style="padding:60px 20px;text-align:center;background:#f5f5f5;color:#666;font-family:sans-serif;">
+      <p style="font-size:18px;margin:0 0 8px;">Anveshan x Go-Ghee Banners</p>
+      <p style="font-size:14px;margin:0;">Connect <strong>go_ghee_banners</strong> metafield (list of go_ghee_banner) on this page to display banners.</p>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Go-Ghee Banners",
+  "tag": "section",
+  "class": "go-ghee-banners",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Go-Ghee Banners"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{% comment %}
+  Qty Sold Badge
+  Uses JavaScript to fetch real-time sales data from FBT API
+  Only shows for products with MRP between ₹1000 and ₹4000
+{% endcomment %}
+
+{%- liquid
+  assign current_pid = product.id | append: ''
+  assign current_vid = card_product.id | append: ''
+
+  # Get MRP (compare_at_price) in rupees (Shopify stores in paise, divide by 100)
+  assign mrp = card_product.compare_at_price | divided_by: 100
+  # If no compare_at_price, use regular price
+  if mrp == 0 or mrp == blank
+    assign mrp = card_product.price | divided_by: 100
+  endif
+
+  # Check if MRP is between 1000 and 4000
+  assign show_badge = false
+  if mrp >= 1000 and mrp <= 4000
+    assign show_badge = true
+  endif
+-%}
+
+{% comment %} Qty Sold Badge - Only render if MRP is between ₹1000-₹4000 {% endcomment %}
+{% if show_badge %}
+<div class="qty-sold-badge"
+     data-variant-id="{{ current_vid }}"
+     data-product-id="{{ current_pid }}">
+  <span>🔥 <span class="sold-count">0</span></span>
+</div>
+{% endif %}
+
+<style>
+  .qty-sold-badge{display:none;align-items:center;gap:3px;background:#f5edd0;color:#235A49;font-size:clamp(9px,1.5vw,11px);font-weight:600;padding:clamp(3px,0.5vw,5px) clamp(5px,0.8vw,8px);border-radius:8px;line-height:1}
+  .qty-sold-badge.show{display:inline-flex!important}
+</style>

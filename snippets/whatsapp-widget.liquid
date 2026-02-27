@@ -1,0 +1,57 @@
+{% comment %}
+  WhatsApp Widget
+  Floating WhatsApp button with popup chat interface
+  All CSS is inline to prevent FOUC
+{% endcomment %}
+
+<style>
+#whatsapp-widget{display:none;position:fixed;bottom:20px;right:20px;z-index:9999;font-family:'Segoe UI',Arial,sans-serif;transition:transform .3s ease-in-out}
+@media(max-width:768px){#whatsapp-widget{bottom:80px}}
+#whatsapp-button{background:linear-gradient(45deg,#25D366,#1ebe5d);border-radius:50%;width:60px;height:60px;display:flex;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 6px 12px rgba(0,0,0,.3);position:relative;transition:transform .2s ease-in-out,box-shadow .2s ease-in-out}
+#whatsapp-button:hover{transform:scale(1.1);box-shadow:0 8px 16px rgba(0,0,0,.4)}
+#whatsapp-button img{width:35px;height:35px}
+#whatsapp-popup{display:none;position:absolute;bottom:80px;right:0;width:300px;background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.25);overflow:hidden;animation:slideInUp .4s cubic-bezier(.25,.46,.45,.94)}
+@media(max-width:768px){#whatsapp-popup{width:280px}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.popup-header{background:#075E54;color:#fff;padding:12px 15px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;position:relative}
+@media(max-width:768px){.popup-header{padding:10px 15px;gap:6px}}
+.close-btn{position:absolute;top:10px;right:15px;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background-color .2s ease}
+.close-btn:hover{background-color:rgba(255,255,255,.1)}
+.popup-header img{width:55px;height:55px}
+@media(max-width:768px){.popup-header img{width:45px;height:45px}}
+.header-content{display:flex;flex-direction:column;align-items:center;gap:5px}
+.popup-header .title{font-size:16px;font-weight:700;margin:0}
+.popup-header .status{font-size:12px;color:#dcdcdc;opacity:.8;margin:0}
+.popup-body{background:#ECE5DD;padding:15px}
+.message{background:#fff;display:inline-block;padding:10px 15px;border-radius:15px 15px 15px 0;margin-bottom:10px;font-size:14px;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.popup-footer{text-align:center;padding:15px;background:#fff}
+.popup-footer button{background:#25D366;color:#fff;border:none;padding:10px 20px;border-radius:25px;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px;justify-content:center;width:100%;transition:background-color .2s ease}
+.popup-footer button:hover{background:#1ebe5d}
+</style>
+
+<div id="whatsapp-widget">
+  <div id="whatsapp-popup">
+    <div class="popup-header">
+      <button class="close-btn" id="close-popup">&times;</button>
+      <img src="https://cdn.shopify.com/s/files/1/0270/3346/9006/files/Asset_72_4x_671c4d13-742c-44a5-be95-346de2cbce85.png?v=1758116807" alt="Anveshan Farm">
+      <div class="header-content">
+        <div class="title">Anveshan Farm</div>
+        <div id="status" class="status">Online now</div>
+      </div>
+    </div>
+    <div class="popup-body">
+      <div id="greeting-message" class="message"></div>
+    </div>
+    <div class="popup-footer">
+      <button id="chat-btn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="18" height="18">
+        Chat on WhatsApp
+      </button>
+    </div>
+  </div>
+  <div id="whatsapp-button">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+  </div>
+</div>
+
+<script src="{{ 'whatsapp-widget.js' | asset_url }}" defer></script>

@@ -1,0 +1,102 @@
+<section class="product-coupon-list">
+  <h4>Available offers for you (2)</h4>
+  <ul class="coupon-lists active-scroll">
+    <li class="coupon-list">
+      <h4>Flat 15% off</h4>
+      <p>Minimum purchase of ₹599</p>
+      <div class="coupon">
+        <input id="coupon_newme15" type="text" readonly value="NEWME15" />
+        <button onclick="copyIt('#coupon_newme15','#btn_newme15')"  class="copybtn" id="btn_newme15">COPY 
+        <svg width="11" height="13" viewBox="0 0 11 13" fill="none"><path d="M2.5 5.88889C2.5 4.31778 2.5 3.53167 2.9395 3.04389C3.3785 2.55556 4.086 2.55556 5.50001 2.55556H7.00001C8.41401 2.55556 9.12151 2.55556 9.56051 3.04389C10 3.53167 10 4.31778 10 5.88889V8.66667C10 10.2378 10 11.0239 9.56051 11.5117C9.12151 12 8.41401 12 7.00001 12H5.50001C4.086 12 3.3785 12 2.9395 11.5117C2.5 11.0239 2.5 10.2378 2.5 8.66667V5.88889Z" stroke="white"/><path d="M2.5 10.3333C2.10218 10.3333 1.72065 10.1577 1.43934 9.84518C1.15804 9.53261 1 9.10869 1 8.66666V5.33333C1 3.23833 1 2.19055 1.586 1.54C2.172 0.889441 3.1145 0.888885 5.00001 0.888885H7.00001C7.39784 0.888885 7.77937 1.06448 8.06067 1.37704C8.34198 1.6896 8.50001 2.11352 8.50001 2.55555" stroke="white"/></svg></button>
+      </div>
+    </li>
+    <li class="coupon-list">
+      <h4>Buy 3 Get 8% off</h4>
+      <p>Minimum purchase of 3 items</p>
+      <div class="coupon">
+        <input id="coupon_buy3" type="text" readonly value="BUY4" />
+        <button onclick="copyIt('#coupon_buy3','#btn_buy3')"  class="copybtn" id="btn_buy3">COPY 
+        <svg width="11" height="13" viewBox="0 0 11 13" fill="none"><path d="M2.5 5.88889C2.5 4.31778 2.5 3.53167 2.9395 3.04389C3.3785 2.55556 4.086 2.55556 5.50001 2.55556H7.00001C8.41401 2.55556 9.12151 2.55556 9.56051 3.04389C10 3.53167 10 4.31778 10 5.88889V8.66667C10 10.2378 10 11.0239 9.56051 11.5117C9.12151 12 8.41401 12 7.00001 12H5.50001C4.086 12 3.3785 12 2.9395 11.5117C2.5 11.0239 2.5 10.2378 2.5 8.66667V5.88889Z" stroke="white"/><path d="M2.5 10.3333C2.10218 10.3333 1.72065 10.1577 1.43934 9.84518C1.15804 9.53261 1 9.10869 1 8.66666V5.33333C1 3.23833 1 2.19055 1.586 1.54C2.172 0.889441 3.1145 0.888885 5.00001 0.888885H7.00001C7.39784 0.888885 7.77937 1.06448 8.06067 1.37704C8.34198 1.6896 8.50001 2.11352 8.50001 2.55555" stroke="white"/></svg></button>
+      </div>
+    </li>
+  </ul>
+</section>
+<style>
+  .coupon-list-group {
+    padding: 10px;
+  }
+  .product-coupon-list h4 { text-transform: none; }
+  .coupon-lists {
+    display: flex;
+    line-height: normal;
+    padding: 2px 1px;
+    margin: 0;
+  }
+  .product-coupon-list .coupon-list {
+    background: #fff;
+    border-radius: 5px;
+    padding: 12px;
+    list-style: none;
+    position: relative;
+    box-shadow: none;
+    border: 1px solid #eee;
+    flex: 0 0 45%;
+    min-width: 180px;
+    max-width: 210px;
+  }
+  .product-coupon-list  .coupon-list:after, .product-coupon-list  .coupon-list:before {
+    content: '';
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    border-radius: 100%;
+    background: #FFF8F1;
+    top: 30px;
+  }
+  .coupon-list:after { left: -7px; }
+  .coupon-list:before { right: -7px; }
+  .coupon-list:not(:last-child) {
+    margin-right: 8px;
+  }
+  .coupon-list h4 {
+    color: #000000;
+    margin: 0;
+  }
+  .coupon-list p {
+    color: #606060;
+    font-size: 13px;
+    margin: 4px 0 8px;
+  }
+  .coupon {
+    display: flex;
+  }
+  .coupon input {
+    border: 1px dotted #A3A3A3;
+    width: 80px;
+    padding: 5px 7px;
+    border-right: 0;
+  }
+  .coupon button {
+    border: 0;
+    background: #235A49;
+    color: #fff;
+    width: 65px;
+    cursor: pointer;
+  }
+  #discount-feedback {
+    position: absolute;
+    margin-top: 32px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+</style>
+  <script>
+    function copyIt(_id,_txt){
+      let copyInput = document.querySelector(_id);
+      copyInput.select();
+      document.execCommand("copy");
+      console.log(_txt);
+      document.querySelector(_txt).textContent = "COPIED";
+      setTimeout(() => { document.querySelector(_txt).textContent = "COPY" }, 1000);
+    }
+  </script>

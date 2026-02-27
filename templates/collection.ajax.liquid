@@ -1,0 +1,187 @@
+{% comment %} {% comment %} {% comment %} {% comment %} <div class="grid product-grid">
+  {% for product in collection.products limit: limit %}
+    <li class="grid__item">
+      {% render 'variant-product',
+        card_product: product,
+        product: product,
+        show_secondary_image: true,
+        show_vendor: false,
+        show_rating: true,
+        media_aspect_ratio: 'square',
+        lazy_load: false
+      %}
+    </li>
+  {% endfor %}
+</div> {% endcomment %}
+
+{%- liquid
+  assign limit = 30
+  if collections[collection.handle].products.size == 0
+    assign limit = 30
+  endif
+-%}
+
+<ul class="grid product-grid contains-card contains-card--product">
+  {% assign skip_card_product_styles = false %}
+  {% for product in collection.products limit: limit %}
+    <li id="Slide-ajax-{{ forloop.index }}" class="grid__item">
+      {% render 'variant-product',
+        card_product: product,
+        product: product,
+        show_secondary_image: true,
+        show_vendor: false,
+        show_rating: false,
+        skip_styles: skip_card_product_styles,
+        quick_add: 'standard',
+        section_id: 'ajax-section',
+        media_aspect_ratio: 'square',
+        lazy_load: true
+      %}
+    </li>
+    {%- assign skip_card_product_styles = true -%}
+  {% endfor %}
+</ul> {% endcomment %}
+
+{%- liquid
+  assign limit = 30
+-%}
+
+<ul class="grid product-grid contains-card contains-card--product">
+  {% assign skip_card_product_styles = false %}
+  {% for product in collection.products limit: limit %}
+    {% if product.available %}
+      {% liquid
+       
+        assign variant_for_card = product.selected_or_first_available_variant
+        if variant_for_card == blank or variant_for_card.available == false
+          assign variant_for_card = product.variants | where: 'available', true | first
+        endif
+        if variant_for_card == blank
+          assign variant_for_card = product.variants.first
+        endif
+      %}
+      <li id="Slide-ajax-{{ forloop.index }}" class="grid__item">
+        {% render 'variant-product',
+          card_product: variant_for_card,
+          product: product,
+          show_secondary_image: true,
+          show_vendor: false,
+          show_rating: false,
+          skip_styles: skip_card_product_styles,
+          quick_add: 'standard',
+          section_id: 'ajax-section',
+          media_aspect_ratio: 'square',
+          lazy_load: true
+        %}
+      </li>
+      {%- assign skip_card_product_styles = true -%}
+    {% endif %}
+  {% endfor %}
+</ul> {% endcomment %}
+
+{%- liquid
+  assign limit = 30
+-%}
+
+<ul class="grid product-grid contains-card contains-card--product">
+  {% assign skip_card_product_styles = false %}
+  {% for product in collection.products limit: limit %}
+    {% if product.available %}
+      {% liquid
+        assign variant_for_card = product.selected_or_first_available_variant
+        if variant_for_card == blank or variant_for_card.available == false
+          assign variant_for_card = product.variants | where: 'available', true | first
+        endif
+        if variant_for_card == blank
+          assign variant_for_card = product.variants.first
+        endif
+      %}
+      <li 
+        id="Slide-ajax-{{ forloop.index }}" 
+        class="grid__item scroll-trigger animate--slide-in"
+        data-cascade
+        style="--animation-order: {{ forloop.index }};"
+      >
+        {% render 'variant-product',
+          card_product: variant_for_card,
+          product: product,
+          show_secondary_image: true,
+          show_vendor: false,
+          show_rating: false,
+          skip_styles: skip_card_product_styles,
+          quick_add: 'standard',
+          section_id: 'ajax-section',
+          media_aspect_ratio: 'square',
+          lazy_load: true
+        %}
+      </li>
+      {%- assign skip_card_product_styles = true -%}
+    {% endif %}
+  {% endfor %}
+</ul> {% endcomment %}
+
+{%- liquid
+  assign product_list = collection.metafields.custom.template.value
+  assign metafield_products = blank
+  assign limit = 30
+  
+   
+  if product_list != blank
+    for objbundle in product_list.blocks.value
+      case objbundle.system.type
+        when 'product_variants'
+          assign metafield_products = objbundle.product.value
+          break
+      endcase
+    endfor
+  endif
+  
+  
+  if metafield_products == blank
+    assign metafield_products = collection.products
+  endif
+-%}
+
+<ul class="grid product-grid contains-card contains-card--product">
+  {% assign skip_card_product_styles = false %}
+  {% for product_variant in metafield_products limit: limit %}
+    {% if product_variant.available %}
+      {% liquid
+       
+        if product_variant.product
+          assign actual_product = product_variant.product
+          assign variant_for_card = product_variant
+        else
+          assign actual_product = product_variant
+          assign variant_for_card = product_variant.selected_or_first_available_variant
+          if variant_for_card == blank or variant_for_card.available == false
+            assign variant_for_card = product_variant.variants | where: 'available', true | first
+          endif
+          if variant_for_card == blank
+            assign variant_for_card = product_variant.variants.first
+          endif
+        endif
+      %}
+      <li 
+        id="Slide-ajax-{{ forloop.index }}" 
+        class="grid__item scroll-trigger animate--slide-in"
+        data-cascade
+        style="--animation-order: {{ forloop.index }};"
+      >
+        {% render 'variant-product',
+          card_product: variant_for_card,
+          product: actual_product,
+          show_secondary_image: true,
+          show_vendor: false,
+          show_rating: false,
+          skip_styles: skip_card_product_styles,
+          quick_add: 'standard',
+          section_id: 'ajax-section',
+          media_aspect_ratio: 'square',
+          lazy_load: true
+        %}
+      </li>
+      {%- assign skip_card_product_styles = true -%}
+    {% endif %}
+  {% endfor %}
+</ul>

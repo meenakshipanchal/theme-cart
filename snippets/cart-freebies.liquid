@@ -1,0 +1,139 @@
+{% comment %}
+  cart: cart, freebies: freebies
+{% endcomment %}
+{% liquid
+  assign freebies = freebies | where: 'type', 'freebie'
+  assign cart_price = cart.total_price | divided_by: 100
+  assign freebie_count = freebies.size
+  assign active_freebie = 0
+  assign min_price = 4999
+  assign freebie_id = false
+  for item_fb in cart.items
+    if item_fb.properties._freebie
+      assign freebie_id = true
+    endif
+  endfor
+%}
+{% for freebie in freebies %}
+  {% liquid
+    assign freebie_price = freebie.settings.price | times: 1
+    if cart_price >= freebie_price
+      assign active_freebie = active_freebie | plus: 1
+    endif
+    if min_price > freebie_price
+      assign min_price = freebie_price
+    endif
+    assign unlock_price = min_price | minus: cart_price
+  %}
+{% endfor %}
+<!-- Freebie Selection in Cart Drawer (Using Radio Buttons) -->
+<cart-freebies>
+<div id="freebie-section" class="freebie-container cart-freebies">
+  <div class="freebie-header" onClick="freebieList()">
+    <h3 class="h4">Choose your freebie! 
+    <svg class="icon icon-caret" viewBox="0 0 10 6" width="22px"><path fill="currentColor" fill-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" clip-rule="evenodd"></path></svg></h3>
+    {% if unlock_price < 0 %}
+      <p>Congratulations! You have unlocked <span id="unlocked-count">{{- active_freebie -}}</span> out of {{ freebie_count }} freebies!</p>
+    {% else %}
+      <p>Add <span id="remaining-amount">₹{{ unlock_price }}</span> more to unlock your <span id="next-freebie">first</span> freebie!</p>
+    {% endif %}
+  </div>
+  <div class="freebie-list freebie-products" id="freebieList"{% unless unlock_price < 0 %} style="display: none;"{% endunless %}>
+    {%- for freebie in freebies -%}
+      {% liquid
+        assign disabled = ''
+        assign card_product = freebie.settings.product
+        assign freebie_price = freebie.settings.price | times: 1
+        if freebie_id
+          assign disabled = 'disabled'
+        elsif cart_price < freebie_price
+          assign disabled = 'disabled'
+        endif
+      %}
+      <label>
+          <input type="radio" id="{{ card_product.id }}" value="{{- card_product.selected_or_first_available_variant.id -}}" data-discount="{{- freebie.settings.code | escape -}}" name="freebie-option" {{ disabled }}>
+          {{ card_product.featured_media
+            | image_url: width: 200 | image_tag: widths: '50,100,200',
+            class: 'freebie-img', loading: 'lazy', alt: card_product.title
+          }}
+          <div>
+            <h5>{{ card_product.title | escape }}</h5>
+            <span>worth <b>{{ card_product.price | money }}</b></span>
+            {% if cart_price < freebie_price %}
+              <br><span style="color: red">Add ₹{{ freebie_price | minus: cart_price }} more to unlock</span>
+            {% endif %}
+          </div>
+      </label>
+    {%- endfor -%}
+  </div>
+  <div id="freebie-feedback" class="feedback-message"></div>
+</div>
+</cart-freebies>
+
+
+<style>
+  .cart-freebies {
+    position: relative;
+  }
+  .freebie-header {
+    background: #235A49;
+    color: #fff;
+    padding: 1rem 1rem 1.2rem;
+    font-size: 12px;
+  }
+  .freebie-header h3 {
+    margin: 0;
+    color: #fff;
+  }
+  .freebie-header svg { 
+    width: 18px;
+    float: right;
+    margin: 4px 0 0; 
+  }
+  .freebie-header  p {
+    margin: 0.4rem 0 0;
+  }
+  .freebie-products {
+    padding: 0;
+  }
+  .freebie-list label {
+    display: flex;
+    padding: 0.5rem 1rem;
+    font-size: 12px;
+  }
+  .freebie-products h5 {
+    margin: 0;
+  }
+  .freebie-img {
+    width: 60px;
+    height: auto;
+    margin: 0 1.25rem 0 0.8rem;
+  }
+  .spinner {
+  display: inline-block !important;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin: auto;
+  vertical-align: middle;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+#freebie-feedback.loading {
+  display: flex;
+  color: gray;
+  font-style: italic;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background: rgba(255,255,255, 0.5);
+}
+</style>

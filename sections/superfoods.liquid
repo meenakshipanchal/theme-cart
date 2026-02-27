@@ -1,0 +1,662 @@
+{%- comment -%} variant-card, quick-add CSS now loaded globally in theme.liquid {%- endcomment -%}
+{{ 'metaobject-collection.css' | asset_url | stylesheet_tag }}
+{% if section.settings.image_shape == 'blob' %}
+  {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+{%- if section.settings.quick_add == 'standard' -%}
+  <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+{%- if section.settings.quick_add == 'bulk' -%}
+  <script src="{{ 'quick-add-bulk.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'quick-order-list.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+<style>
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* Horizontal scroll container */
+  .superfoods-horizontal-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .superfoods-horizontal-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Horizontal product grid */
+  .superfoods-horizontal-product-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 0 16px;
+  }
+  @media screen and (min-width: 750px) {
+    .superfoods-horizontal-product-grid {
+      gap: 16px;
+      padding: 0 20px;
+    }
+  }
+
+  /* Grid item sizing - FIXED WIDTH for consistent card sizes */
+  /* Mobile: 190px */
+  .superfoods-horizontal-grid__item {
+    flex: 0 0 190px;
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
+  }
+  @media screen and (min-width: 750px) {
+    .superfoods-horizontal-grid__item {
+      flex: 0 0 240px;
+      width: 240px;
+      min-width: 240px;
+      max-width: 240px;
+    }
+  }
+
+  /* Scrollbar row */
+  .superfoods-scrollbar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-top: 10px;
+  }
+  @media screen and (min-width: 750px) {
+    .superfoods-scrollbar-row {
+      gap: 16px;
+      padding: 15px 20px;
+    }
+  }
+
+  .superfoods-custom-scrollbar-track {
+    flex: 1;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .superfoods-custom-scrollbar-thumb {
+    height: 100%;
+    background: #404040;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 20px;
+    cursor: pointer;
+    width: 50px;
+  }
+  .superfoods-custom-scrollbar-thumb:hover {
+    background: #2d2d2d;
+  }
+
+  .superfoods-see-all-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1.5px solid #404040;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #404040;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  @media screen and (min-width: 750px) {
+    .superfoods-see-all-button {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+  }
+  .superfoods-see-all-button:hover {
+    background: #404040;
+    color: white;
+  }
+  .superfoods-see-all-button::after {
+    content: '→';
+    font-size: 16px;
+    font-weight: bold;
+  }
+</style>
+{% liquid
+  # Get the selected collection
+  if section.settings.collection != blank
+    assign selected_collection = section.settings.collection
+  elsif section.settings.collection_url != blank
+    assign collection_handle = section.settings.collection_url | split: '/collections/' | last | split: '?' | first | split: '#' | first
+    assign selected_collection = collections[collection_handle]
+  endif
+  
+  # Get products from the collection
+  if selected_collection != blank
+    assign product_list = selected_collection.metafields.custom.template.value
+    assign collection_url = selected_collection.url
+  endif
+%}
+<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
+  <div class="page-width">
+    {%- if section.settings.title != blank -%}
+      <div class="collection__title title-wrapper title-wrapper--no-top-margin">
+        <h2 class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          {{ section.settings.title }}
+        </h2>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <div class="collection__description {{ section.settings.description_style }} rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {{ section.settings.description }}
+      </div>
+    {%- endif -%}
+  </div>
+  
+  {% if product_list != blank %}
+    {% for objbundle in product_list.blocks.value %}
+      {% case objbundle.system.type %}
+        {% when 'product_variants' %}
+          {% assign lists = objbundle.product.value %}
+          
+          <div class="superfoods-horizontal-scroll-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" id="superfoods-product-grid-{{ section.id }}">
+            <div class="superfoods-horizontal-product-grid">
+              {% assign skip_card_product_styles = false %}
+              {%- for product_variant in lists limit: section.settings.products_to_show -%}
+                {% assign lazy_load = false %}
+                {%- if forloop.index > 4 -%}
+                  {%- assign lazy_load = true -%}
+                {%- endif -%}
+                
+                <div class="superfoods-horizontal-grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                  {% if settings.animations_reveal_on_scroll %}
+                    data-cascade
+                    style="--animation-order: {{ forloop.index }};"
+                  {% endif %}>
+                  
+                  {% if section.settings.show_superfoods_badge %}
+                    <span class="superfoods-badge">{{ section.settings.badge_text | default: 'Superfood' }}</span>
+                  {% endif %}
+                  
+                  {% render 'variant-product',
+                    card_product: product_variant,
+                    product: product_variant.product,
+                    media_aspect_ratio: section.settings.image_ratio,
+                    image_shape: section.settings.image_shape,
+                    show_secondary_image: section.settings.show_secondary_image,
+                    show_vendor: section.settings.show_vendor,
+                    show_rating: section.settings.show_rating,
+                    lazy_load: lazy_load,
+                    skip_styles: skip_card_product_styles,
+                    quick_add: section.settings.quick_add,
+                    section_id: section.id
+                  %}
+                </div>
+                {%- assign skip_card_product_styles = true -%}
+              {%- endfor -%}
+            </div>
+          </div>
+          
+          <!-- Custom scrollbar with See All button -->
+          <div class="superfoods-scrollbar-row" id="superfoods-scrollbar-row-{{ section.id }}">
+            <div class="superfoods-custom-scrollbar-track" id="superfoods-custom-scrollbar-track-{{ section.id }}">
+              <div class="superfoods-custom-scrollbar-thumb" id="superfoods-custom-scrollbar-thumb-{{ section.id }}"></div>
+            </div>
+            <a href="{{ section.settings.view_all_url | default: collection_url | default: '/collections/superfoods' }}" class="superfoods-see-all-button">
+              {{ section.settings.view_all_text | default: 'See All' }}
+            </a>
+          </div>
+          
+      {% endcase %}
+    {% endfor %}
+  {% else %}
+    <!-- Fallback: Use manual product selection if no metaobject collection -->
+    <div class="superfoods-horizontal-scroll-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" id="superfoods-product-grid-{{ section.id }}">
+      <div class="superfoods-horizontal-product-grid">
+        {% assign skip_card_product_styles = false %}
+        {%- for product in section.settings.manual_products limit: section.settings.products_to_show -%}
+          {% assign lazy_load = false %}
+          {%- if forloop.index > 4 -%}
+            {%- assign lazy_load = true -%}
+          {%- endif -%}
+          
+          <div class="superfoods-horizontal-grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            {% if settings.animations_reveal_on_scroll %}
+              data-cascade
+              style="--animation-order: {{ forloop.index }};"
+            {% endif %}>
+            
+            {% if section.settings.show_superfoods_badge %}
+              <span class="superfoods-badge">{{ section.settings.badge_text | default: 'Superfood' }}</span>
+            {% endif %}
+            
+            {% render 'card-product',
+              card_product: product,
+              media_aspect_ratio: section.settings.image_ratio,
+              image_shape: section.settings.image_shape,
+              show_secondary_image: section.settings.show_secondary_image,
+              show_vendor: section.settings.show_vendor,
+              show_rating: section.settings.show_rating,
+              lazy_load: lazy_load,
+              skip_styles: skip_card_product_styles,
+              quick_add: section.settings.quick_add,
+              section_id: section.id
+            %}
+          </div>
+          {%- assign skip_card_product_styles = true -%}
+        {%- endfor -%}
+      </div>
+    </div>
+    
+    <!-- Custom scrollbar with See All button for manual products -->
+    <div class="superfoods-scrollbar-row" id="superfoods-scrollbar-row-{{ section.id }}">
+      <div class="superfoods-custom-scrollbar-track" id="superfoods-custom-scrollbar-track-{{ section.id }}">
+        <div class="superfoods-custom-scrollbar-thumb" id="superfoods-custom-scrollbar-thumb-{{ section.id }}"></div>
+      </div>
+      <a href="{{ section.settings.view_all_url | default: collection_url | default: '/collections/superfoods' }}" class="superfoods-see-all-button">
+        {{ section.settings.view_all_text | default: 'See All' }}
+      </a>
+    </div>
+  {% endif %}
+  
+  {% if section.settings.image_shape == 'arch' %}
+    {{- 'mask-arch.svg' | inline_asset_content -}}
+  {%- endif -%}
+</div>
+<!-- Enhanced JavaScript for Custom Scrollbar Functionality -->
+<script>
+(function() {
+  'use strict';
+  
+  function initSuperfoodsScrollbar(sectionId) {
+    const productGrid = document.getElementById(`superfoods-product-grid-${sectionId}`);
+    const scrollbarRow = document.getElementById(`superfoods-scrollbar-row-${sectionId}`);
+    const customScrollbarTrack = document.getElementById(`superfoods-custom-scrollbar-track-${sectionId}`);
+    const customScrollbarThumb = document.getElementById(`superfoods-custom-scrollbar-thumb-${sectionId}`);
+    
+    if (!productGrid || !customScrollbarTrack || !customScrollbarThumb) {
+      {% comment %} console.log('Superfoods scrollbar elements not found for section:', sectionId); {% endcomment %}
+      return;
+    }
+    
+    function updateCustomScrollbar() {
+      const gridScrollWidth = productGrid.scrollWidth;
+      const gridClientWidth = productGrid.clientWidth;
+      
+      // Hide scrollbar if content fits in container
+      if (gridScrollWidth <= gridClientWidth) {
+        if (scrollbarRow) {
+          scrollbarRow.style.display = 'none';
+        }
+        return;
+      }
+      
+      // Show scrollbar if content overflows
+      if (scrollbarRow) {
+        scrollbarRow.style.display = 'flex';
+      }
+      
+      const trackWidth = customScrollbarTrack.clientWidth;
+      const thumbWidth = Math.max((gridClientWidth / gridScrollWidth) * trackWidth, 20);
+      const maxThumbPosition = trackWidth - thumbWidth;
+      
+      customScrollbarThumb.style.width = `${thumbWidth}px`;
+      
+      function updateThumbPosition() {
+        const scrollPercentage = productGrid.scrollLeft / (gridScrollWidth - gridClientWidth);
+        const thumbPosition = scrollPercentage * maxThumbPosition;
+        customScrollbarThumb.style.left = `${thumbPosition}px`;
+      }
+      
+      updateThumbPosition();
+      
+      // Remove existing scroll listeners to prevent duplicates
+      productGrid.removeEventListener('scroll', updateThumbPosition);
+      productGrid.addEventListener('scroll', updateThumbPosition, { passive: true });
+    }
+    
+    function setupCustomScrollbar() {
+      let isDragging = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+      
+      customScrollbarThumb.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startScrollLeft = productGrid.scrollLeft;
+        customScrollbarThumb.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - startX;
+        const trackWidth = customScrollbarTrack.clientWidth;
+        const thumbWidth = customScrollbarThumb.clientWidth;
+        const maxThumbPosition = trackWidth - thumbWidth;
+        
+        const scrollRatio = deltaX / maxThumbPosition;
+        const maxScrollLeft = productGrid.scrollWidth - productGrid.clientWidth;
+        const newScrollLeft = startScrollLeft + (scrollRatio * maxScrollLeft);
+        
+        productGrid.scrollLeft = Math.max(0, Math.min(newScrollLeft, maxScrollLeft));
+      });
+      
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          customScrollbarThumb.style.cursor = 'pointer';
+        }
+      });
+    }
+    
+    // Initialize scrollbar
+    setTimeout(() => {
+      updateCustomScrollbar();
+      setupCustomScrollbar();
+      
+      // Force visibility of thumb
+      customScrollbarThumb.style.display = 'block';
+      customScrollbarThumb.style.opacity = '1';
+      customScrollbarThumb.style.background = '#404040';
+    }, 200);
+    
+    // Update on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        updateCustomScrollbar();
+      }, 150);
+    });
+  }
+  
+  // Initialize for this section
+  document.addEventListener('DOMContentLoaded', () => {
+    initSuperfoodsScrollbar('{{ section.id }}');
+  });
+  
+  // Fallback if DOM is already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initSuperfoodsScrollbar('{{ section.id }}');
+    });
+  } else {
+    initSuperfoodsScrollbar('{{ section.id }}');
+  }
+  
+})();
+</script>
+{% schema %}
+{
+  "name": "Superfoods",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "Superfoods",
+      "label": "Section title"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Discover our nutrient-packed superfoods for a healthier lifestyle</p>"
+    },
+    {
+      "type": "select",
+      "id": "description_style",
+      "label": "Description style",
+      "options": [
+        {
+          "value": "body",
+          "label": "Body"
+        },
+        {
+          "value": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection (with metaobject template)",
+      "info": "Select a collection that has metaobject template configured"
+    },
+    {
+      "type": "url",
+      "id": "collection_url",
+      "label": "Collection URL",
+      "info": "Or paste a collection URL directly"
+    },
+    {
+      "type": "product_list",
+      "id": "manual_products",
+      "label": "Manual product selection",
+      "limit": 50,
+      "info": "Fallback: Select products manually if no metaobject collection is chosen"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_superfoods_badge",
+      "label": "Show superfood badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Superfood"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 50,
+      "step": 1,
+      "default": 20,
+      "label": "Products to show",
+      "info": "All products will be accessible via horizontal scroll"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "'View all' button text",
+      "default": "See All Superfoods"
+    },
+    {
+      "type": "text",
+      "id": "view_all_url",
+      "label": "'View all' button URL",
+      "default": "/collections/superfoods",
+      "info": "URL where the 'View all' button should link to (e.g., /collections/superfoods)"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Product card settings"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        }
+      ],
+      "default": "adapt",
+      "label": "Image ratio"
+    },
+    {
+      "type": "select",
+      "id": "image_shape",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "arch",
+          "label": "Arch"
+        },
+        {
+          "value": "blob",
+          "label": "Blob"
+        },
+        {
+          "value": "chevronleft",
+          "label": "Chevron left"
+        },
+        {
+          "value": "chevronright",
+          "label": "Chevron right"
+        },
+        {
+          "value": "diamond",
+          "label": "Diamond"
+        },
+        {
+          "value": "parallelogram",
+          "label": "Parallelogram"
+        },
+        {
+          "value": "round",
+          "label": "Round"
+        }
+      ],
+      "default": "default",
+      "label": "Image shape"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": false,
+      "label": "Show second image on hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": false,
+      "label": "Show vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": false,
+      "label": "Show product rating"
+    },
+    {
+      "type": "select",
+      "id": "quick_add",
+      "default": "standard",
+      "label": "Quick add",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "bulk",
+          "label": "Bulk"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Superfoods with Custom Scrollbar"
+    }
+  ]
+}
+{% endschema %}

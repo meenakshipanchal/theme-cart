@@ -1,0 +1,203 @@
+{% comment %}
+  Cross-Sell Modal - Bottom Sheet Style
+  Smooth animation from bottom, scrollable products, fixed footer
+{% endcomment %}
+
+{% if template contains 'product' and product %}
+  {% assign cross_sell_products = product.metafields.custom.cross_sell_products.value %}
+  {% assign cs_data = '' %}
+  {% assign has_data = false %}
+
+  {% if cross_sell_products and cross_sell_products.size > 0 %}
+    {% assign has_data = true %}
+    {% capture cs_data %}[{% for cs_product in cross_sell_products %}{% if cs_product.available and forloop.index <= 6 %}{% assign cs_variant = cs_product.selected_or_first_available_variant %}{"id":{{ cs_product.id }},"vid":{{ cs_variant.id }},"t":{{ cs_product.title | json }},"p":{{ cs_variant.price }},"cp":{{ cs_variant.compare_at_price | default: 0 }},"img":"{{ cs_product.featured_image | image_url: width: 120 }}","h":"{{ cs_product.handle }}"}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}]{% endcapture %}
+  {% else %}
+    {% assign fallback_collection = product.collections | first %}
+    {% if fallback_collection %}
+      {% assign has_data = true %}
+      {% capture cs_data %}[{% assign fb_count = 0 %}{% for fb_product in fallback_collection.products %}{% if fb_product.id != product.id and fb_product.available and fb_count < 6 %}{% assign fb_variant = fb_product.selected_or_first_available_variant %}{% if fb_count > 0 %},{% endif %}{"id":{{ fb_product.id }},"vid":{{ fb_variant.id }},"t":{{ fb_product.title | json }},"p":{{ fb_variant.price }},"cp":{{ fb_variant.compare_at_price | default: 0 }},"img":"{{ fb_product.featured_image | image_url: width: 120 }}","h":"{{ fb_product.handle }}"}{% assign fb_count = fb_count | plus: 1 %}{% endif %}{% endfor %}]{% endcapture %}
+    {% endif %}
+  {% endif %}
+
+  {% if has_data %}
+<script>
+/* Cross-Sell Modal - Zero impact on LCP/FCP/INP/TTFB */
+(function(){
+  const csData = {{ cs_data }};
+  if (!csData || csData.length === 0) return;
+
+  let modalLoaded = false;
+  let modalEl = null;
+
+  const fmt = (c) => '₹' + (c/100).toLocaleString('en-IN');
+
+  // GA Event Helper
+  const trackGA = (action, data = {}) => {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'PDPCrossSellModal', { action, ...data });
+    }
+    if (typeof dataLayer !== 'undefined') {
+      dataLayer.push({ event: 'PDPCrossSellModal', action, ...data });
+    }
+  };
+
+  function createModal() {
+    if (modalLoaded) return modalEl;
+
+    // CREATE MODAL with dark background overlay built-in
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'csm-modal';
+    modalDiv.innerHTML = `
+<div id="csm-sheet">
+  <div id="csm-header">
+    <div id="csm-success"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#235a49"/><path d="M8 12L11 15L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>Added to Cart!</span></div>
+    <button type="button" id="csm-close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+  <div id="csm-body">
+    <h3 id="csm-title">Top Add-Ons for This Product</h3>
+    <p id="csm-subtitle">These are usually added together — don’t miss out</p>
+    <div id="csm-products"></div>
+  </div>
+  <div id="csm-footer">
+    <button type="button" id="csm-skip">Skip</button>
+    <button type="button" id="csm-add"><span id="csm-add-txt">Add to Cart</span><span id="csm-loader"></span></button>
+  </div>
+</div>`;
+
+    // STYLES - Modal itself has dark background
+    const style = document.createElement('style');
+    style.textContent = `
+#csm-modal{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999999;display:none;opacity:0;transition:opacity .3s}
+#csm-modal.show{opacity:1}
+#csm-sheet{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;max-height:70vh;display:flex;flex-direction:column;transform:translate3d(0,100%,0);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+#csm-modal.show #csm-sheet{transform:translate3d(0,0,0)}
+#csm-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee;flex-shrink:0}
+#csm-success{display:flex;align-items:center;gap:8px;color:#235a49;font-weight:600;font-size:14px}
+#csm-close{background:#f0f0f0;border:none;padding:8px;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#666}
+#csm-body{padding:12px 16px;overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+#csm-title{margin:0 0 2px;font-size:16px;font-weight:700;color:#1a1a1a}
+#csm-subtitle{margin:0 0 12px;font-size:12px;color:#888}
+#csm-products{display:flex;flex-direction:column;gap:8px}
+.csm-item{display:flex;align-items:center;gap:10px;padding:12px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:12px;cursor:pointer;transition:all .2s ease}
+.csm-item.sel{border:1.5px solid #235a49;background:#f9fdfb}
+.csm-check{width:20px;height:20px;border:2px solid #ccc;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;transition:all .15s}
+.csm-item.sel .csm-check{background:#235a49;border-color:#235a49}
+.csm-check svg{display:none;width:12px;height:12px}
+.csm-item.sel .csm-check svg{display:block}
+.csm-thumb{width:48px;height:48px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#fff;border:1px solid #eee}
+.csm-thumb img{width:100%;height:100%;object-fit:cover}
+.csm-info{flex:1;min-width:0}
+.csm-name{font-size:12px;font-weight:500;color:#1a1a1a;margin:0 0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.csm-prices{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.csm-price{font-size:13px;font-weight:700;color:#235a49}
+.csm-compare{font-size:11px;color:#999;text-decoration:line-through}
+.csm-off{font-size:9px;font-weight:600;color:#fff;background:#235a49;padding:2px 4px;border-radius:3px}
+#csm-footer{padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eee;flex-shrink:0;display:flex;gap:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
+#csm-skip{flex:1;padding:14px 10px;background:#fff;border:2px solid #235a49;border-radius:10px;font-size:14px;font-weight:600;color:#235a49;cursor:pointer}
+#csm-add{flex:1.5;padding:14px 10px;background:#235a49;border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+#csm-add:disabled{opacity:0.5;cursor:not-allowed}
+#csm-loader{display:none}
+#csm-add.loading #csm-add-txt{display:none}
+#csm-add.loading #csm-loader{display:block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:601px){#csm-modal{display:flex;align-items:center;justify-content:center}#csm-sheet{position:relative;bottom:auto;max-width:420px;border-radius:16px;max-height:80vh;transform:scale(.95) translateY(20px);opacity:0;transition:transform .3s,opacity .3s}#csm-modal.show #csm-sheet{transform:scale(1) translateY(0);opacity:1}#csm-footer{border-radius:0 0 16px 16px}}
+`;
+    document.head.appendChild(style);
+    document.body.appendChild(modalDiv);
+    modalEl = modalDiv;
+    modalLoaded = true;
+
+    // Render products
+    const lst = document.getElementById('csm-products');
+    csData.forEach((p, i) => {
+      const sel = i < 2;
+      const disc = p.cp > p.p ? Math.round((1 - p.p/p.cp) * 100) : 0;
+      lst.innerHTML += `<div class="csm-item${sel?' sel':''}" data-vid="${p.vid}" data-p="${p.p}">
+        <div class="csm-check"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <div class="csm-thumb"><img src="${p.img}" alt="" loading="lazy"></div>
+        <div class="csm-info"><p class="csm-name">${p.t}</p><div class="csm-prices"><span class="csm-price">${fmt(p.p)}</span>${p.cp>p.p?`<span class="csm-compare">${fmt(p.cp)}</span>`:''}${disc?`<span class="csm-off">${disc}% OFF</span>`:''}</div></div>
+      </div>`;
+    });
+
+    bindEvents();
+    return modalEl;
+  }
+
+  function bindEvents() {
+    const modal = modalEl;
+    const addBtn = document.getElementById('csm-add');
+    const addTxt = document.getElementById('csm-add-txt');
+
+    const hide = () => {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+      setTimeout(() => { modal.style.display = 'none'; }, 350);
+    };
+
+    // Click on dark background area (not on sheet) closes modal
+    modal.addEventListener('click', (e) => {
+      const t = e.target;
+      // Click on dark overlay (modal itself, not sheet)
+      if (t.id === 'csm-modal') { hide(); return; }
+      // Close/Skip buttons
+      if (t.closest('#csm-close') || t.closest('#csm-skip')) { hide(); return; }
+      // Product item toggle
+      const item = t.closest('.csm-item');
+      if (item) {
+        item.classList.toggle('sel');
+        addBtn.disabled = !modal.querySelector('.csm-item.sel');
+        return;
+      }
+    }, {passive: true});
+
+    // Add to cart
+    addBtn.addEventListener('click', async () => {
+      const sel = modal.querySelectorAll('.csm-item.sel');
+      if (!sel.length || addBtn.disabled) return;
+
+      addBtn.classList.add('loading');
+      addBtn.disabled = true;
+
+      try {
+        const items = Array.from(sel).map(el => ({ id: +el.dataset.vid, quantity: 1 }));
+        const res = await fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
+        if (!res.ok) throw new Error();
+
+        if (typeof publish !== 'undefined' && typeof PUB_SUB_EVENTS !== 'undefined') {
+          publish(PUB_SUB_EVENTS.cartUpdate, { source: 'cross-sell' });
+        }
+
+        // GA Event - Only fires on successful add to cart from cross-sell modal
+        trackGA('add_to_cart', { items_count: items.length });
+
+        fetch('/cart.js').then(r => r.json()).then(cart => {
+          document.querySelectorAll('.cart-count-bubble span[aria-hidden="true"]').forEach(el => el.textContent = cart.item_count);
+          document.querySelectorAll('.cart-count-bubble').forEach(b => b.classList.remove('hidden'));
+        });
+
+        addTxt.textContent = '✓ Added!';
+        addBtn.classList.remove('loading');
+        setTimeout(() => { hide(); addTxt.textContent = 'Add to Cart'; addBtn.disabled = false; }, 700);
+      } catch (e) {
+        addTxt.textContent = 'Error';
+        addBtn.classList.remove('loading');
+        addBtn.disabled = false;
+        setTimeout(() => { addTxt.textContent = 'Add to Cart'; }, 2000);
+      }
+    });
+  }
+
+  window.showCrossSellModal = function() {
+    const modal = createModal();
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        modal.classList.add('show');
+      });
+    });
+  };
+})();
+</script>
+  {% endif %}
+{% endif %}

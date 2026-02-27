@@ -1,0 +1,116 @@
+<!-- Video -->
+<style>
+/* VIDEO STYLING - RESPONSIVE WITH BACKGROUND */
+.product-videos-gallery {
+  width: 100%;
+  max-width: 1400px; /* INCREASED FROM 1200px */
+  margin: 0 auto;
+  padding: 0 15px; /* REMOVED VERTICAL PADDING */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background: linear-gradient(135deg, #f8fffe 0%, #e8f5f3 100%); /* SUBTLE GREEN BACKGROUND */ */
+  border-radius: 16px;
+  /* box-shadow: 0 4px 12px rgba(0, 88, 75, 0.08); /* SOFT SHADOW */ */
+}
+.product-videos-gallery .videos-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px; /* INCREASED GAP */
+  width: 100%;
+  max-width: 1200px; /* CONTAINER WIDTH */
+}
+.product-videos-gallery .video-item {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 88, 75, 0.12); /* VIDEO SHADOW */
+  border: 2px solid rgba(0, 88, 75, 0.1); /* SUBTLE BORDER */
+}
+.product-videos-gallery video {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 14px;
+  object-fit: contain;
+  display: block;
+}
+/* TABLET VIDEO STYLING */
+@media screen and (min-width: 600px) and (max-width: 749px) {
+  .product-videos-gallery {
+    width: 95%;
+    max-width: 1300px;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+  
+  .product-videos-gallery .videos-container {
+    max-width: 1000px;
+    gap: 30px;
+  }
+}
+/* DESKTOP VIDEO STYLING */
+@media screen and (min-width: 750px) {
+  .product-videos-gallery {
+    width: 95%; /* INCREASED FROM 90% */
+    max-width: 1400px; /* INCREASED FROM 1000px */
+    margin: 0 auto; /* REMOVED VERTICAL MARGIN */
+    padding: 0 30px; /* REMOVED VERTICAL PADDING */
+  }
+  
+  .product-videos-gallery .videos-container {
+    max-width: 1300px; /* INCREASED CONTAINER */
+    gap: 35px;
+  }
+  
+  .product-videos-gallery .video-item {
+    width: 100%;
+    max-width: 1200px; /* INCREASED FROM 1100px */
+    margin: 0 auto;
+  }
+  
+  .product-videos-gallery video {
+    width: 100%;
+    height: auto;
+    max-height: 600px; /* INCREASED FROM 500px */
+    object-fit: contain;
+  }
+}
+/* LARGE DESKTOP VIDEO STYLING */
+@media screen and (min-width: 1200px) {
+  .product-videos-gallery {
+    width: 90%;
+    max-width: 1500px; /* EVEN WIDER FOR LARGE SCREENS */
+    padding: 0 40px;
+    margin: 0 auto;
+  }
+  
+  .product-videos-gallery .videos-container {
+    max-width: 1400px;
+  }
+  
+  .product-videos-gallery .video-item {
+    max-width: 1300px;
+  }
+  
+  .product-videos-gallery video {
+    max-height: 700px;
+  }
+}
+/* LOADING STATES */
+.video-loading::after {
+  /* content: "Loading video..."; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #666;
+  font-size: 14px;
+}
+</style>

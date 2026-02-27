@@ -1,0 +1,186 @@
+{% comment %} {% unless request.path contains '/products' %}
+  <style>
+    @media (max-width: 749px) {
+      div.css-oul1fl { bottom: 105px !important; }
+    }
+  </style>
+  <ul>
+    {% for block in section.blocks %}
+      {% assign iconSvg = '' %}
+      {% if block.settings.link == '/' and template.name == 'index' -%}
+        {%- assign iconSvg = block.settings.svgHover -%}
+      {%- elsif canonical_url contains block.settings.link and block.settings.link != '/' -%}
+        {%- assign iconSvg = block.settings.svgHover -%}
+      {%- endif %}
+      {% if iconSvg == blank %}{% assign iconSvg = block.settings.svg %}{% endif %}
+      <li>
+        {% if block.settings.link == '/cart' %}
+          <a class="mobile-cart" id="cart-icon--bubble">
+            <span id="cart--bubble" class="cart-item-count--quantity">{{ cart.item_count }}</span>
+            {{- iconSvg -}}
+            <span>{{ block.settings.text }}</span></a
+          >
+        {% elsif block.settings.text == 'More' %}
+          <span onClick="openMenu()" class="mobile-menu js-drawer-open-left-link">
+            {{- iconSvg -}}
+            <span>{{ block.settings.text }}</span></span
+          >
+        {% else %}
+          <a href="{{block.settings.link}}">
+            {{- iconSvg -}}
+            <span>{{ block.settings.text }}</span></a
+          >
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endunless %}
+<script>
+  function openMenu() {
+    var element = document.getElementById("Details-menu-drawer-container");
+    element.classList.add("menu-opening");
+    element.setAttribute('open', '');
+    document.getElementById("themebody").classList.add("overflow-hidden-tablet");
+  }
+</script>
+{% schema %}
+ {
+   "name": "Mobile Nav",
+"class": "mobile-bottom-nav",
+"max_blocks": 8,
+   "settings": [
+     {
+       "type": "checkbox",
+       "id": "mobileNav",
+       "label": "Enable Mobile Menu",
+       "default": true
+     }
+],
+   "blocks": [
+       {
+           "type": "mobile_nav",
+           "name": "Mobile Nav",
+           "settings": [
+               {
+                   "type": "text",
+                   "id": "text",
+                   "label": "Label"
+               },
+               {
+                   "type": "textarea",
+                   "id": "svg",
+                   "label": "Icon (svg code)"
+               },
+               {
+                   "type": "textarea",
+                   "id": "svgHover",
+                   "label": "Actice Icon (svg code)"
+               },
+               {
+                   "type": "url",
+                   "id": "link",
+                   "label": "Link"
+               }
+           ]
+       }
+   ]
+ }
+{% endschema %} {% endcomment %}
+
+
+
+{% unless request.path contains '/products' %}
+  <style>
+    @media (max-width: 749px) {
+      div.css-oul1fl { bottom: 105px !important; }
+    }
+  </style>
+  <ul>
+    {% for block in section.blocks %}
+      {% assign iconSvg = '' %}
+      {% if block.settings.link == '/' and template.name == 'index' -%}
+        {%- assign iconSvg = block.settings.svgHover -%}
+      {%- elsif canonical_url contains block.settings.link and block.settings.link != '/' -%}
+        {%- assign iconSvg = block.settings.svgHover -%}
+      {%- endif %}
+      {% if iconSvg == blank %}{% assign iconSvg = block.settings.svg %}{% endif %}
+      <li>
+        {% if block.settings.link == '/cart' %}
+          <a class="mobile-cart" id="cart-icon--bubble">
+            <span id="cart--bubble" class="cart-item-count--quantity">{{ cart.item_count }}</span>
+            {{- iconSvg -}}
+            <span>{{ block.settings.text }}</span>
+          </a>
+        {% elsif block.settings.text == 'Account' %}
+          {% if shop.customer_accounts_enabled %}
+            <a href="{% if customer %}{{ routes.account_url }}{% else %}#{% endif %}" title="Account" {%- unless customer -%}onclick="accountLogin(event)"{%- endunless -%}>
+              {{- iconSvg -}}
+              <span>{{ block.settings.text }}</span>
+            </a>
+          {% else %}
+            <a href="{{ block.settings.link }}">
+              {{- iconSvg -}}
+              <span>{{ block.settings.text }}</span>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{{block.settings.link}}">
+            {{- iconSvg -}}
+            <span>{{ block.settings.text }}</span>
+          </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endunless %}
+<script>
+  function openMenu() {
+    var element = document.getElementById("Details-menu-drawer-container");
+    element.classList.add("menu-opening");
+    element.setAttribute('open', '');
+    document.getElementById("themebody").classList.add("overflow-hidden-tablet");
+  }
+</script>
+{% schema %}
+ {
+   "name": "Mobile Nav",
+   "class": "mobile-bottom-nav",
+   "max_blocks": 8,
+   "settings": [
+     {
+       "type": "checkbox",
+       "id": "mobileNav",
+       "label": "Enable Mobile Menu",
+       "default": true
+     }
+ ],
+   "blocks": [
+     {
+       "type": "mobile_nav",
+       "name": "Mobile Nav",
+       "settings": [
+         {
+           "type": "text",
+           "id": "text",
+           "label": "Label"
+         },
+         {
+           "type": "textarea",
+           "id": "svg",
+           "label": "Icon (svg code)"
+         },
+         {
+           "type": "textarea",
+           "id": "svgHover",
+           "label": "Actice Icon (svg code)"
+         },
+         {
+           "type": "url",
+           "id": "link",
+           "label": "Link"
+         }
+       ]
+     }
+   ]
+ }
+{% endschema %}

@@ -1,0 +1,30 @@
+{% liquid
+  assign title = metaobject.title.value
+  assign id = metaobject._id.value
+  assign sub_title = metaobject.sub_title.value
+  assign elements = metaobject.elements.value
+%}
+<div class="page-width  product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
+  <details class="product_accordion-tab" open id="Details-{{ id }}">
+    <summary>
+      <div class="summary__title">
+        <h4 class="accordion__title">{{ title }}</h4>
+      </div>
+      {{- 'icon-caret.svg' | inline_asset_content -}}
+    </summary>
+    <div class="accordion__content {{ block.settings.cls }} rte" id="ProductAccordion-{{ id }}">
+      <h5>{{ sub_title }}</h5>
+      <ul class="benfites">
+        {% for element in elements %}
+          <li>
+            <figure>{{ element.media.value | image_url: width: 80 | image_tag: widths: '40,60,80', loading: 'lazy' }}</figure>
+            <div class="benfites-txt">
+              <strong>{{ element.title.value }}</strong>
+              <p>{{ element.subtitle.value }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </details>
+</div>

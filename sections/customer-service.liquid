@@ -1,0 +1,104 @@
+<div class="page-width">
+  <h2>{{ section.settings.title }}</h2>
+  {{ section.settings.description }}
+  {% for block in section.blocks %}
+    {% case block.type %}
+      {% when 'customer' %}
+        {% capture customer_team %}
+          {{ customer_team }}
+          <li>
+            <img
+              srcset="{{ block.settings.image | image_url: width: 150 }} 1x, {{ block.settings.image | image_url: width: 300 }} 2x,"
+              src="{{ block.settings.image | image_url: width: 150 }}" alt="{{ block.settings.image.alt | escape }}"
+              loading="lazy" width="150" height="150">
+          </li>
+        {% endcapture %}
+      {% when 'support' %}
+        {% capture support_team %}
+          {{ support_team }}
+          <li>
+            {% if block.settings.icon %}{{ block.settings.icon }}{% endif %}
+            {% if block.settings.text %}<h5>{{ block.settings.text }}</h5>{% endif %}
+          </li>
+        {% endcapture %}
+    {% endcase %}
+  {% endfor %}
+  {% if customer_team %}
+    <ul class="customer-team flex">
+      {{ customer_team }}
+    </ul>
+  {% endif %}
+  {% if support_team %}
+    <ul class="support-team flex">
+      {{ support_team }}
+    </ul>
+  {% endif %}
+</div>
+<style>
+  .customer-service { background-color: {{ section.settings.color }}  }
+</style>
+{% schema %}
+  {
+    "name": "Customer Service",
+    "class": "customer-service",
+    "enabled_on": {
+      "templates": ["index"]
+    },
+    "settings": [
+      {
+         "type": "text",
+         "id": "title",
+         "label": "Heading"
+      },
+      {
+         "type": "richtext",
+         "id": "description",
+         "label": "Describe"
+      },
+      {
+        "type": "color",
+        "id": "color",
+        "label": "Background"
+      }
+    ],
+    "blocks": [
+      {
+         "type": "support",
+         "name": "Support",
+         "settings": [
+           {
+             "type": "textarea",
+             "id": "icon",
+             "label": "Icon"
+           },
+           {
+             "type": "text",
+             "id": "text",
+             "label": "Text"
+           }
+         ]
+      },
+      {
+         "type": "customer",
+         "name": "Customer",
+         "settings": [
+           {
+             "type": "image_picker",
+             "id": "image",
+             "label": "Image"
+           }
+         ]
+       }
+    ],
+    "presets": [
+      {
+        "name": "Customer Service",
+        "blocks": [
+          {
+            "type": "customer"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

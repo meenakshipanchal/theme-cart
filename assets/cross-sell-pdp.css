@@ -1,0 +1,429 @@
+/* Cross-Sell Section Styles */
+.cross-sell-section {
+  width: 100%;
+}
+
+.cross-sell-container {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.cross-sell-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.cross-sell-title {
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.cross-sell-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Content Layout */
+.cross-sell-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+/* Plus Sign */
+.cross-sell-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #f5f5f5;
+  border-radius: 50%;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.cross-sell-plus--small {
+  width: 32px;
+  height: 32px;
+}
+
+.cross-sell-plus--small svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Product Card */
+.cross-sell-product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: #fafafa;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  width: 160px;
+  position: relative;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cross-sell-product-card:has(.cross-sell-item-checkbox:checked) {
+  border-color: #137b6c;
+  box-shadow: 0 0 0 1px #137b6c;
+}
+
+.cross-sell-product-card--main {
+  border-color: #137b6c;
+  background: #f0faf8;
+}
+
+/* Product Image */
+.cross-sell-product-image {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 12px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cross-sell-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cross-sell-product-image a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Discount Badge */
+.cross-sell-discount-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: #137b6c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Product Info */
+.cross-sell-product-info {
+  text-align: center;
+  width: 100%;
+}
+
+.cross-sell-this-item {
+  display: inline-block;
+  background: #137b6c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cross-sell-product-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #1a1a1a;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 34px;
+}
+
+.cross-sell-product-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cross-sell-product-title a:hover {
+  color: #137b6c;
+}
+
+/* Price */
+.cross-sell-product-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cross-sell-price,
+.cross-sell-price-sale {
+  font-size: 14px;
+  font-weight: 600;
+  color: #137b6c;
+}
+
+.cross-sell-price-compare {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* Checkbox */
+.cross-sell-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.cross-sell-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.cross-sell-checkbox label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.cross-sell-checkbox input[type="checkbox"]:checked + label {
+  background: #137b6c;
+  border-color: #137b6c;
+}
+
+.cross-sell-checkbox input[type="checkbox"]:checked + label::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.cross-sell-checkbox input[type="checkbox"]:disabled + label {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* Products List */
+.cross-sell-products-list {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Footer */
+.cross-sell-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+  flex-wrap: wrap;
+}
+
+.cross-sell-total {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cross-sell-total-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.cross-sell-total-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #137b6c;
+}
+
+.cross-sell-total-savings {
+  font-size: 13px;
+  color: #137b6c;
+  font-weight: 500;
+  background: #e8f5f2;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Add All Button */
+.cross-sell-add-all {
+  min-width: 180px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #137b6c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cross-sell-add-all:hover {
+  background: #0f6358;
+  transform: translateY(-1px);
+}
+
+.cross-sell-add-all:active {
+  transform: translateY(0);
+}
+
+.cross-sell-add-all:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cross-sell-add-all .spinner {
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+.cross-sell-add-all .spinner .path {
+  stroke: #fff;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 749px) {
+  .cross-sell-container {
+    padding: 16px;
+  }
+
+  .cross-sell-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cross-sell-main-product {
+    width: 100%;
+  }
+
+  .cross-sell-product-card {
+    width: 100%;
+    flex-direction: row;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .cross-sell-product-card--main {
+    flex-direction: row;
+  }
+
+  .cross-sell-product-image {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .cross-sell-product-info {
+    text-align: left;
+    flex: 1;
+  }
+
+  .cross-sell-product-title {
+    min-height: auto;
+    -webkit-line-clamp: 2;
+  }
+
+  .cross-sell-product-price {
+    justify-content: flex-start;
+  }
+
+  .cross-sell-checkbox {
+    position: relative;
+    top: auto;
+    right: auto;
+    align-self: center;
+  }
+
+  .cross-sell-plus {
+    width: 32px;
+    height: 32px;
+    transform: rotate(90deg);
+  }
+
+  .cross-sell-plus--small {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cross-sell-products-list {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .cross-sell-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .cross-sell-total {
+    text-align: center;
+  }
+
+  .cross-sell-add-all {
+    width: 100%;
+  }
+
+  .cross-sell-total-price {
+    font-size: 22px;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .cross-sell-product-card {
+    width: 140px;
+  }
+
+  .cross-sell-product-image {
+    width: 80px;
+    height: 80px;
+  }
+}

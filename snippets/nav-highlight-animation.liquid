@@ -1,0 +1,40 @@
+{% comment %} NAV RAINBOW ANIMATION - Add menu items to highlight {% endcomment %}
+{% assign highlighted_items = "Anveshan Health Partner" | split: "," %}
+
+<style>
+  .nav-rainbow {
+    animation: rainbowText 2s linear infinite;
+    font-weight: 500 !important;
+  }
+  .nav-rainbow span {
+    animation: rainbowText 2s linear infinite;
+  }
+  @keyframes rainbowText {
+    0% { color: #ff0000; }
+    17% { color: #ff8000; }
+    33% { color: #ffff00; }
+    50% { color: #00ff00; }
+    67% { color: #0080ff; }
+    83% { color: #8000ff; }
+    100% { color: #ff0000; }
+  }
+</style>
+
+<script>
+  (function() {
+    var items = [{%- for item in highlighted_items -%}"{{ item | strip | downcase }}"{% unless forloop.last %},{% endunless %}{%- endfor -%}];
+
+    function apply() {
+      document.querySelectorAll('.header__menu-item, .list-menu__item, .mega-menu__link, .menu-drawer__menu-item').forEach(function(el) {
+        var txt = el.textContent.trim().toLowerCase();
+        items.forEach(function(h) {
+          if (txt === h || txt.includes(h)) el.classList.add('nav-rainbow');
+        });
+      });
+    }
+
+    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', apply) : apply();
+
+    new MutationObserver(function() { setTimeout(apply, 100); }).observe(document.body, {childList: true, subtree: true});
+  })();
+</script>

@@ -1,0 +1,171 @@
+<!-- OPTIMIZED SHIPROCKET LOADING - Delayed until user interaction or 3 seconds after page load -->
+<script type="application/javascript">
+  checkoutBuyer = "https://fastrr-boost-ui.pickrr.com/";
+
+  // Delay Shiprocket loading to improve LCP and initial page performance
+  let shiprocketLoaded = false;
+
+  function loadShiprocket() {
+    if (shiprocketLoaded) return;
+    shiprocketLoaded = true;
+
+    // Load CSS
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'https://weight-fix.s3.ap-south-1.amazonaws.com/fastrr-boost-ui/shopify.css';
+    document.head.appendChild(cssLink);
+
+    // Load JS scripts
+    const script1 = document.createElement('script');
+    script1.src = 'https://fastrr-boost-ui.pickrr.com/assets/js/channels/shopify.js';
+    script1.defer = true;
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement('script');
+    script2.src = 'https://fastrr-boost-ui.pickrr.com/assets/js/channels/shiprocketMarketing.js';
+    script2.defer = true;
+    document.head.appendChild(script2);
+  }
+
+  // Load after 3 seconds OR on first user interaction (whichever comes first)
+  window.addEventListener('load', () => {
+    setTimeout(loadShiprocket, 3000);
+  });
+
+  // Load on scroll, click, or touchstart (for mobile)
+  document.addEventListener('scroll', loadShiprocket, { once: true, passive: true });
+  document.addEventListener('click', loadShiprocket, { once: true });
+  document.addEventListener('touchstart', loadShiprocket, { once: true, passive: true });
+</script>
+
+<input type="hidden" value="www.anveshan.farm" id="sellerDomain"/>
+
+<input type="hidden" value="true" id = "otpLess" />
+<input type="hidden" value="rz" id="template"/>
+
+<!-- <input type="hidden" value="percent" id="discountType"/>
+<input type="hidden" value="2" id="discValue"/> -->
+
+
+
+<style>	
+  .sr-headless-checkout {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 30px;
+    height: 45px;
+    letter-spacing: 1px;
+    background-color:rgb(0, 88, 75) !important ; 
+    margin-bottom:0;
+  }
+  .sr-powered-by{
+    right:14px !important;
+  }
+  .shiprocket-headless{
+    width:100%;
+    margin: 0;
+  }
+  .sr-powered-by {
+    right: 10px;
+    bottom: 5px;
+  }
+  .drawer__footer div.cart__ctas {
+    background: #f5f5f5;
+  }
+
+  .powered-by.svelte-1hgrbqo
+  {
+    display:none !important;
+  }
+  
+/* .sr-discount-label{
+  font-size:0px !important;
+}
+
+ .sr-discount-label:before{
+    content:"EXTRA 5% OFF on PERFUMES";
+    font-size: 9px;
+    color: #000;
+    text-transform: none;
+    top: -8px;
+    left: 6px;
+    background-color: #53ff73;
+    border-radius: 3px;
+    padding: 0 10px;
+} */
+</style>
+
+ <!-- <script>
+  // Select the node that will be observed for mutations
+  let fastrrBtn = '<div id="headless-button" class="shiprocket-headless" data-type="mini-cart"></div>'
+  let buttonAdded = false
+  let parsedBtnCode = new DOMParser().parseFromString(fastrrBtn, 'text/html').querySelectorAll('.shiprocket-headless')[0];
+  const headlessNode = document.querySelector('html');
+  // Options for the observer (which mutations to observe)
+  const configuration = { attributes: true, childList: true, subtree: true };
+  // Callback function to execute when mutations are observed
+  const headlessCallback = (mutationList, observer) => {
+   for (const mutation of mutationList) {
+   let sidecart = document.querySelector('.amp-cart__footer')
+   let sideCartButton = document.querySelector('.amp-button.amp-cart__footer-checkout-button.false')
+   if(sidecart) {
+   if(!document.getElementById('headless-button')) {
+   sideCartButton.before(parsedBtnCode)
+   }
+   }
+   }
+  };
+  // Create an observer instance linked to the callback function
+  const observer1 = new MutationObserver(headlessCallback);
+  // Start observing the target node for configured mutations
+  observer1.observe(headlessNode, configuration);
+</script>   -->
+{% comment %}
+<script>
+  
+// Select the node that will be observed for mutations
+let fastrrBtn = '<div id="headless-button" class="shiprocket-headless" data-type="mini-cart" style="width:100% !important;"><button type="button" style="width:100%;color:white;background-color:rgba(var(--color-button),var(--alpha-button-background)) !important;height:45px;" class="sr-headless-checkout" onclick="shiprocketCheckoutEvents.buyCart(event)"><div class="sr-d-flex flex-center"><div class="sr-d-flex full-width flex-center" style="display:inline-flex;"><span class="sr-checkout-visible2">BUY NOW</span> <img style="padding-left:15px;" src="https://fastrr-boost-ui.pickrr.com/assets/images/boost_button/upi_options.svg" alt="Google Pay | Phone Pay | UPI" class="sr-pl-15 sr-checkout-visible"><div class="loader5" style="padding-left:15px;"></div><img src="https://fastrr-boost-ui.pickrr.com/assets/images/boost_button/right_arrow.svg" class="sr-pl-15 sr-checkout-visible1" alt="right_arrow"></div><div><span class="sr-powered-by" style="position:absolute;right:25px;bottom:8px;font-size:0px;"><img src="https://fastrr-boost-ui.pickrr.com/assets/images/boost_button/powered_by.svg " alt=""></span></div></div></button></div>'
+let buttonAdded = false
+let parsedBtnCode = new DOMParser().parseFromString(fastrrBtn, 'text/html').querySelectorAll('.shiprocket-headless')[0];
+const headlessNode = document.querySelector('html');
+// Options for the observer (which mutations to observe)
+const configuration = { attributes: true, childList: true, subtree: true };
+// Callback function to execute when mutations are observed
+const headlessCallback = (mutationList, observer) => {
+  
+  for (const mutation of mutationList) {
+    
+       
+  let sidecart = document.querySelector('shadow-dom-container')
+    
+    const srshadowRoot = sidecart.shadowRoot;
+
+ 
+   const srshadowElement = srshadowRoot.querySelector('.sidecart.false.svelte-a5u4vt');
+   const prd=srshadowRoot.querySelector('.powered-by.svelte-1hgrbqo');
+    prd.style.display='none';
+            
+  let sideCartButton = srshadowElement.querySelector('.gokwik-checkout.svelte-1hgrbqo')
+    if (sideCartButton) {
+  sideCartButton.style.display = 'none';
+}
+    if(sidecart) {
+      
+      if(!srshadowRoot.querySelector('#headless-button')) {
+        
+      sideCartButton.before(parsedBtnCode)
+       
+      }
+    }
+    
+  }
+  
+};
+// Create an observer instance linked to the callback function
+const observer1 = new MutationObserver(headlessCallback);
+// Start observing the target node for configured mutations
+observer1.observe(headlessNode, configuration);
+</script>
+  
+{% endcomment %}
