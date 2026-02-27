@@ -162,9 +162,9 @@
     {% endif %}
   </div>
 
-  <!-- Sliding bar track -->
+  <!-- Track -->
   <div class="rpb__track" id="rpbTrack">
-    <div class="rpb__slider" id="rpbSlider" data-target="{{ overall_progress }}%" style="width: {{ overall_progress }}%; background: #235A49; position: absolute; top: 0; left: 0; height: 100%; border-radius: 10px; z-index: 1; display: block;"></div>
+    <div class="rpb__fill" id="rpbFill" style="width: {{ overall_progress }}%;"></div>
 
     {% comment %} Milestone dots on the track {% endcomment %}
     {% for ms in milestones %}
@@ -235,26 +235,19 @@
 
   /* Track */
   .rpb__track {
-    position: relative !important;
-    height: 6px !important;
-    background: #dce5df !important;
+    position: relative;
+    height: 6px;
+    background: #dce5df;
     border-radius: 10px;
     margin: 0 14px;
     overflow: visible;
   }
 
-  /* Sliding green bar */
-  .rpb__slider {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100% !important;
-    min-height: 6px;
-    background: #235A49 !important;
+  /* Green fill bar */
+  .rpb__fill {
+    height: 100%;
+    background: #235A49;
     border-radius: 10px;
-    transition: width 1s ease;
-    z-index: 1;
-    display: block !important;
   }
 
   /* Milestone dots ON the track */
@@ -346,19 +339,6 @@
 </style>
 
 <script>
-/** Animate slider from 0 to target width */
-window.animateRewardsSlider = function() {
-  var slider = document.getElementById('rpbSlider');
-  if (!slider) return;
-  var target = slider.getAttribute('data-target') || slider.style.width || '0%';
-  slider.style.transition = 'none';
-  slider.style.width = '0%';
-  // Force reflow so the browser registers 0% before transitioning
-  slider.offsetWidth;
-  slider.style.transition = 'width 1s ease';
-  slider.style.width = target;
-};
-
 window.updateCartRewards = function(cartTotal) {
   var milestones = [
     {% for ms in milestones %}
@@ -370,9 +350,9 @@ window.updateCartRewards = function(cartTotal) {
   var total = cartTotal || {{ current_cart_total | default: 0 }};
   var count = milestones.length;
   var seg = count > 1 ? 100 / (count - 1) : 100;
-  var slider = document.getElementById('rpbSlider');
+  var fill = document.getElementById('rpbFill');
   var msg = document.getElementById('rpbMsg');
-  if (!slider) return;
+  if (!fill) return;
 
   var reached = 0;
   var nextMsg = '', nextRem = 0, allDone = true;
@@ -400,9 +380,7 @@ window.updateCartRewards = function(cartTotal) {
     pct = filled + partial;
   }
 
-  var widthVal = Math.min(100, Math.max(0, pct)) + '%';
-  slider.setAttribute('data-target', widthVal);
-  slider.style.width = widthVal;
+  fill.style.width = Math.min(100, Math.max(0, pct)) + '%';
 
   if (msg) {
     msg.innerHTML = allDone
