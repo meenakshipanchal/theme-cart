@@ -164,7 +164,7 @@
 
   <!-- Sliding bar track -->
   <div class="rpb__track" id="rpbTrack">
-    <div class="rpb__slider" id="rpbSlider" data-target="{{ overall_progress }}%" style="width: {{ overall_progress }}%;"></div>
+    <div class="rpb__slider" id="rpbSlider" data-target="{{ overall_progress }}%" style="width: {{ overall_progress }}%; background: #235A49; position: absolute; top: 0; left: 0; height: 100%; border-radius: 10px; z-index: 1; display: block;"></div>
 
     {% comment %} Milestone dots on the track {% endcomment %}
     {% for ms in milestones %}
@@ -235,23 +235,26 @@
 
   /* Track */
   .rpb__track {
-    position: relative;
-    height: 6px;
-    background: #dce5df;
+    position: relative !important;
+    height: 6px !important;
+    background: #dce5df !important;
     border-radius: 10px;
     margin: 0 14px;
+    overflow: visible;
   }
 
   /* Sliding green bar */
   .rpb__slider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: #235A49;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100% !important;
+    min-height: 6px;
+    background: #235A49 !important;
     border-radius: 10px;
     transition: width 1s ease;
     z-index: 1;
+    display: block !important;
   }
 
   /* Milestone dots ON the track */

@@ -153,11 +153,6 @@ class CartDrawer extends HTMLElement {
     document.body.classList.add('overflow-hidden');
     document.querySelector('button#pop-club-quick-buy3')?.classList.add('hidden');
     typeof(renderPopPrices)==='function' && renderPopPrices(true);
-
-    // Animate rewards progress bar slider on drawer open
-    if (typeof window.animateRewardsSlider === 'function') {
-      setTimeout(window.animateRewardsSlider, 150);
-    }
   }
 
   close() {
