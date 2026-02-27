@@ -138,7 +138,13 @@
         }
 
         return chain.then(function () {
-          if (lastResponse) applySectionHTML(lastResponse);
+          if (lastResponse) {
+            applySectionHTML(lastResponse);
+            // Update rewards slider after DOM replacement
+            if (typeof window.updateCartRewards === 'function') {
+              window.updateCartRewards(realTotal);
+            }
+          }
         });
       })
       .catch(function (err) {

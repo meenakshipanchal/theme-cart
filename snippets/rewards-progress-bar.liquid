@@ -164,7 +164,7 @@
 
   <!-- Sliding bar track -->
   <div class="rpb__track" id="rpbTrack">
-    <div class="rpb__slider" id="rpbSlider" style="width: {{ overall_progress }}%;"></div>
+    <div class="rpb__slider" id="rpbSlider" data-target="{{ overall_progress }}%" style="width: {{ overall_progress }}%;"></div>
 
     {% comment %} Milestone dots on the track {% endcomment %}
     {% for ms in milestones %}
@@ -343,16 +343,18 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+/** Animate slider from 0 to target width */
+window.animateRewardsSlider = function() {
   var slider = document.getElementById('rpbSlider');
-  if (slider) {
-    var target = slider.style.width;
-    slider.style.width = '0%';
-    setTimeout(function() {
-      slider.style.width = target;
-    }, 100);
-  }
-});
+  if (!slider) return;
+  var target = slider.getAttribute('data-target') || slider.style.width || '0%';
+  slider.style.transition = 'none';
+  slider.style.width = '0%';
+  // Force reflow so the browser registers 0% before transitioning
+  slider.offsetWidth;
+  slider.style.transition = 'width 1s ease';
+  slider.style.width = target;
+};
 
 window.updateCartRewards = function(cartTotal) {
   var milestones = [
@@ -395,7 +397,9 @@ window.updateCartRewards = function(cartTotal) {
     pct = filled + partial;
   }
 
-  slider.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  var widthVal = Math.min(100, Math.max(0, pct)) + '%';
+  slider.setAttribute('data-target', widthVal);
+  slider.style.width = widthVal;
 
   if (msg) {
     msg.innerHTML = allDone
