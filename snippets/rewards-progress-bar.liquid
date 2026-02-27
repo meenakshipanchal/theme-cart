@@ -106,9 +106,15 @@
 
   comment
     Calculate overall progress % using loop (no variable indexing)
-    Each milestone gets equal segment = 100/N
+    Milestones are positioned at 0%, 50%, 100% (tracking-bar style)
+    segment_size = 100 / (N-1) for spacing between milestones
   endcomment
-  assign segment_size = 100 | divided_by: ms_count
+  if ms_count > 1
+    assign ms_gaps = ms_count | minus: 1
+    assign segment_size = 100 | divided_by: ms_gaps
+  else
+    assign segment_size = 100
+  endif
   assign overall_progress = 0
   assign prev_threshold = 0
   assign progress_done = false
@@ -122,15 +128,19 @@
       assign prev_threshold = ms_t
     elsif progress_done == false
       assign progress_done = true
-      assign filled = seg_index | times: segment_size
-      assign seg_diff = current_cart_total | minus: prev_threshold
-      assign seg_range = ms_t | minus: prev_threshold
-      if seg_range > 0
-        assign partial = seg_diff | times: segment_size | divided_by: seg_range
+      if seg_index > 0
+        assign filled = seg_index | minus: 1 | times: segment_size
+        assign seg_diff = current_cart_total | minus: prev_threshold
+        assign seg_range = ms_t | minus: prev_threshold
+        if seg_range > 0
+          assign partial = seg_diff | times: segment_size | divided_by: seg_range
+        else
+          assign partial = 0
+        endif
+        assign overall_progress = filled | plus: partial
       else
-        assign partial = 0
+        assign overall_progress = 0
       endif
-      assign overall_progress = filled | plus: partial
     endif
   endfor
 
@@ -160,8 +170,7 @@
     {% for ms in milestones %}
       {% assign parts = ms | split: ':' %}
       {% assign ms_t = parts[0] | plus: 0 %}
-      {% assign idx_1 = forloop.index %}
-      {% assign dot_pos = idx_1 | times: segment_size %}
+      {% assign dot_pos = forloop.index0 | times: segment_size %}
       <div class="rpb__dot {% if current_cart_total >= ms_t %}done{% endif %}" style="left: {{ dot_pos }}%;" data-idx="{{ forloop.index0 }}">
         {% if current_cart_total >= ms_t %}
           <svg viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4L13 1" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -178,9 +187,8 @@
       {% assign ms_disp = parts[1] %}
       {% assign ms_lbl = parts[2] %}
       {% assign ms_ico = parts[4] %}
-      {% assign idx_1 = forloop.index %}
-      {% assign lbl_pos = idx_1 | times: segment_size %}
-      <div class="rpb__label {% if current_cart_total >= ms_t %}done{% endif %}" style="left: {{ lbl_pos }}%;" data-idx="{{ forloop.index0 }}">
+      {% assign lbl_pos = forloop.index0 | times: segment_size %}
+      <div class="rpb__label {% if current_cart_total >= ms_t %}done{% endif %}{% if forloop.first %} rpb__label--first{% endif %}{% if forloop.last %} rpb__label--last{% endif %}" style="left: {{ lbl_pos }}%;" data-idx="{{ forloop.index0 }}">
         <span class="rpb__ico">
           {% if ms_ico == 'truck' %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
@@ -285,6 +293,14 @@
     align-items: center;
     gap: 0;
   }
+  .rpb__label--first {
+    transform: translateX(0);
+    align-items: flex-start;
+  }
+  .rpb__label--last {
+    transform: translateX(-100%);
+    align-items: flex-end;
+  }
   .rpb__ico {
     display: flex;
     color: #a8b2ab;
@@ -348,7 +364,7 @@ window.updateCartRewards = function(cartTotal) {
 
   var total = cartTotal || {{ current_cart_total | default: 0 }};
   var count = milestones.length;
-  var seg = 100 / count;
+  var seg = count > 1 ? 100 / (count - 1) : 100;
   var slider = document.getElementById('rpbSlider');
   var msg = document.getElementById('rpbMsg');
   if (!slider) return;
@@ -374,10 +390,9 @@ window.updateCartRewards = function(cartTotal) {
   } else if (reached > 0) {
     var prevT = milestones[reached - 1].threshold;
     var currT = milestones[reached].threshold;
+    var filled = (reached - 1) * seg;
     var partial = ((total - prevT) / (currT - prevT)) * seg;
-    pct = reached * seg + partial;
-  } else if (total > 0) {
-    pct = (total / milestones[0].threshold) * seg;
+    pct = filled + partial;
   }
 
   slider.style.width = Math.min(100, Math.max(0, pct)) + '%';
