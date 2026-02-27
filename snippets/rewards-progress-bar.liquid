@@ -167,7 +167,7 @@
 
   <!-- Track -->
   <div class="rpb__track" id="rpbTrack">
-    <div id="rpbFill" style="width: {{ overall_progress }}%; height: 6px; background-color: #235A49; border-radius: 10px;"></div>
+    <div id="rpbFill" style="width: {{ overall_progress }}%; height: 6px; background: #235A49 !important; border-radius: 10px; box-shadow: inset 0 0 0 10px #235A49;"></div>
 
     {% comment %} Milestone dots on the track {% endcomment %}
     {% for ms in milestones %}
