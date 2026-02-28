@@ -7,7 +7,7 @@
 
   var FREEBIES = [
     { threshold: 149900, variantId: '47070925095104' },
-    { threshold: 299900, variantId: '47503774187712' }
+    { threshold: 499900, variantId: '47503774187712' }
   ];
 
   var SECTION = 'cart-drawer';
