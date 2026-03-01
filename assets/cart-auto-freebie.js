@@ -47,8 +47,14 @@
     var newD = doc.querySelector('#CartDrawer');
     if (!oldD || !newD) return;
 
+    var scroller = oldD.querySelector('.drawer__inner') || oldD;
+    var scrollTop = scroller.scrollTop;
+
     _selfUpdate = true;
     oldD.innerHTML = newD.innerHTML;
+
+    var newScroller = oldD.querySelector('.drawer__inner') || oldD;
+    newScroller.scrollTop = scrollTop;
 
     var el = document.querySelector('cart-drawer');
     var nel = doc.querySelector('cart-drawer');
