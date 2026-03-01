@@ -347,7 +347,7 @@ window.updateCartRewards = function(cartTotal) {
     {% endfor %}
   ];
 
-  var total = cartTotal || {{ current_cart_total | default: 0 }};
+  var total = (cartTotal !== undefined && cartTotal !== null) ? cartTotal : {{ current_cart_total | default: 0 }};
   var count = milestones.length;
   var seg = count > 1 ? 100 / (count - 1) : 100;
   var track = document.getElementById('rpbTrack');

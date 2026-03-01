@@ -12,6 +12,7 @@
 
   var SECTION = 'cart-drawer';
   var _busy = false;
+  var _busyTimer = null;
   var _selfUpdate = false;
 
   function fetchCart() {
@@ -37,6 +38,13 @@
   function hideFreebies() {
     var els = document.querySelectorAll('[data-freebie]');
     for (var i = 0; i < els.length; i++) els[i].style.display = 'none';
+  }
+
+  function showEmptyCart() {
+    var cartDrawer = document.querySelector('cart-drawer');
+    if (cartDrawer) cartDrawer.classList.add('is-empty');
+    var cartItems = document.querySelector('cart-drawer-items');
+    if (cartItems) cartItems.classList.add('is-empty');
   }
 
   function patchDrawer(resp) {
@@ -65,15 +73,32 @@
       if (a) el.classList.add('active');
       if (an) el.classList.add('animate');
     }
+
+    // Re-bind overlay (remove old first to prevent accumulation)
     var ov = document.querySelector('#CartDrawer-Overlay');
-    if (ov && el) ov.addEventListener('click', function () { el.close(); });
+    if (ov && el) {
+      var newOv = ov.cloneNode(true);
+      ov.parentNode.replaceChild(newOv, ov);
+      newOv.addEventListener('click', function () { el.close(); });
+    }
 
     setTimeout(function () { _selfUpdate = false; }, 100);
   }
 
+  function lock() {
+    _busy = true;
+    clearTimeout(_busyTimer);
+    _busyTimer = setTimeout(function () { _busy = false; }, 15000);
+  }
+
+  function unlock() {
+    _busy = false;
+    clearTimeout(_busyTimer);
+  }
+
   function run() {
     if (_busy) return;
-    _busy = true;
+    lock();
 
     fetchCart().then(function (cart) {
       if (!cart || !cart.items || cart.items.length === 0) return;
@@ -100,7 +125,11 @@
 
       if (have === want) return;
 
-      if (freebie) hideFreebies();
+      // Freebie needs removal — hide instantly + show empty cart if no real items
+      if (freebie) {
+        hideFreebies();
+        if (realTotal === 0) showEmptyCart();
+      }
 
       var chain = Promise.resolve();
       var last = null;
@@ -125,7 +154,7 @@
       });
     })
     .catch(function (e) { console.error('[Freebie]', e); })
-    .then(function () { _busy = false; });
+    .then(function () { unlock(); });
   }
 
   // Trigger 1: Page load
@@ -135,7 +164,7 @@
     setTimeout(run, 80);
   }
 
-  // Trigger 2: Cart drawer content changes (covers add-to-cart, qty change, remove — everything)
+  // Trigger 2: Cart drawer content changes
   var _debounce = null;
   function onDrawerChange() {
     if (_selfUpdate) return;
