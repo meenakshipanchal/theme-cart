@@ -567,19 +567,6 @@
 
               <div class="drawer__cart-items-wrapper">
                 <div class="cart-items">
-                  
-                  {%- for item in cart.items -%}
-                    {% liquid
-                      assign _total = _total | plus: item.original_line_price
-                      assign item_mrp = item.variant.compare_at_price | times: item.quantity
-                      assign _mrp = _mrp | plus: item_mrp
-                      if item.properties._type == 'winter'
-                        assign winterPrice = winterPrice | plus: item.final_price
-                        assign winterId = item.index | plus: 1
-                      endif
-                    %}
-                    {% render 'cart-draw-item', item: item %}
-                  {%- endfor -%}
 
                   {%- comment -%} Visual Freebie Card — no actual product added to cart {%- endcomment -%}
                   <div id="freebieCard" style="display:none;" data-cart-total="{{ cart.total_price }}">
@@ -614,6 +601,7 @@
                       align-items: center;
                       gap: 12px;
                       padding: 10px;
+                      margin-bottom: 10px;
                       background: #f4faf7;
                     }
                     .freebie-card__img {
@@ -666,6 +654,19 @@
                       border-radius: 4px;
                     }
                   </style>
+
+                  {%- for item in cart.items -%}
+                    {% liquid
+                      assign _total = _total | plus: item.original_line_price
+                      assign item_mrp = item.variant.compare_at_price | times: item.quantity
+                      assign _mrp = _mrp | plus: item_mrp
+                      if item.properties._type == 'winter'
+                        assign winterPrice = winterPrice | plus: item.final_price
+                        assign winterId = item.index | plus: 1
+                      endif
+                    %}
+                    {% render 'cart-draw-item', item: item %}
+                  {%- endfor -%}
                   
 
                   <div
