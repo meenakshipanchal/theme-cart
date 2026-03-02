@@ -34,6 +34,10 @@
   }
 
   function refresh(total) {
+    if (total === undefined || total === null) {
+      var card = document.getElementById('freebieCard');
+      if (card) total = parseInt(card.getAttribute('data-cart-total') || '0', 10);
+    }
     if (typeof window.updateCartRewards === 'function') window.updateCartRewards(total);
     updateFreebie(total);
   }
